@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import {useDispatch, useSelector} from 'react-redux';
+import { useNavigate } from "react-router-dom";
 import backgroundImage from '../../../Public/banner/register_img.jpg';
+import { registerUser, googleRegister,  clearError } from "../../Store/Slices/userSlice";
 import googleLogo from '../../../Public/banner/Google_logo.png';
 import {Link} from "react-router-dom"
+import {auth} from '../../FirebaseConfig/firebaseConfig';
+import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
 
 function Register() {
     const [name, setName] = useState("")
@@ -9,15 +14,101 @@ function Register() {
     const [mobile, setMobile] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [errors, setErrors] = useState({})
+
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const {status, error} = useSelector((state) => state.user);
+
+
+    useEffect(() => {
+        dispatch(clearError());
+    },[dispatch]);
+
+
+    useEffect(() => {
+        if (errors.general || error) {
+            const timer = setTimeout(() => {
+                setErrors({});
+                dispatch(clearError());
+            }, 5000);
+    
+            return () => clearTimeout(timer);
+        }
+    }, [errors.general, error, dispatch]);
+
+    const handleGoogleSignIn = async () => {
+        const provider = new GoogleAuthProvider();
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            console.log("user goggole auth:", user);
+
+            //dispatch an action to save the user details in redux store
+            dispatch(googleRegister({
+                name: user.displayName,
+                email: user.email,
+            }))
+            .unwrap()
+            .then(() => {
+                navigate("/dashboard");
+            });
+        } catch(error) {
+            console.error("Google Sign-In Error:", error);
+            setErrors({general: "Google Sign-In failed"});
+        }
+    }
+
+    const validate = () => {
+        const errors = {};
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const mobileRegex = /^[0-9]{10}$/;
+
+        if(!name) {
+            errors.name = "Name is required";
+        }
+        if(!email || !emailRegex.test(email)) {
+            errors.email = "Valid email is required";
+        }
+        if(!mobile || !mobileRegex.test(mobile)) {
+            errors.mobile = "Valid 10-digit mobile number is required";
+        }
+        if(!password || password.length < 6) {
+            errors.password = "Password must be at least 6 characters long";
+        }
+        if(password !== confirmPassword) {
+            errors.confirmPassword = "Passwords do not match";
+        }
+        return errors;
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Email:", email);
-        console.log("Mobile:", mobile);
-        console.log("Password:", password);
-        console.log("Confirm Password:", confirmPassword);
-        
+        const validateErrors = validate();
+
+        console.log("Before validation:", {name, email, mobile, password, confirmPassword})
+
+        if(Object.keys(validateErrors).length > 0) {
+            setErrors(validateErrors);
+            return;
+        }
+
+        console.log("After validation:", {name, email, mobile, password, confirmPassword});
+
+        setErrors({});
+        dispatch(registerUser({name, email, mobile, password}))
+            .unwrap()
+            .then(() => {
+                navigate("/otp_verify");
+            })
+            .catch((err) => {
+                setErrors({general: err.message || 'Registration failed, user already exists'});
+            })
     }
+
+    
+
     return (
         <div className="flex justify-center items-center h-screen  bg-cover bg-center" style={{backgroundImage: `url(${backgroundImage})`}}>
             <div className="w-full max-w-sm sm:max-w-sm md:max-w-md lg:max-w-lg p-6 bg-white rounded-lg shadow-md">
@@ -25,7 +116,7 @@ function Register() {
 
                 {/* Sign up with Google Button */}
 
-                <button type="button" className="flex items-center justify-center w-full bg-white text-gray-800 font-regular py-2 px-4 rounded-full shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 mb-4">
+                <button type="button"  onClick={handleGoogleSignIn} className="flex items-center justify-center w-full bg-white text-gray-800 font-regular py-2 px-4 rounded-full shadow-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50 mb-4">
                 <img src={googleLogo} alt="Google logo" className="w-5 h-5 mr-3" />
                     Sign up with Google
                 </button>
@@ -40,14 +131,16 @@ function Register() {
 
                 <div className="mb-4">
                         <input
-                            type="name"
+                            type="text"
                             id="name"
                             placeholder="Enter your name"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? "border-red-500" : ""
+                            }`}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
                         />
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                     </div>
 
                     <div className="mb-4">
@@ -55,11 +148,13 @@ function Register() {
                             type="email"
                             id="email"
                             placeholder="Enter email address"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? "border-red-500" : ""
+                            }`}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
+                        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                     </div>
 
                     <div className="mb-4">
@@ -67,11 +162,15 @@ function Register() {
                             type="tel"
                             id="mobile"
                             placeholder="Enter mobile number"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.mobile ? "border-red-500" : ""
+                            }`}
                             value={mobile}
                             onChange={(e) => setMobile(e.target.value)}
+                            pattern="[0-9]{10}"
+                            title="Please enter a 10-digit mobile number"
                             required
                         />
+                        {errors.mobile && <p className="text-red-500 text-sm">{errors.mobile}</p>}
                     </div>
 
                     <div className="mb-4">
@@ -79,11 +178,14 @@ function Register() {
                             type="password"
                             id="password"
                             placeholder="Enter password"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? "border-red-500" : ""
+                            }`}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            minLength="6"
                             required
                         />
+                        {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                     </div>
 
                     <div className="mb-6">
@@ -91,11 +193,13 @@ function Register() {
                             type="password"
                             id="confirmPassword"
                             placeholder="Confirm password"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.confirmPassword ? "border-red-500" : ""
+                            }`}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                         />
+                        {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
                     </div>
                     
                     <div className="mb-6">
@@ -112,6 +216,9 @@ function Register() {
                         </Link>
                     </div>
                 </form>
+
+                {status === 'loading' && <p>Loading...</p>}
+                {status === 'failed' && <p className="text-red-500">{errors.general || error}</p>}
             </div>
         </div>
     )

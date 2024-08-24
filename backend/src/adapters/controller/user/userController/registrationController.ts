@@ -1,56 +1,68 @@
-import { log } from "console";
 import { Request, Response } from "express";
-import 'express-session';
+import jwt from "jsonwebtoken";
+import dotenv from 'dotenv';
 
-declare module 'express-session' {
-    interface SessionData {
-        userData?: {
-            name: string;
-            email: string;
-            password: string;
-            mobile: string;
-            role: string;
-        };
-        otp?: string
-    }
+dotenv.config();
+
+interface UserData {
+    name: string;
+    email: string;
+    password: string;
+    mobile: string;
 }
+
+interface RegistrationResponse {
+    status: boolean;
+    token?: string;
+    data?: any; // Replace `any` with a more specific type if available
+}
+
+const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
 
 export default (dependencies: any) => {
-    const {userRegistration} = dependencies.useCase;
+    const { userRegistration } = dependencies.useCase;
 
-    const registerController = async (req:Request, res:Response) => {
+    const registerController = async (req: Request, res: Response) => {
         try {
+            console.log('controller');
 
-      
-        const {name, email, password, mobile, role} = req.body;
+            const { name, email, password, mobile } = req.body;
+            console.log("req.body:", req.body);
 
-        const data = {
-            name,
-            email,
-            password,
-            mobile,
-            role,
-        };
+            const userData: UserData = { name, email, password, mobile };
 
-        req.session.userData = data;
-        console.log(req.session.userData);
+            // Invoke the registration use case
+            const registrationFunction = await userRegistration(dependencies);
+            const response: RegistrationResponse = await registrationFunction.executionFunction(userData);
 
-        const executionFunction = await userRegistration(dependencies);
-        const response = await executionFunction.executionFunction(data);
+            console.log("response in registration controller:", response);
 
-        if(response.status) {
-            req.session.otp = response.data;
-            console.log(response);
-            
-         res.json({ status: true, data:response.data})
-        } else {
-            res.json({ status: false, data: response.data});
+            if (response.status) {
+                const encodedToken = response.token as string;
+
+                console.log("encoded token:", encodedToken);
+
+                // Verify and decode the token
+                const decodedToken = jwt.verify(encodedToken, SECRET_KEY) as jwt.JwtPayload;
+
+                console.log("Decoded token:", decodedToken);
+
+                // Generate a new token
+                const token = jwt.sign(
+                    { otp: decodedToken.otp, userData: decodedToken.userData }, 
+                    SECRET_KEY, 
+                    { expiresIn: '10m' }
+                );
+
+                res.json({ status: true, token });
+            } else {
+                res.status(400).json({ status: false, data: response.data });
+            }
+        } catch (error) {
+            console.error('Error in registration:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
+    };
 
-    } catch(error) {
-        console.error('Error in registration:', error);
-        res.status(500).json({message: 'Internal Server Error'});
-    }
-    } 
     return registerController;
-}
+};

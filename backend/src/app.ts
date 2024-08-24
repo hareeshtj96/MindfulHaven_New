@@ -29,6 +29,6 @@ app.use((req, res, next) => {
     next();
 })
 
-app.use('/api', routes(dependencies))
+app.use('/', routes(dependencies))
 
 serverConfig(server, config).startServer()

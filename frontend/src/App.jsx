@@ -4,13 +4,16 @@ import UserRoute from "./Routes/UserRoutes/UserRoute"
 import TherapistRoutes from "./Routes/TherapistRoutes/TherapistRoutes"
 import AdminRoute from "./Routes/AdminRoutes/AdminRoute"
 
+
+
 function App() {
+  
   return (
     <Router>
       <Routes>
-        <Route path="/*" element={<UserRoute />} />
-        <Route path="/therapist/*" element={<TherapistRoutes />}/>
-        <Route path="/admin/*" element={<AdminRoute />} /> 
+        <Route path="/*" element={ <UserRoute />} />
+        <Route path="/therapist/*" element={ <TherapistRoutes />}/>
+        <Route path="/admin/*" element={ <AdminRoute />  } /> 
       </Routes>
     </Router>
   )

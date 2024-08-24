@@ -1,11 +1,10 @@
 import jwt from "jsonwebtoken";
-import { SendOtp } from "../../utils";
 import dotenv from 'dotenv';
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET || 'undefined';
 
-export default function userRegistration(dependencies: any) {
+export default function userLoginGoogle(dependencies: any) {
 
     const {userRepository} = dependencies.repository;
 
@@ -17,24 +16,31 @@ export default function userRegistration(dependencies: any) {
             const userExists = await userRepository.getUserByEmail({email});
             console.log("userExists:", userExists);
             if (userExists.status) {
-                console.log("user already exists error triggered:");
-                return { status: false, data: "User already exists"};
-            }
-
-
-            const response = await SendOtp(email);
-            console.log("response otp:", response);
-            if(response.status) {
+                console.log("user already exists, generating token...");
 
                 const token = jwt.sign(
-                    {otp: response.otp, userData:data},
+                    {name:userExists.data.name, email: userExists.data.email},
                     SECRET_KEY,
-                    {expiresIn: "10m"}
+                    {expiresIn: '1h'}
                 );
                 return {status: true, token};
-            } else {
-                return {status: false, data: response.message}
+                
             }
+
+            const response = await userRepository.createUser(data);
+            console.log("response from userRepository:", response);
+
+            if(response.status) {
+                const token = jwt.sign (
+                    {userData: data},
+                    SECRET_KEY,
+                    {expiresIn: '10m'}
+                );
+                return { status: true, token};
+            } else {
+                return { status: false, data: response.message}
+            }
+            
         } catch (error) {
             console.error('Error in user registration use case:', error);
             return { status: false, message: 'Internal server error' };
