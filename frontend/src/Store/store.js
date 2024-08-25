@@ -3,17 +3,19 @@ import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from "@reduxjs/toolkit";
 import userReducer from './Slices/userSlice';
+import adminReducer from './Slices/adminSlice';
 
 //persist configuration
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['user']
+    whitelist: ['user', 'admin']
 }
 
 //rootreducer for wrapping it with persistReducer
 const rootReducer = combineReducers({
-    user: userReducer
+    user: userReducer,
+    admin: adminReducer
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

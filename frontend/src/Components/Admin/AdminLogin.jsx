@@ -1,14 +1,32 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loginAdmin } from "../../Store/Slices/adminSlice";
 
 function AdminLogin() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleSubmit = (e) => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { loading, error, token } = useSelector((state) => state.admin); // Get loading and error state from admin slice
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("Email:", email);
-        console.log*("Password:", password);
+       
+        const resultAction = await dispatch(loginAdmin({ email, password }));
+
+        if (loginAdmin.fulfilled.match(resultAction)) {
+            const { token } = resultAction.payload; 
+            if (token) {
+                
+                navigate("/admin/admin_dashboard");
+            }
+        } else {
+            
+            console.error("Login failed:", resultAction.error.message);
+        }
     };
 
     return (
@@ -47,18 +65,27 @@ function AdminLogin() {
                         />
                     </div>
 
+                    {error && (
+                        <div className="mb-4 text-red-500 text-sm">
+                            {error}
+                        </div>
+                    )}
+
                     <div>
                         <button
                             type="submit"
-                            className="w-full bg-customGreen text-white font-bold py-2 px-4 rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-customGreen focus:ring-opacity-50"
+                            className={`w-full bg-customGreen text-white font-bold py-2 px-4 rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-customGreen focus:ring-opacity-50 ${
+                                loading ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
+                            disabled={loading}
                         >
-                            Login
+                            {loading ? "Logging in..." : "Login"}
                         </button>
                     </div>
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
-export default AdminLogin
+export default AdminLogin;

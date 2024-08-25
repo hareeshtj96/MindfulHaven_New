@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtp } from "../../Store/Slices/userSlice";
 
-function OtpVerification() {
+function TherapistOTP() {
     const [otp, setOtp] = useState("");
     const [localError, setLocalError] = useState(null);
     const navigate = useNavigate();
@@ -17,7 +17,7 @@ function OtpVerification() {
         try {
             const result = await dispatch(verifyOtp(otp)).unwrap();
             if(result) {
-                navigate("/dashboard");
+                navigate("/dashboar");
             }
         } catch(error) {
             setLocalError(error || "OTP verification failed")
@@ -56,4 +56,4 @@ function OtpVerification() {
     )
 }
 
-export default OtpVerification;
+export default TherapistOTP;
