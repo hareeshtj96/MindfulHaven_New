@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Routes} from "react-router-dom"
 import AdminLoginPage from "../../Pages/Admin/AdminLoginPage";
-import AdminDashboardPage from "../../Pages/Admin/AdminDashboardPage";
+import AdminDashboardPage from "../../Pages/Admin/AdminDashboardPage"
 import AdminProtectedRoute from "../../ProtectedRoute/AdminProtectedRoute";
 
 

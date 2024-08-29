@@ -1,9 +1,14 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "../../src/Store/store";
 
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = useSelector((state) => state.user.isAuthenticated);
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
   console.log(isAuthenticated);
   
   const navigate = useNavigate();

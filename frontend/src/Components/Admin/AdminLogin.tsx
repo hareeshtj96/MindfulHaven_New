@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { AppDispatch, RootState } from "../../../src/Store/store";
 import { loginAdmin } from "../../Store/Slices/adminSlice";
 
 function AdminLogin() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
 
-    const dispatch = useDispatch();
+    const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { loading, error, token } = useSelector((state) => state.admin); // Get loading and error state from admin slice
+    const { loading, error, token } = useSelector((state: RootState) => state.admin); 
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
        

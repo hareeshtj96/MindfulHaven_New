@@ -1,8 +1,33 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 
 
-export const loginAdmin = createAsyncThunk(
+interface Admin {
+    id: string;
+    name: string;
+    email: string;
+}
+
+interface LoginResponse {
+    token: string;
+    admin: Admin;
+}
+
+interface AdminState {
+    admin: Admin | null;
+    token: string | null;
+    loading: boolean;
+    error: string | null;
+}
+
+const initialState: AdminState = {
+    admin: null,
+    token: localStorage.getItem('adminToken') || null,
+    loading: false,
+    error:null
+}
+
+export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, password: string }, { rejectValue: string }>(
     'admin/admin_login',
     async (adminData, thunkAPI) => {
         console.log("entered loginAdminslice");
@@ -17,7 +42,7 @@ export const loginAdmin = createAsyncThunk(
             localStorage.setItem('adminToken', response.data.token);
 
             return response.data;
-        } catch (error) {
+        } catch (error: any) {
             const message = error.response?.data?.data || "An error occured";
             return thunkAPI.rejectWithValue(message);
         }
@@ -26,12 +51,7 @@ export const loginAdmin = createAsyncThunk(
 
 const adminSlice = createSlice({
     name: 'admin',
-    initialState: {
-        admin: null,
-        token: localStorage.getItem('adminToken') || null,
-        loading: false,
-        error: null,
-    },
+    initialState,
     reducers: {
         logout: (state) => {
             state.admin = null;
@@ -45,14 +65,14 @@ const adminSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(loginAdmin.fulfilled, (state, action) => {
+            .addCase(loginAdmin.fulfilled, (state, action: PayloadAction<LoginResponse>) => {
                 state.loading = false;
                 state.admin = action.payload.admin;
                 state.token = action.payload.token;
             })
-            .addCase(loginAdmin.rejected, (state, action) => {
+            .addCase(loginAdmin.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload || 'Login failed';
             });
     },
 });

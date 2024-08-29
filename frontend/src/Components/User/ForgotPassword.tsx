@@ -1,19 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { forgotPassword } from "../../Store/Slices/userSlice";
+import { RootState, AppDispatch } from "../../../src/Store/store";
 
 function ForgotPassword() {
-    const [email, setEmail] = useState("");  // Added email state
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [localError, setLocalError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
-    const dispatch = useDispatch();
+    const [email, setEmail] = useState<string>("");
+    const [newPassword, setNewPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPassword] = useState<string>("");
+    const [localError, setLocalError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { forgotPasswordStatus, forgotPasswordError, forgotPasswordSuccess } = useSelector((state) => state.user);
+    const { forgotPasswordStatus, forgotPasswordError, forgotPasswordSuccess } = useSelector((state: RootState) => state.user);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
 
         if (newPassword !== confirmPassword) {

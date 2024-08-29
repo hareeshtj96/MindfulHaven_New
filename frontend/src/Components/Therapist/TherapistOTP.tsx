@@ -1,26 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { verifyOtp } from "../../Store/Slices/userSlice";
+import { verifyOtp } from "../../Store/Slices/therapistSlice";
+import { RootState, AppDispatch } from "../../../src/Store/store";
 
 function TherapistOTP() {
-    const [otp, setOtp] = useState("");
-    const [localError, setLocalError] = useState(null);
+    const [otp, setOtp] = useState<string>("");
+    const [localError, setLocalError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const {loading, error} = useSelector(state => state.user);
+    const dispatch: AppDispatch = useDispatch();
+    const {loading, error} = useSelector((state: RootState) => state.therapist);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLocalError(null);
         
         try {
             const result = await dispatch(verifyOtp(otp)).unwrap();
             if(result) {
-                navigate("/dashboar");
+                navigate("/therapist/therapist_login");
             }
         } catch(error) {
-            setLocalError(error || "OTP verification failed")
+            setLocalError(error as string || "OTP verification failed")
         }
     };
 
@@ -32,7 +33,7 @@ function TherapistOTP() {
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <input type="text" id="otp" placeholder="Enter OTP" className="w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                         value={otp} onChange={(e) => setOtp(e.target.value)} required disabled={loading} />
+                         value={otp} onChange={(e: ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)} required disabled={loading} />
                     </div>
 
                     <div className="mb-6">

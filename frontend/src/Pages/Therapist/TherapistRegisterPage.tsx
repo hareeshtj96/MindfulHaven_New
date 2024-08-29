@@ -1,18 +1,18 @@
 import React from "react";
-import TherapistLogin from "../../Components/Therapist/TherapistLogin";
+import TherapistRegister from "../../Components/Therapist/TherapistRegister";
 import TherapistHeader from "../../Layout/TherapistLayout/TherapistHeader";
 
 
-function TherapistLoginPage() {
+function TherapistRegisterPage() {
     return (
         <>
         <div className="flex flex-col min-h-screen">
             <TherapistHeader/>
-            <TherapistLogin />
+            <TherapistRegister  />
             
         </div>
         </>
     )
 }
 
-export default TherapistLoginPage
+export default TherapistRegisterPage

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FormEvent } from "react";
 import {useDispatch, useSelector} from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import backgroundImage from '../../../Public/banner/register_img.jpg';
@@ -7,18 +7,29 @@ import googleLogo from '../../../Public/banner/Google_logo.png';
 import {Link} from "react-router-dom"
 import {auth} from '../../FirebaseConfig/firebaseConfig';
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
+import { RootState, AppDispatch } from "../../../src/Store/store";
+
+//define type for error state
+interface Errors {
+    name?: string;
+    email?: string;
+    mobile?: string;
+    password?: string;
+    confirmPassword?: string;
+    general?: string;
+}
 
 function Register() {
-    const [name, setName] = useState("")
-    const [email, setEmail] = useState("")
-    const [mobile, setMobile] = useState("")
-    const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
-    const [errors, setErrors] = useState({})
+    const [name, setName] = useState<string>("")
+    const [email, setEmail] = useState<string>("")
+    const [mobile, setMobile] = useState<string>("")
+    const [password, setPassword] = useState<string>("")
+    const [confirmPassword, setConfirmPassword] = useState<string>("")
+    const [errors, setErrors] = useState<Errors>({})
 
-    const dispatch = useDispatch();
+    const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const {status, error} = useSelector((state) => state.user);
+    const {status, error} = useSelector((state: RootState) => state.user);
 
 
     useEffect(() => {
@@ -60,8 +71,8 @@ function Register() {
         }
     }
 
-    const validate = () => {
-        const errors = {};
+    const validate = (): Errors => {
+        const errors: Errors = {};
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const mobileRegex = /^[0-9]{10}$/;
 
@@ -83,7 +94,7 @@ function Register() {
         return errors;
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         const validateErrors = validate();
 
@@ -182,7 +193,7 @@ function Register() {
                             }`}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            minLength="6"
+                            minLength={6}
                             required
                         />
                         {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}

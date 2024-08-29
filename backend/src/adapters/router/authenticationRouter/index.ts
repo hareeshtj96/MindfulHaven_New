@@ -1,6 +1,6 @@
 import express from "express";
 
-import { userController, adminController } from "../../controller";
+import { userController, adminController, therapistController } from "../../controller";
 
 
 export default (dependencies: any) =>{
@@ -29,6 +29,20 @@ export default (dependencies: any) =>{
     } = adminController(dependencies);
 
     router.post('/admin/admin_login', adminLoginController);
+
+
+
+    const {
+        therapistRegisterController,
+        verifyOTP,
+        therapistLogin,
+    } = therapistController(dependencies);
+
+
+    router.post('/therapist/therapist_register', therapistRegisterController);
+    router.post('/therapist/therapist_OTP', verifyOTP);
+    router.post('/therapist/therapist_login', therapistLogin);
+
 
     return router;
 }

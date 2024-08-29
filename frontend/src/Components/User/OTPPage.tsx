@@ -1,25 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtp } from "../../Store/Slices/userSlice";
+import { AppDispatch, RootState } from "../../../src/Store/store";
 
 function OtpVerification() {
-    const [otp, setOtp] = useState("");
-    const [localError, setLocalError] = useState(null);
+    const [otp, setOtp] = useState<string>("");
+    const [localError, setLocalError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const {loading, error} = useSelector(state => state.user);
+    const dispatch: AppDispatch = useDispatch();
+    const {loading, error} = useSelector((state: RootState ) => state.user);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         setLocalError(null);
         
         try {
             const result = await dispatch(verifyOtp(otp)).unwrap();
             if(result) {
-                navigate("/dashboard");
+                navigate("/login");
             }
-        } catch(error) {
+        } catch(error: any) {
             setLocalError(error || "OTP verification failed")
         }
     };

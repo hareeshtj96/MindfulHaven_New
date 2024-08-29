@@ -15,3 +15,10 @@ import { adminLogin } from "./adminUseCases";
 export {
     adminLogin
 }
+
+
+import { therapistRegistration } from "./therapistUseCases";
+
+export {
+    therapistRegistration
+}

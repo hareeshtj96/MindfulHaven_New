@@ -1,6 +1,10 @@
 import React from "react";
 
-function AdminSidebar({ isSidebarOpen }) {
+interface AdminSidebarProps {
+    isSidebarOpen: boolean;
+}
+
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ isSidebarOpen }) => {
     return (
         <aside className={`bg-green-200 h-screen ${isSidebarOpen ? 'block' : 'hidden'} md:block w-64 flex flex-col`}>
             <div className="flex flex-col justify-between h-full">

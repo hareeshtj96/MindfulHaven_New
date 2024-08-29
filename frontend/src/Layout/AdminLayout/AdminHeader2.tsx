@@ -4,14 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { FaBell, FaUser } from 'react-icons/fa'; 
 import logoImage from '../../../Public/banner/MindfulHaven_logo.png';
 import {logout} from '../../Store/Slices/adminSlice';
+import { RootState, AppDispatch } from "../../../src/Store/store";
 
 function AdminHeader2() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const dispatch = useDispatch();
+    const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const {admin, token} = useSelector((state) => state.admin);
+    const {admin, token} = useSelector((state: RootState) => state.admin);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen)

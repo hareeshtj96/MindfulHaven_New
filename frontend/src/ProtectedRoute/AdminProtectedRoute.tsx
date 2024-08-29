@@ -1,9 +1,14 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "../../src/Store/store";
 
-const AdminProtectedRoute = ({ children }) => {
-    const token = useSelector((state) => state.admin.token);
+interface AdminProtectedRouteProps {
+    children: React.ReactNode;
+}
+
+const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({ children }) => {
+    const token = useSelector((state: RootState) => state.admin.token);
     const navigate = useNavigate()
 
     useEffect(() => {

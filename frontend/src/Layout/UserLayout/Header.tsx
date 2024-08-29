@@ -45,7 +45,7 @@ function Header() {
                 <a href="/login" className="text-btncolor py-2 md:py-0 text-right">
                     Login
                 </a>
-                <a href="/therapist/therapist_login" className="text-btncolor py-2 md:py-0 text-right">
+                <a href="/therapist/therapist_register" className="text-btncolor py-2 md:py-0 text-right">
                     Become a therapist
                 </a>
             </div>

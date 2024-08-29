@@ -1,18 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaUserCircle } from 'react-icons/fa'; 
 import logoImage from '../../../Public/banner/MindfulHaven_logo.png';
 import { useNavigate } from "react-router-dom"; 
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../../Store/Slices/therapistSlice";
+import { RootState, AppDispatch } from "../../../src/Store/store";
 
 function TherapistHeader2() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const navigate = useNavigate(); 
+    const dispatch: AppDispatch = useDispatch();
+
+    const therapist = useSelector((state: RootState) => state.therapist.therapist);
+
+    useEffect(() => {
+        if(!therapist) {
+            navigate('/therapist/therapist_login')
+        }
+    }, [therapist]);
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
     };
 
     const handleLogout = () => {
-       
+        console.log("inside handle logout")
+        localStorage.removeItem('therapistToken');
+        dispatch(logout())
+        navigate("/therapist/therapist_login");
     };
 
     return (
@@ -26,6 +41,7 @@ function TherapistHeader2() {
                     <div className="relative">
                         <button onClick={toggleDropdown} className="flex items-center space-x-2 focus:outline-none">
                             <FaUserCircle className="h-8 w-8 text-btncolor" />
+                            <span className="hidden md:inline">{therapist?.name || 'therapist'}</span>
                         </button>
                         {isDropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">

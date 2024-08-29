@@ -4,15 +4,16 @@ import { useNavigate } from "react-router-dom";
 import logoImage from '../../../Public/banner/MindfulHaven_logo.png';
 import {FaUserCircle} from 'react-icons/fa';
 import { logoutUser } from "../../Store/Slices/userSlice";
+import { RootState, AppDispatch } from "../../../src/Store/store";
 
 
 function DashboardHeader() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
-    const user = useSelector((state) => state.user.user);
+    const user = useSelector((state: RootState) => state.user.user);
    
-    const dispatch = useDispatch();
+    const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {

@@ -1,20 +1,20 @@
-import React, {  useEffect, useState } from "react";
+import React, {  FormEvent, useEffect, useState } from "react";
 import loginImage from '../../../Public/banner/login_img.jpg';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { loginUser } from "../../Store/Slices/userSlice";
 import googleLogo from '../../../Public/banner/Google_logo.png';
-import { googleRegister, clearError } from "../../Store/Slices/userSlice";
+import { loginUser,googleRegister, clearError } from "../../Store/Slices/userSlice";
 import {auth} from '../../FirebaseConfig/firebaseConfig';
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
+import { RootState, AppDispatch } from "../../../src/Store/store";
 
 function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [errors, setErrors] = useState({})
-    const dispatch = useDispatch();
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [errors, setErrors] = useState<{general?: string}>({})
+    const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const {status, loginError} = useSelector((state) => state.user);
+    const {status, loginError} = useSelector((state: RootState) => state.user);
 
     useEffect(() => {
         dispatch(clearError());
@@ -58,7 +58,7 @@ function Login() {
         }
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         console.log("dispatching loginuser with:", {email, password});
 

@@ -7,31 +7,31 @@ const therapistSchema = new Schema({
     },
     phone: {
         type: String, 
-        required: true,
+        required: false,
     },
     specialization: {
         type: String,
-        required: true,
+        required: false,
     },
     gender: {
         type: String,
         enum: ['male', 'female', 'other'],
-        required: true,
+        required: false,
     },
     educationalQualifications: {
         type: [String],
-        required: true,
+        required: false,
     },
     identityProof: {
         type: String, 
     },
     counsellingQualification: {
         type: String,
-        required: true,
+        required: false,
     },
     professionalExperience: {
         type: String,
-        required: true,
+        required: false,
     },
     establishment: {
         type: String,
