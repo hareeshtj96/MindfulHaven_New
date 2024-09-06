@@ -16,6 +16,7 @@ const therapistSchema = new Schema({
     gender: {
         type: String,
         enum: ['male', 'female', 'other'],
+        default: 'other',
         required: false,
     },
     educationalQualifications: {
@@ -50,12 +51,12 @@ const therapistSchema = new Schema({
     },
     email: {
         type: String,
-        required: true,
+        required: false,
         unique: true,
     },
     password: {
         type: String,
-        required: true,
+        required: false,
     },
     isVerified: {
         type: Boolean,

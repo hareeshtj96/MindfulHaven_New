@@ -14,7 +14,7 @@ export default function therapistLogin (dependencies: any) {
     const therapistloginController = async (req: Request, res: Response) => {
         console.log("entered therapist login controller:")
         try {
-            const { email, password } = req.body;
+            const { email, password, role } = req.body;
             console.log("req body:", req.body);
 
 
@@ -34,7 +34,7 @@ export default function therapistLogin (dependencies: any) {
 
             // Generate JWT token upon successful login
             const token = jwt.sign(
-                { therapistId: therapist.user._id, email: therapist.user.email, name: therapist.user.name },
+                { therapistId: therapist.user._id, email: therapist.user.email, name: therapist.user.name, role: therapist.user.role },
                 SECRET_KEY,
                 { expiresIn: "1h" }
             );

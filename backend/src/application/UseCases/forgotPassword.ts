@@ -1,59 +1,41 @@
-import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { SendOtp } from "../../utils";
+import dotenv from 'dotenv';
+dotenv.config();
 
-interface ForgotPasswordData {
-    email: string;
-    newPassword: string;
-    confirmPassword: string;
-}
-
-interface ForgotPasswordResult {
-    status: boolean;
-    data: string;
-}
-
-const SALT_ROUNDS = 10;
+const SECRET_KEY = process.env.JWT_SECRET || 'undefined';
 
 export default function forgotPassword(dependencies: any) {
 
-    const { userRepository } = dependencies.repository;
+    const {userRepository} = dependencies.repository;
 
-    const executionFunction =  async (data: ForgotPasswordData): Promise<ForgotPasswordResult> => {
+    const execute = async (data: any) => {
         try {
-            const { email, newPassword, confirmPassword } = data;
-            console.log("Password reset attempt for email:", email);
+            const {email} = data;
+            console.log("email:", email);
 
-            // Check if passwords match
-            if (newPassword !== confirmPassword) {
-                return { status: false, data: "Passwords do not match" };
+            const userExists = await userRepository.getUserByEmail({email});
+            console.log("userExists:", userExists);
+            if (!userExists.status) {
+                console.log("user not found:");
+                return { status: false, data: "User not found"};
             }
 
-            // Find the user by email
-            const user = await userRepository.getUserByEmail({ email });
-            console.log("user found:", user);
 
-            if (!user.status) {
-                return { status: false, data: "User not found" };
+            const response = await SendOtp(email);
+            console.log("response otp:", response);
+            if(response.status) {
+                
+                return {status: true, otp: response.otp};
+            } else {
+                return {status: false, data: response.message}
             }
-
-            // Hash the new password
-            const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
-            console.log("hashed password:", hashedPassword);
-
-            // Update the password in the database
-            const updateResult = await userRepository.updateUserPassword({ email, hashedPassword });
-
-            if (!updateResult.status) {
-                return { status: false, data: "Failed to reset password" };
-            }
-
-            return { status: true, data: "Password reset successful" };
         } catch (error) {
-            console.error("Error in forgot password use case:", error);
-            return { status: false, data: "Internal Server Error" };
+            console.error('Error in user registration use case:', error);
+            return { status: false, message: 'Internal server error' };
         }
     }
-
     return {
-        executionFunction: executionFunction
-    }
+        executionFunction: execute
+    };
 }

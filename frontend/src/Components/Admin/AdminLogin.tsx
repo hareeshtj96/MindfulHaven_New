@@ -1,8 +1,8 @@
 import React, { useState, FormEvent } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { AppDispatch, RootState } from "../../../src/Store/store";
-import { loginAdmin } from "../../Store/Slices/adminSlice";
+import { AppDispatch, RootState } from "../../Redux/Store/store";
+import { loginAdmin } from "../../Redux/Store/Slices/adminSlice";
 
 function AdminLogin() {
     const [email, setEmail] = useState<string>("");

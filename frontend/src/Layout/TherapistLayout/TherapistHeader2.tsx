@@ -3,8 +3,8 @@ import { FaUserCircle } from 'react-icons/fa';
 import logoImage from '../../../Public/banner/MindfulHaven_logo.png';
 import { useNavigate } from "react-router-dom"; 
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../Store/Slices/therapistSlice";
-import { RootState, AppDispatch } from "../../../src/Store/store";
+import { logout } from "../../Redux/Store/Slices/therapistSlice"
+import { RootState, AppDispatch } from "../../Redux/Store/store";
 
 function TherapistHeader2() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -12,6 +12,9 @@ function TherapistHeader2() {
     const dispatch: AppDispatch = useDispatch();
 
     const therapist = useSelector((state: RootState) => state.therapist.therapist);
+
+    console.log(therapist,"tyyt");
+    
 
     useEffect(() => {
         if(!therapist) {

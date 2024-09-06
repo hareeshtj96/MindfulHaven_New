@@ -7,7 +7,7 @@ import coupleImg from '../../../Public/banner/couple_therapy.jpg'
 function Dashboard() {
     const [activeIndex, setActiveIndex] = useState(null);
 
-    const toggleFAQ = (index) => {
+    const toggleFAQ = (index:any) => {
         setActiveIndex(activeIndex === index ? null : index);
     }
     return (

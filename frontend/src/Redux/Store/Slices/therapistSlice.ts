@@ -1,12 +1,43 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import { REGISTERTHERAPIST, VERIFYOTP, LOGINTHERAPIST, UPDATETHERAPIST  } from "../../../Services/therapistApi";
+
 
 
 //Interfaces for state and Responses
 interface Therapist {
-    id: string,
+    therapistId: string,
     name: string,
-    email: string;
+    email: string,
+    phone?: string;
+    specialization?: string;
+    gender?: string;
+    educationalQualifications?: string;
+    identityProof?: string;
+    counsellingQualification?: string;
+    professionalExperience?: string;
+    establishment?: string;
+    location?: string;
+    timings?: string;
+    fees?: number;
+    photo?: string;
+}
+
+export  interface TherapistUpdation {
+    therapistId:string,
+    name: string;
+    phone: string;
+    specialization: string;
+    gender: string;
+    educationalQualifications: string;
+    identityProof: string;
+    counsellingQualification: string;
+    professionalExperience: string;
+    establishment: string;
+    location: string;
+    timings: string;
+    fees: number;
+    photo?: string;
 }
 
 interface RegisterResponse {
@@ -30,7 +61,9 @@ interface TherapistState {
 
 //initial state
 const initialState: TherapistState = {
-    therapist: null,
+    therapist: localStorage.getItem('therapist') 
+    ? JSON.parse(localStorage.getItem('therapist')!) as Therapist
+    : null,
     token: localStorage.getItem('therapistToken'),
     loading: false,
     error: null,
@@ -44,7 +77,7 @@ export const registerTherapist = createAsyncThunk<RegisterResponse, {name: strin
     async (therapistData, thunkAPI) => {
         console.log("entered registerTherapist slice");
         try {
-            const response = await axios.post('http://localhost:8080/therapist/therapist_register', therapistData, {
+            const response = await axios.post(REGISTERTHERAPIST, therapistData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -79,7 +112,7 @@ export const verifyOtp = createAsyncThunk<{status: boolean}, string, {rejectValu
                     Authorization: `Bearer ${token}`,
                 },
             };
-            const response = await axios.post('http://localhost:8080/therapist/therapist_OTP', { otp }, config);
+            const response = await axios.post(VERIFYOTP, { otp }, config);
             console.log("response from slice:", response);
 
             if (response.data.status) {
@@ -100,7 +133,7 @@ export const logintherapist = createAsyncThunk<LoginResponse, { email: string, p
     'therapist/therapist_login',
     async (therapistData, thunkAPI) => {
         try {
-            const response = await axios.post('http://localhost:8080/therapist/therapist_login', therapistData);
+            const response = await axios.post(LOGINTHERAPIST, therapistData);
 
             const { token } = response.data;
             console.log("Token received from logintherapist slice:", token);
@@ -126,6 +159,35 @@ export const logintherapist = createAsyncThunk<LoginResponse, { email: string, p
         }
     }
 );
+
+
+// updating therapist details
+export const updateTherapistDetails = createAsyncThunk<Therapist, FormData, {rejectValue:string}>(
+    "therapist/updateTherapistDetails",
+    async (formData, thunkAPI) => {
+        try {
+            const token = localStorage.getItem("therapistToken");
+            console.log("token from updateTherapist:", token);
+            if(!token) {
+                return thunkAPI.rejectWithValue("No token found");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+                }
+            }
+            const response = await axios.put(UPDATETHERAPIST, formData, config);
+
+            console.log("Response from updateTherapistDetails thunk:", response.data);
+            return response.data;
+        } catch (error:any) {
+            const message = error.response?.data?.message || "update failed";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
 
 
 
@@ -180,10 +242,24 @@ const therapistSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || "Login failed";
             })
+            .addCase(updateTherapistDetails.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updateTherapistDetails.fulfilled,(state, action: PayloadAction<Therapist>) => {
+                  state.loading = false;
+                //   state.therapist = action.payload;
+            })
+            .addCase(updateTherapistDetails.rejected,(state, action: PayloadAction<string | undefined>) => {
+                  state.loading = false;
+                  state.error = action.payload || "Update failed";
+            });
     },
-});
+}); 
 
 export const { logout, clearError } = therapistSlice.actions;
+
+
 
 export default therapistSlice.reducer;
 

@@ -8,6 +8,7 @@ interface TherapistData {
     name: string;
     email: string;
     password: string;
+    role: string;
    
 }
 
@@ -19,10 +20,10 @@ export default (dependencies: any) => {
     const registerController = async (req: Request, res: Response) => {
         console.log("entered register control ..............");
         try {
-            const { name, email, password } = req.body;
+            const { name, email, password, role } = req.body;
             console.log("req.body:", req.body);
 
-            const data = { name, email, password };
+            const data = { name, email, password, role };
 
             const response = await therapistRegistration(dependencies);
 

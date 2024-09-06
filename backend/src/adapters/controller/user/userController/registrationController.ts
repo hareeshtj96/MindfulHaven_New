@@ -9,12 +9,14 @@ interface UserData {
     email: string;
     password: string;
     mobile: string;
+    role: string;
 }
+
 
 interface RegistrationResponse {
     status: boolean;
     token?: string;
-    data?: any; // Replace `any` with a more specific type if available
+    data?: any; 
 }
 
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
@@ -26,10 +28,10 @@ export default (dependencies: any) => {
         try {
             console.log('controller');
 
-            const { name, email, password, mobile } = req.body;
+            const { name, email, password, mobile, role } = req.body;
             console.log("req.body:", req.body);
 
-            const userData: UserData = { name, email, password, mobile };
+            const userData: UserData = { name, email, password, mobile, role };
 
             // Invoke the registration use case
             const registrationFunction = await userRegistration(dependencies);
@@ -49,7 +51,7 @@ export default (dependencies: any) => {
 
                 // Generate a new token
                 const token = jwt.sign(
-                    { otp: decodedToken.otp, userData: decodedToken.userData }, 
+                    { otp: decodedToken.otp, userData: {name, email, role} }, 
                     SECRET_KEY, 
                     { expiresIn: '10m' }
                 );

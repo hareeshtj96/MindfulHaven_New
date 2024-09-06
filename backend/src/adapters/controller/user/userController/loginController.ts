@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
+const REFRESH_SECRET_KEY = process.env.JWT_REFRESH_SECRET || "your-refresh-secret-key";
 
 export default function userLogin (dependencies: any) {
     const { userRepository } = dependencies.repository;
@@ -34,10 +35,25 @@ export default function userLogin (dependencies: any) {
 
             // Generate JWT token upon successful login
             const token = jwt.sign(
-                { userId: user.data._id, email: user.data.email, name: user.data.name },
+                { userId: user.data._id, email: user.data.email, name: user.data.name, role: user.data.role },
                 SECRET_KEY,
-                { expiresIn: "1h" }
+                { expiresIn: "1m" }
             );
+
+            // Generate Refresh token
+            const refreshToken = jwt.sign(
+                { userId: user.data._id, email: user.data.email, name: user.data.name, role: user.data.role },
+                REFRESH_SECRET_KEY,
+                {expiresIn: "7d"}
+            );
+
+            // Set Refresh token in HTTP-only cookie
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+            })
 
             // Send response
             res.json({ status: true, token });

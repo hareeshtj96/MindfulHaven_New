@@ -1,11 +1,13 @@
-import { userRegistration, userLogin, userLoginGoogle, userRegistrationGoogle, forgotPassword  } from "./UseCases";
+import { userRegistration, userLogin, userLoginGoogle, userRegistrationGoogle, forgotPassword, resetPassword, refreshTokenUseCase } from "./UseCases";
 
 export {
     userRegistration,
     userLogin,
     userRegistrationGoogle,
     userLoginGoogle,
-    forgotPassword
+    forgotPassword,
+    resetPassword,
+    refreshTokenUseCase,
 }
 
 

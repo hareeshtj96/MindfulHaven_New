@@ -1,9 +1,17 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-function TherapistDashboard() {
+interface TherapistDashboardProps {
+    therapistId: string;
+}
+
+function TherapistDashboard({ therapistId }: TherapistDashboardProps) {
+    const navigate = useNavigate();
+
     const handleContinue = () => {
         // Handle the continue button action here
         console.log("Continue button clicked");
+        navigate("/therapist/therapist_details", { state: { therapistId }});
     };
 
     return (

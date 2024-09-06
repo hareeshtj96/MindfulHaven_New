@@ -1,5 +1,5 @@
 import { userRepository, adminRepository, therapistRepository } from "../repository";
-import { userRegistration, userRegistrationGoogle, userLoginGoogle, userLogin, forgotPassword } from "../../application/UseCases";
+import { userRegistration, userRegistrationGoogle, userLoginGoogle, userLogin, forgotPassword, resetPassword } from "../../application/UseCases";
 
 import { adminLogin } from "../../application/adminUseCases";
 
@@ -11,6 +11,8 @@ const useCase: any={
     userLoginGoogle:userLoginGoogle,
     userLogin: userLogin,
     forgotPassword: forgotPassword,
+    resetPassword: resetPassword,
+
     
 
     adminLogin: adminLogin,

@@ -1,8 +1,8 @@
 import React, { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { verifyOtp } from "../../Store/Slices/userSlice";
-import { AppDispatch, RootState } from "../../../src/Store/store";
+import { verifyOtp } from "../../Redux/Store/Slices/userSlice"
+import { AppDispatch, RootState } from "../../Redux/Store/store";
 
 function OtpVerification() {
     const [otp, setOtp] = useState<string>("");

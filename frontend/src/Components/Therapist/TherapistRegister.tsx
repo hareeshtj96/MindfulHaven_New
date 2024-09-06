@@ -1,10 +1,10 @@
 import React, { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { useDispatch, useSelector} from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { registerTherapist, clearError } from "../../Store/Slices/therapistSlice";
+import { registerTherapist, clearError } from "../../Redux/Store/Slices/therapistSlice";
 import {Link} from "react-router-dom"
 import loginImg from '../../../Public/banner/login_image.jpg';
-import { RootState, AppDispatch } from "../../../src/Store/store";
+import { RootState, AppDispatch } from "../../Redux/Store/store";
 
 interface ErrorState {
     general?: string;

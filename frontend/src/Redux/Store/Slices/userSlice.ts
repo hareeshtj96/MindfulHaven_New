@@ -1,5 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import axiosInstance from "../../../AxiosConfig/AxiosConfig";
+import { USERREGISTER } from "../../../Services/userApi";
+import { GOOGLEREGISTER } from "../../../Services/userApi";
+import { VERIFYOTP } from "../../../Services/userApi";
+import { USERLOGIN } from "../../../Services/userApi";
+import { FORGOTPASSWORD } from "../../../Services/userApi";
+import { FORGOTPASSWORDOTP } from "../../../Services/userApi";
+import { PASSWORDRESET } from "../../../Services/userApi";
 
 
 interface User {
@@ -20,7 +28,14 @@ interface LoginResponse {
 
 
 interface ForgotPasswordResponse {
+    status: boolean;
     message: string;
+}
+
+
+interface PasswordResetPayload {
+    newPassword: string;
+    confirmPassword: string;
 }
 
 interface UserState {
@@ -32,6 +47,9 @@ interface UserState {
     otpVerified: boolean;
     otpError: string | null;
     isAuthenticated: boolean;
+    resetPasswordStatus: string | null;
+    resetPasswordError: string | null;
+    resetPasswordSuccess: string | null;
     loginError: string | null;
     forgotPasswordStatus : 'idle' | 'loading' | 'succeeded' | 'failed';
     forgotPasswordError: string | null;
@@ -48,6 +66,9 @@ const initialState: UserState = {
     otpVerified: false,
     otpError: null,
     isAuthenticated: false,
+    resetPasswordStatus: 'idle',
+    resetPasswordError: null,
+    resetPasswordSuccess: null,
     loginError: null,
     forgotPasswordStatus: 'idle',
     forgotPasswordError: null,
@@ -59,7 +80,7 @@ export const registerUser = createAsyncThunk<RegisterResponse, {name: string, em
     async (userData, thunkAPI) => {
         try {
 
-            const response = await axios.post('http://localhost:8080/register', userData);
+            const response = await axiosInstance.post( USERREGISTER, userData);
 
             console.log("response:", response);
 
@@ -78,7 +99,7 @@ export const googleRegister = createAsyncThunk<{token: string; user: User}, any,
     'user/googleRegister',
     async (userData, thunkAPI) => {
         try {
-            const response = await axios.post('http://localhost:8080/register_google_auth', userData);
+            const response = await axios.post( GOOGLEREGISTER, userData);
 
 
             const { token } = response.data;
@@ -119,7 +140,7 @@ export const verifyOtp = createAsyncThunk<{status: boolean}, string, {rejectValu
                     Authorization: `Bearer ${token}`,
                 },
             };
-            const response = await axios.post('http://localhost:8080/verify_otp', { otp }, config);
+            const response = await axios.post( VERIFYOTP, { otp }, config);
 
             if (response.data.status) {
                 localStorage.removeItem('otpToken');
@@ -139,7 +160,7 @@ export const loginUser = createAsyncThunk<LoginResponse, {email: string, passwor
     'user/loginUser',
     async (userData, thunkAPI) => {
         try {
-            const response = await axios.post('http://localhost:8080/login', userData);
+            const response = await axios.post(USERLOGIN, userData);
 
             const { token } = response.data;
             console.log("Token received from loginUser slice:", token);
@@ -167,12 +188,73 @@ export const loginUser = createAsyncThunk<LoginResponse, {email: string, passwor
 );
 
 //forgot password
-export const forgotPassword = createAsyncThunk<ForgotPasswordResponse, any, {rejectValue:string}>(
+export const forgotPassword = createAsyncThunk<ForgotPasswordResponse, string, {rejectValue:string}>(
     'user/forgotPassword',
+    async (email, thunkAPI) => {
+        console.log("sending email for password reset:", email);
+        try {
+            const response = await axios.post(FORGOTPASSWORD, {email});
+            const token = response.data.token;
+
+            console.log("token recieved and saved:", token);
+            localStorage.setItem('newToken', token);
+           
+            return response.data;
+        } catch (error:any) {
+            const message = error.response?.data?.message || "An error occurred";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+//Async thunk for OTP verification
+export const verifyForgotPasswordOTP = createAsyncThunk<{status: boolean}, string, {rejectValue: string}>(
+    'user/verifyForgotPasswordOTP',
+    async (otp, thunkAPI) => {
+        try {
+            const token = localStorage.getItem('newToken');
+            console.log("Token retrieved for verification:", token);
+            if(!token) {
+                return thunkAPI.rejectWithValue('Token is missing or invalid');
+            }
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+            const response = await axios.post(FORGOTPASSWORDOTP, { otp }, config);
+            console.log("response from verifyforgotot slice:", response);
+
+            if (response.data.status) {
+                return response.data;
+            } else {
+                return thunkAPI.rejectWithValue(response.data.message);
+            }
+
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue('Error verifying otp');
+        }
+    }
+)
+
+// password reset
+export const PasswordResetSlice = createAsyncThunk<ForgotPasswordResponse, PasswordResetPayload, {rejectValue:string}>(
+    'user/passwordReset',
     async (passwordData, thunkAPI) => {
         console.log("password data:", passwordData);
         try {
-            const response = await axios.post('http://localhost:8080/forgot_password', passwordData);
+            const token = localStorage.getItem("newToken");
+            console.log("Token retrieved for password reset:", token);
+            if(!token) {
+                return thunkAPI.rejectWithValue("Token is missing or invalid");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+            const response = await axios.post(PASSWORDRESET, passwordData, config);
             console.log("response from user slice:", response);
             return response.data;
         } catch (error:any) {
@@ -260,6 +342,27 @@ const userSlice = createSlice({
             .addCase(forgotPassword.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.forgotPasswordStatus = 'failed';
                 state.forgotPasswordError = action.payload || "Forgot password request failed";
+            })
+            .addCase(verifyForgotPasswordOTP.pending, (state) => {
+                state.otpVerified = false;
+                state.otpError = null;
+            })
+            .addCase(verifyForgotPasswordOTP.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.otpVerified = true;
+                state.otpError = action.payload || "OTP verification failed"
+            })
+            .addCase(PasswordResetSlice.pending, (state) => {
+                state.resetPasswordStatus = 'loading';
+                state.resetPasswordError = null;
+                state.resetPasswordSuccess = null;
+            })
+            .addCase(PasswordResetSlice.fulfilled, (state, action: PayloadAction<ForgotPasswordResponse>) => {
+                state.resetPasswordStatus = 'succeeded';
+                state.resetPasswordSuccess = action.payload.message;
+            })
+            .addCase(PasswordResetSlice.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.resetPasswordStatus = 'failed';
+                state.resetPasswordError = action.payload || "Password reset failed";
             });
     }
 })

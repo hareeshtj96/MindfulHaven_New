@@ -3,10 +3,10 @@ import loginImage from '../../../Public/banner/login_img.jpg';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import googleLogo from '../../../Public/banner/Google_logo.png';
-import { loginUser,googleRegister, clearError } from "../../Store/Slices/userSlice";
+import { loginUser,googleRegister, clearError } from "../../Redux/Store/Slices/userSlice"
 import {auth} from '../../FirebaseConfig/firebaseConfig';
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
-import { RootState, AppDispatch } from "../../../src/Store/store";
+import { RootState, AppDispatch } from "../../Redux/Store/store";
 
 function Login() {
     const [email, setEmail] = useState<string>("");

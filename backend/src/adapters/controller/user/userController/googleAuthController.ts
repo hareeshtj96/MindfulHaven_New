@@ -8,6 +8,7 @@ dotenv.config();
 interface UserData {
     name: string;
     email: string;
+    role: string;
 }
 
 interface RegistrationResponse {
@@ -25,10 +26,10 @@ export default (dependencies: any) => {
         try {
             console.log(' entered google auth controller');
 
-            const { name, email} = req.body;
+            const { name, email, role} = req.body;
             console.log("req.body:", req.body);
 
-            const userData: UserData = { name, email };
+            const userData: UserData = { name, email, role };
 
             // check if user already exists (login use case)
             const loginFunction = await userLoginGoogle(dependencies);
@@ -51,7 +52,7 @@ export default (dependencies: any) => {
 
             if (response.status) {
                 const token = jwt.sign(
-                    {name: userData.name, email: userData.email},
+                    {name: userData.name, email: userData.email, role: userData.role},
                     SECRET_KEY,
                     {expiresIn: "1h"}
                 )

@@ -11,7 +11,7 @@ export default function userRegistration(dependencies: any) {
 
     const executionFunction = async (data: any) => {
         try {
-            const {email} = data;
+            const {email, role} = data;
             console.log("email:", email);
 
             const userExists = await userRepository.getUserByEmail({email});

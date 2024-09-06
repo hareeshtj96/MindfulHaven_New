@@ -1,15 +1,18 @@
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 
 interface ForgotPasswordRequestBody {
     email: string;
-    newPassword: string;
-    confirmPassword: string;
 }
 
 interface ForgotPasswordResponse {
     status: boolean;
     message: string;
+    token?: string;
 }
 
 export default function forgotPassword(dependencies: any) {
@@ -19,18 +22,25 @@ export default function forgotPassword(dependencies: any) {
         console.log("Entered forgot password controller");
         
         try {
-            const { email, newPassword, confirmPassword } = req.body;
-            const forgot = await forgotPassword(dependencies)
+            const { email} = req.body;
+            const forgot = await forgotPassword(dependencies);
+          
             console.log("request body:", req.body);
 
-            if(newPassword !== confirmPassword) {
-                return res.status(400).json({ status: false, message: "Passwords do not match"});
-            }
+            const result = await forgot.executionFunction({email});
 
-            const result = await forgot.executionFunction({email, newPassword, confirmPassword});
+            console.log("result forgot controller:", result);
 
             if(result.status) {
-                res.json({status: true, message: result.data});
+                const SECRET_KEY = process.env.JWT_SECRET || 'your-secret-key';
+                const token = jwt.sign (
+                    {otp: result.otp, email},
+                    SECRET_KEY,
+                    {expiresIn: '10m'}
+                )
+                console.log("token from forgotpasswordcontoller:", token);
+
+                res.json({status: true, message: "OTP sent to email", token});
             } else {
                 res.status(400).json({ status: false, message: result.data});
             }

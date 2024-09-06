@@ -8,6 +8,8 @@ import LocationPage from "../../Pages/User/LocationPage";
 import UserOTP from "../../Pages/User/UserOTP";
 import UserDashboardPage from "../../Pages/User/UserDashboardPage";
 import UserForgotPassword from "../../Pages/User/UserForgotPassword";
+import ForgotPasswordOtpPage from "../../Pages/User/ForgotPasswordOtp"
+import PasswordResetPage from "../../Pages/User/PasswordReset";
 import ProtectedRoute from "../../ProtectedRoute/ProtectedRoute";
 
 function UserRoute() {
@@ -22,6 +24,8 @@ function UserRoute() {
             <Route path="/otp_Verify" element={<UserOTP />} />
             <Route path="/dashboard" element={ <UserDashboardPage />} />
             <Route path="/forgot-password" element={ <UserForgotPassword />} />
+            <Route path="/forgotPasswordOtp" element={<ForgotPasswordOtpPage /> } />
+            <Route path="/password_Reset" element={<PasswordResetPage /> } />
         </Routes>
         </>
     )

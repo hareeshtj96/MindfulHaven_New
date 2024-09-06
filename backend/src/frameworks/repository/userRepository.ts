@@ -1,3 +1,4 @@
+import dependencies from "../config/dependencies";
 import { databaseSchema } from "../database";
 import bcrypt from "bcryptjs";
 
@@ -50,18 +51,17 @@ export default {
         }
     },
 
-    updateUserPassword: async ({ email, hashedPassword }: {email:string, hashedPassword: string }) => {
+    updateUserPassword: async ({ email, hashedPassword }: { email: string; hashedPassword: string }) => {
         try {
-
-            console.log("email:", email);
-            const user = await databaseSchema.User.findOneAndUpdate(
-                {email:email},
+    
+            const updatedUser = await databaseSchema.User.findOneAndUpdate(
+                {email},
                 {password: hashedPassword },
             );
 
-            console.log('user:', user);
+            console.log('updateduser:', updatedUser);
 
-            if(user) {
+            if(updatedUser) {
                 return { status: true, data: "password updated successfully"};
             } else {
                 return { status: false, message: "User not found or update failed"}

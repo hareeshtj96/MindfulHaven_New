@@ -1,10 +1,10 @@
 import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useDispatch, useSelector} from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { logintherapist, clearError } from "../../Store/Slices/therapistSlice";
+import { logintherapist, clearError } from "../../Redux/Store/Slices/therapistSlice"
 import {Link} from "react-router-dom"
 import loginImg from "../../../Public/banner/therapist-login.png";
-import { RootState, AppDispatch } from "../../Store/store";
+import { RootState, AppDispatch } from "../../Redux/Store/store";
 
 function TherapistLogin () {
     

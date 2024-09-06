@@ -2,12 +2,15 @@ import React, { useState, useEffect, FormEvent } from "react";
 import {useDispatch, useSelector} from 'react-redux';
 import { useNavigate } from "react-router-dom";
 import backgroundImage from '../../../Public/banner/register_img.jpg';
-import { registerUser, googleRegister,  clearError } from "../../Store/Slices/userSlice";
+import { registerUser, googleRegister,  clearError } from "../../Redux/Store/Slices/userSlice";
 import googleLogo from '../../../Public/banner/Google_logo.png';
 import {Link} from "react-router-dom"
 import {auth} from '../../FirebaseConfig/firebaseConfig';
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
-import { RootState, AppDispatch } from "../../../src/Store/store";
+import { RootState, AppDispatch } from "../../Redux/Store/store";
+import axios from "axios";
+
+
 
 //define type for error state
 interface Errors {
@@ -26,6 +29,7 @@ function Register() {
     const [password, setPassword] = useState<string>("")
     const [confirmPassword, setConfirmPassword] = useState<string>("")
     const [errors, setErrors] = useState<Errors>({})
+    const [cancelTokenSource] = useState(axios.CancelToken.source);
 
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
@@ -118,6 +122,12 @@ function Register() {
             })
     }
 
+    // cleanup function to cancel the request if component unmounts
+    useEffect(() => {
+        return () => {
+            cancelTokenSource.cancel('operation canceled by user');
+        }
+    },[cancelTokenSource]);
     
 
     return (

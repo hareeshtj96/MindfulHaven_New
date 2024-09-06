@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import { ADMINLOGIN } from "../../../Services/adminApi";
 
 
 interface Admin {
@@ -32,7 +33,7 @@ export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, passwo
     async (adminData, thunkAPI) => {
         console.log("entered loginAdminslice");
         try {
-            const response = await axios.post('http://localhost:8080/admin/admin_login', adminData, {
+            const response = await axios.post( ADMINLOGIN, adminData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },

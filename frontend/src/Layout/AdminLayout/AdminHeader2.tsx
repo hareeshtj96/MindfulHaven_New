@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FaBell, FaUser } from 'react-icons/fa'; 
 import logoImage from '../../../Public/banner/MindfulHaven_logo.png';
-import {logout} from '../../Store/Slices/adminSlice';
-import { RootState, AppDispatch } from "../../../src/Store/store";
+import {logout} from '../../Redux/Store/Slices/adminSlice'
+import { RootState, AppDispatch } from "../../Redux/Store/store";
 
 function AdminHeader2() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)

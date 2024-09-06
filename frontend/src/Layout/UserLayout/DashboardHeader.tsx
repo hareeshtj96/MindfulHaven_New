@@ -3,9 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import logoImage from '../../../Public/banner/MindfulHaven_logo.png';
 import {FaUserCircle} from 'react-icons/fa';
-import { logoutUser } from "../../Store/Slices/userSlice";
-import { RootState, AppDispatch } from "../../../src/Store/store";
-
+import { logoutUser } from "../../Redux/Store/Slices/userSlice"
+import { RootState, AppDispatch } from "../../Redux/Store/store";
 
 function DashboardHeader() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -81,6 +80,13 @@ function DashboardHeader() {
                         <FaUserCircle className="text-2xl" />
                         <span className="hidden md:inline">{user?.name || 'user'}</span>
                     </button>
+
+                    {isDropdownOpen && (
+                        <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
+                            <button  className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Profile</button>
+                        </div>
+                    )}
+
                     {isDropdownOpen && (
                         <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg z-50">
                             <button onClick={handleLogOut} className="w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-200">Logout</button>
