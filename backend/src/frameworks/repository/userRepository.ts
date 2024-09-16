@@ -70,6 +70,42 @@ export default {
             console.error("Error in updating user password:", error);
             throw new Error("Internal Server Error");
         }
+    },   
+
+    getUserProfile: async(email: string) => {
+        try {
+            const user = await databaseSchema.User.findOne({email});
+            console.log("foind user profile:", user);
+            console.log("user profile:", user);
+
+            if(user) {
+                return { status: true, data: {user}}
+            } else {
+                return { status: false, message: "User profile not found"}
+            }
+        } catch (error) {
+            console.log("Error in user repository:", error);
+            return { status: false, message: "Error occured during getting user profile"}
+        }
+    },
+
+    getChildTherapist: async() => {
+        try {
+            const therapists = await databaseSchema.Therapist.find({ 
+                specialization: 'Child Therapy',
+                isVerified: true
+            });
+            console.log("child therapist found:", therapists);
+            return {
+                status: true,
+                data: therapists
+            };
+        } catch (error) {
+            console.error("Error fetching child therapists:", error);
+            return {
+                status: false, message: "Error fetching child therapists"
+            }
+        }
     }
 
 }

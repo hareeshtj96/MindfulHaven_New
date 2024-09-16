@@ -1,9 +1,17 @@
 import { userRepository, adminRepository, therapistRepository } from "../repository";
-import { userRegistration, userRegistrationGoogle, userLoginGoogle, userLogin, forgotPassword, resetPassword } from "../../application/UseCases";
+import { 
+    userRegistration, 
+    userRegistrationGoogle, 
+    userLoginGoogle, 
+    userLogin, 
+    forgotPassword, 
+    resetPassword, 
+    getUserProfileUsecase,
+    getChildTherapistUsecase } from "../../application/UseCases";
 
-import { adminLogin } from "../../application/adminUseCases";
+import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase } from "../../application/adminUseCases";
 
-import { therapistRegistration } from "../../application/therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase } from "../../application/therapistUseCases";
 
 const useCase: any={
     userRegistration: userRegistration,
@@ -12,13 +20,20 @@ const useCase: any={
     userLogin: userLogin,
     forgotPassword: forgotPassword,
     resetPassword: resetPassword,
+    getUserProfileUsecase:getUserProfileUsecase,
+    getChildTherapistUsecase:getChildTherapistUsecase,
 
     
 
     adminLogin: adminLogin,
+    getAllUsecase:getAllUsecase,
+    getUsersUsecase: getUsersUsecase,
+    getVerifiedUsecase: getVerifiedUsecase,
+    
 
 
-    therapistRegistration: therapistRegistration
+    therapistRegistration: therapistRegistration,
+    getTherapistProfileUsecase: getTherapistProfileUsecase
 }
 
 const repository:any={

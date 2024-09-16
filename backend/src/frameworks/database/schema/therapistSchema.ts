@@ -40,9 +40,20 @@ const therapistSchema = new Schema({
     location: {
         type: String,
     },
-    timings: {
-        type: String,
-    },
+    timings: [{
+        dayOfWeek: {
+            type: [Number],
+            required: true,
+        },
+        startTime: {
+            type: String,
+            required: true,
+        },
+        endTime: {
+            type: String,
+            required: true,
+        },
+    }],
     fees: {
         type: Number,
     },

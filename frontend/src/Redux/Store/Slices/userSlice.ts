@@ -1,19 +1,25 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import axiosInstance from "../../../AxiosConfig/AxiosConfig";
-import { USERREGISTER } from "../../../Services/userApi";
-import { GOOGLEREGISTER } from "../../../Services/userApi";
-import { VERIFYOTP } from "../../../Services/userApi";
-import { USERLOGIN } from "../../../Services/userApi";
-import { FORGOTPASSWORD } from "../../../Services/userApi";
-import { FORGOTPASSWORDOTP } from "../../../Services/userApi";
-import { PASSWORDRESET } from "../../../Services/userApi";
+import { USERREGISTER,
+    GOOGLEREGISTER,
+    VERIFYOTP,
+    USERLOGIN,
+    FORGOTPASSWORD,
+    FORGOTPASSWORDOTP,
+    PASSWORDRESET,
+    RESENDOTP,
+    GETUSERPROFILE,
+    GETCHILDTHERAPIST
+ } from "../../../Services/userApi";
+
 
 
 interface User {
     id: string;
     name: string;
     email: string;
+    mobile: string;
 }
 
 interface RegisterResponse {
@@ -32,6 +38,16 @@ interface ForgotPasswordResponse {
     message: string;
 }
 
+interface Therapist {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    specialization: string;
+    professionalExperience: number;
+    photo: string;
+}
+
 
 interface PasswordResetPayload {
     newPassword: string;
@@ -40,6 +56,7 @@ interface PasswordResetPayload {
 
 interface UserState {
     user: User | null;
+    therapists: Therapist[];
     token: string | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
@@ -59,6 +76,7 @@ interface UserState {
 
 const initialState: UserState = {
     user: null,
+    therapists: [],
     token: localStorage.getItem('token'),
     status: 'idle',
     error: null,
@@ -155,6 +173,30 @@ export const verifyOtp = createAsyncThunk<{status: boolean}, string, {rejectValu
     }
 )
 
+export const resendOtp = createAsyncThunk<{status: boolean; message: string; token: string}, void, { rejectValue: string}>(
+    "user/resendOtp",
+    async (_, thunkAPI) => {
+        try {
+            const token = localStorage.getItem("otpToken");
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
+
+            const response = await axios.post(RESENDOTP, {}, config);
+            if(response.data.status) {
+                return response.data;
+            } else {
+                return thunkAPI.rejectWithValue(response.data.message);
+            }
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue("Error resending OTP");
+        }
+    }
+)
+
 
 export const loginUser = createAsyncThunk<LoginResponse, {email: string, password: string}, {rejectValue:string}>(
     'user/loginUser',
@@ -243,7 +285,7 @@ export const PasswordResetSlice = createAsyncThunk<ForgotPasswordResponse, Passw
     async (passwordData, thunkAPI) => {
         console.log("password data:", passwordData);
         try {
-            const token = localStorage.getItem("newToken");
+            const token = localStorage.getItem("token");
             console.log("Token retrieved for password reset:", token);
             if(!token) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
@@ -259,6 +301,48 @@ export const PasswordResetSlice = createAsyncThunk<ForgotPasswordResponse, Passw
             return response.data;
         } catch (error:any) {
             const message = error.response?.data?.message || "An error occurred";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
+export const fetchUserProfile = createAsyncThunk<User[], void, {rejectValue: string}>(
+    "user/fetchuserProfile",
+    async(_, thunkAPI) => {
+        try {
+            const token = localStorage.getItem("token");
+            console.log("token recieved:", token);
+
+            if(!token) {
+                return thunkAPI.rejectWithValue("Token is missing or invalid");
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            }
+            const response = await axios.get(GETUSERPROFILE, config);
+            console.log("response from user slice:", response);
+            console.log("response data data user", response.data.data.user);
+            return response.data.data.user;
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch profile";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+) 
+
+export const fetchChildTherapist = createAsyncThunk<Therapist[], void, {rejectValue: string}>(
+    'user/fetchChildTherapist',
+    async(_, thunkAPI) => {
+        try {
+            const response = await axios.get(GETCHILDTHERAPIST);
+            console.log("Response from fetch child therapist slice:", response);
+            return response.data.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Failed to fetch child therapists';
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -363,7 +447,20 @@ const userSlice = createSlice({
             .addCase(PasswordResetSlice.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.resetPasswordStatus = 'failed';
                 state.resetPasswordError = action.payload || "Password reset failed";
+            })
+            .addCase(fetchChildTherapist.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(fetchChildTherapist.fulfilled, (state, action: PayloadAction<Therapist[]>) => {
+                state.status = 'succeeded';
+                state.therapists = action.payload; // Store the fetched therapists
+            })
+            .addCase(fetchChildTherapist.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.status = 'failed';
+                state.error = action.payload || "Failed to fetch therapists";
             });
+            
     }
 })
 

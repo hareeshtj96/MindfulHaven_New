@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateTherapistDetails } from "../../Redux/Store/Slices/therapistSlice";
 import { RootState, AppDispatch } from "../../Redux/Store/store";
@@ -8,9 +8,11 @@ import "react-toastify/dist/ReactToastify.css";
 
 
 const TherapistDetails = () => {
-    const navigate = useLocation();
-    const therapist = useSelector((state: RootState) => state.therapist.therapist)
+    const navigate = useNavigate()
+    const therapist = useSelector((state: RootState) => state.therapist.currentTherapist)
     const dispatch: AppDispatch = useDispatch();
+
+
     const [name, setName] = useState<string>('');
     // const [email, setEmail] = useState<string>('');
     const [phone, setPhone] = useState<string>('');
@@ -22,23 +24,43 @@ const TherapistDetails = () => {
     const [professionalExperience, setProfessionalExperience] = useState<string>('');
     const [establishment, setEstablishment] = useState<string>('');
     const [location, setLocation] = useState<string>('');
-    const [timings, setTimings] = useState<string>('');
+    const [timings, setTimings] = useState<Array<{ dayOfWeek: number[], startTime: string, endTime: string }>>([]);
     const [fees, setFees] = useState<number | ''>('');
     const [photoBase64, setPhotoBase64] = useState<File | null>(null);
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        console.log("e target:", e.target.files);
         if (e.target.files && e.target.files[0]) {
-          const file = e.target.files[0];
-            setPhotoBase64(file);
-            setIdentityProof(file);
+
+            console.log('hiiiiii....');
+            
+            const file = e.target.files[0];
+    
+            if (e.target.name === "photo") {
+                setPhotoBase64(file);      
+            } else if (e.target.name === "identityProof") {
+                console.log("identiyu.....")
+                setIdentityProof(file);    
+            }
         }
     };
+
+    const handleAddTiming = () => {
+        setTimings([...timings, { dayOfWeek: [], startTime: '', endTime: ''}])
+    };
+
+    const handleTimingChange = (index: number, field: string, value: any) => {
+        const updatedTimings = [...timings];
+        updatedTimings[index][field as keyof typeof updatedTimings[0]] = value;
+        setTimings(updatedTimings);
+    }
 
 
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
+        console.log("indentity proof:", identityProof);
 
         if(!name) newErrors.name = "Name is required";
         if(!phone) newErrors.phone = "Phone number is required";
@@ -50,7 +72,7 @@ const TherapistDetails = () => {
         if(!professionalExperience) newErrors.professionalExperience = "Professional experience is required";
         if(!establishment) newErrors.establishment = "Establishment is required";
         if(!location) newErrors.location = "Location is required";
-        if(!timings) newErrors.timings = "Timings are required";
+        if(timings.length === 0) newErrors.timings = "At least one timing block is required";
         if(fees === ""){
             newErrors.fees = "Fees is required";
         } else if (fees <= 0) {
@@ -105,7 +127,7 @@ const TherapistDetails = () => {
             toast.success("Therapist details updated successfully!");
                       
             setTimeout(() => {
-                window.location.reload();
+                navigate("/therapist/therapist_profile");
             },2000);
         } catch (error) {
             toast.error("Failed to update therapist details. Please try again.")
@@ -187,6 +209,7 @@ const TherapistDetails = () => {
                     <input
                         type="file"
                         id="identityProof"
+                        name="identityProof" 
                         onChange={handleFileChange}
                         className="w-full p-2 border border-gray-300 rounded"
                     />
@@ -242,14 +265,27 @@ const TherapistDetails = () => {
                 </div>
 
                 <div className="col-span-2">
-                    <input
-                        type="text"
-                        id="timings"
-                        placeholder="Enter your timings"
-                        value={timings}
-                        onChange={(e) => setTimings(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded"
-                    />
+                    <label className="block">Availability (Timings)</label>
+                    {timings.map((timing, index) => (
+                        <div key={index} className="mb-4">
+                            <select className="w-full p-2 border border-gray-300 rounded mb-2" 
+                            onChange={(e) => handleTimingChange(index, 'dayOfWeek', [...e.target.selectedOptions].map(opt => parseInt(opt.value)))} multiple>
+                                <option value="1">Monday</option>
+                                <option value="2">Tuesday</option>
+                                <option value="3">Wednesday</option>
+                                <option value="4">Thursday</option>
+                                <option value="5">Friday</option>
+                                <option value="6">Saturday</option>
+                                <option value="7">Sunday</option>
+                            </select>
+                            <input type="time" className="w-full p-2 border border-gray-300 rounded mb-2" value={timing.startTime}
+                            onChange={(e) => handleTimingChange(index, 'startTime', e.target.value)} />
+
+                            <input type="time" className="w-full p-2 border border-gray-300 rounded mb-2" value={timing.endTime}
+                            onChange={(e) => handleTimingChange(index, 'endTime', e.target.value)} />
+                        </div>
+                    ))}
+                    <button type="button" onClick={handleAddTiming} className="bg-customGreen text-white py-2 px-4 rounded hover:bg-green-600">Add Timing Block</button>
                     {errors.timings && <p className="text-red-500">{errors.timings}</p>}
                 </div>
 
@@ -270,6 +306,7 @@ const TherapistDetails = () => {
                     <input
                         type="file"
                         id="photo"
+                        name="photo" 
                         onChange={handleFileChange}
                         className="w-full p-2 border border-gray-300 rounded"
                     />

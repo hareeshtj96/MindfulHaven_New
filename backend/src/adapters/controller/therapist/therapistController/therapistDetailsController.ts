@@ -6,23 +6,22 @@ import path from "path";
 import fs from "fs";
 
 
-
 dotenv.config();
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const uploadDir = path.join(__dirname,"../../../../uploads");
-        if(!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));
-    }
-})
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         const uploadDir = path.join(__dirname,"../../../../public/uploads");
+//         if(!fs.existsSync(uploadDir)) {
+//             fs.mkdirSync(uploadDir, { recursive: true });
+//         }
+//         cb(null, uploadDir);
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, Date.now() + path.extname(file.originalname));
+//     }
+// })
 
-const upload = multer({ storage });
+// const upload = multer({ storage });
 
 export default function therapistDetailsController(dependencies: any) {
     const { therapistRepository } = dependencies.repository;
@@ -58,16 +57,20 @@ export default function therapistDetailsController(dependencies: any) {
 
             let identityProofUrl = "";
 
+            console.log("req files:", req.files);
+
             if(req.files) {
                 const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
                 if(files['photo']) {
-                    photoUrl = files['photo'][0].path;
+                    photoUrl = files['photo'][0].filename;
                 }
 
                 if(files['identityProof']) {
-                    identityProofUrl = files['identityProof'][0].path;
+                    identityProofUrl = files['identityProof'][0].filename;
                 }
+
+               
             }
 
             
@@ -89,13 +92,16 @@ export default function therapistDetailsController(dependencies: any) {
                 photo: photoUrl
             }
 
+            console.log("hiiiiiiiii................");
+
             const saveResult = await therapistRepository.saveTherapist(newTherapist);
+            console.log("save result data:", saveResult);
 
             if(!saveResult) {
                 return res.status(500).json({ message: "Failed to save therapist data"});
             }
 
-            res.status(201).json({ status: true, message: "Therapist details saved successfully"})
+            res.status(201).json({ status: true, message: "Therapist details saved successfully", data: saveResult.data});
         } catch (error) {
             console.error("Error in therapistDetailsController:", error);
             res.status(500).json({ message: "Internal Server Error"});

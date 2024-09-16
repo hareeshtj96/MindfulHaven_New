@@ -95,7 +95,27 @@ export default {
             console.error("Error in saving Therapist:", error);
             return { status: false, message: "Internal Server Error"}
         }
-    }
+    },
+
+
+
+    getProfile: async(data: any) => {
+        try {
+            const therapist = await databaseSchema.Therapist.find();
+            console.log("therapist profile:", therapist);
+
+            if(therapist) {
+                return { status: true, data:{therapist}}
+            } else {
+                return { status: false, message: "Therapist profile not found"}
+            }
+        } catch (error) {
+            console.log("Error in therapist reposotry:", error);
+            return { status: false, message: "Error occured during getting therapist profile"}
+        }
+    },
+
+    
 }
 
 

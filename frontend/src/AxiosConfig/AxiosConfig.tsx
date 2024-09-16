@@ -20,9 +20,10 @@ let authInfo: AuthInfo = {
     role: null
 }
 
-export const setAuthInfo = (token: string, role:string) => {
+export const setAuthInfo = (token: string, role:string, refreshToken: string) => {
     authInfo = {accessToken: token, role: role};
     localStorage.setItem('authInfo', JSON.stringify(authInfo));
+    localStorage.setItem('refreshToken', refreshToken);
 }
 
 export const clearAuthInfo = () => {
@@ -67,7 +68,7 @@ axiosInstance.interceptors.response.use (
                     {baseURL: "http://localhost:8080/", withCredentials: true}
                 );
 
-                setAuthInfo(data.accessToken, data.role);
+                setAuthInfo(data.accessToken, data.role, data.refreshToken);
 
                 originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
                 originalRequest.headers['Role'] = data.role;

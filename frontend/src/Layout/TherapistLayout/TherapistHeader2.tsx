@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaUserCircle } from 'react-icons/fa'; 
 import logoImage from '../../../Public/banner/MindfulHaven_logo.png';
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom"; 
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../Redux/Store/Slices/therapistSlice"
@@ -11,7 +12,7 @@ function TherapistHeader2() {
     const navigate = useNavigate(); 
     const dispatch: AppDispatch = useDispatch();
 
-    const therapist = useSelector((state: RootState) => state.therapist.therapist);
+    const therapist = useSelector((state: RootState) => state.therapist.currentTherapist);
 
     console.log(therapist,"tyyt");
     
@@ -48,6 +49,9 @@ function TherapistHeader2() {
                         </button>
                         {isDropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
+
+                                <Link to="/therapist/therapist_profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</Link>
+
                                 <button
                                     onClick={handleLogout}
                                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

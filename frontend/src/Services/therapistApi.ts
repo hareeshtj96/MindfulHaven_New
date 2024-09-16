@@ -4,3 +4,4 @@ export const REGISTERTHERAPIST = `${BASE_URL}/therapist/therapist_register`;
 export const VERIFYOTP = `${BASE_URL}/therapist/therapist_OTP`;
 export const LOGINTHERAPIST = `${BASE_URL}/therapist/therapist_login`;
 export const UPDATETHERAPIST = `${BASE_URL}/therapist/therapist_details`;
+export const GETPROFILE = `${BASE_URL}/therapist/therapist_profile`;

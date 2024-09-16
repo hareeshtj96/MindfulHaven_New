@@ -37,7 +37,7 @@ export default function userLogin (dependencies: any) {
             const token = jwt.sign(
                 { userId: user.data._id, email: user.data.email, name: user.data.name, role: user.data.role },
                 SECRET_KEY,
-                { expiresIn: "1m" }
+                { expiresIn: "20m" }
             );
 
             // Generate Refresh token

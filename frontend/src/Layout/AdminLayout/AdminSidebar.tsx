@@ -1,10 +1,12 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface AdminSidebarProps {
     isSidebarOpen: boolean;
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ isSidebarOpen }) => {
+    const navigate = useNavigate();
     return (
         <aside className={`bg-green-200 h-screen ${isSidebarOpen ? 'block' : 'hidden'} md:block w-64 flex flex-col`}>
             <div className="flex flex-col justify-between h-full">
@@ -17,8 +19,15 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isSidebarOpen }) => {
                             </button>
                         </li>
                         <li>
-                            <button className="w-full text-left bg-green-600 text-white py-3 px-4 rounded-full hover:bg-green-700">
+                            <button className="w-full text-left bg-green-600 text-white py-3 px-4 rounded-full hover:bg-green-700"
+                            onClick={() => navigate("/admin/admin_getUsers")}>
                                 Users
+                            </button>
+                        </li>
+                        <li>
+                            <button className="w-full text-left bg-green-600 text-white py-3 px-4 rounded-full hover:bg-green-700"
+                            onClick={() => navigate("/admin/admin_getTherapist")}>
+                                Therapists
                             </button>
                         </li>
                         <li>

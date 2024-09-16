@@ -39,8 +39,28 @@ export default function therapistLogin (dependencies: any) {
                 { expiresIn: "1h" }
             );
 
+            // Exclude the password from the response
+            const therapistDetails = {
+                therapistId: therapist.user._id,
+                name: therapist.user.name,
+                email: therapist.user.email,
+                phone: therapist.user.phone,
+                specialization: therapist.user.specialization,
+                gender: therapist.user.gender,
+                educationalQualifications: therapist.user.educationalQualifications,
+                identityProof: therapist.user.identityProof,
+                counsellingQualification: therapist.user.counsellingQualification,
+                professionalExperience: therapist.user.professionalExperience,
+                establishment: therapist.user.establishment,
+                location: therapist.user.location,
+                timings: therapist.user.timings,
+                fees: therapist.user.fees,
+                photo: therapist.user.photo,
+                role: therapist.user.role
+            };
+
             // Send response
-            res.json({ status: true, token });
+            res.json({ status: true, token, therapist: therapistDetails });
         } catch (error) {
             console.error("Error in therapist loginController:", error);
             res.status(500).json({ message: "Internal Server Error" });

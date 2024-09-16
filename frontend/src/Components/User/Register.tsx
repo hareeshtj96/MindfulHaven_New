@@ -42,7 +42,7 @@ function Register() {
 
 
     useEffect(() => {
-        if (errors.general || error) {
+        if (Object.keys(errors).length > 0) {
             const timer = setTimeout(() => {
                 setErrors({});
                 dispatch(clearError());
@@ -77,22 +77,37 @@ function Register() {
 
     const validate = (): Errors => {
         const errors: Errors = {};
+        const nameRegex = /^[A-Za-z\s]+$/;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const mobileRegex = /^[0-9]{10}$/;
+        const mobileRegex = /^[6-9]{9}$/;
 
         if(!name) {
             errors.name = "Name is required";
+        } else if (!nameRegex.test(name)) {
+            errors.name = "Name should contain only alphabets and spaces";
         }
-        if(!email || !emailRegex.test(email)) {
-            errors.email = "Valid email is required";
+
+        if(!email) {
+            errors.email = "Email is required";
+        } else if (!emailRegex.test(email)) {
+            errors.email = "Enter a valid email address";
         }
-        if(!mobile || !mobileRegex.test(mobile)) {
-            errors.mobile = "Valid 10-digit mobile number is required";
+
+        if(!mobile) {
+            errors.mobile = "Mobile number is required";
+        } else if(!mobileRegex.test(mobile)) {
+            errors.mobile = "Enter a valid 10-digit mobile number starting with 6-9";
         }
-        if(!password || password.length < 6) {
+
+        if(!password) {
+            errors.password = "Password is required";
+        } else if (password.length < 6) {
             errors.password = "Password must be at least 6 characters long";
         }
-        if(password !== confirmPassword) {
+
+        if(!confirmPassword) {
+            errors.confirmPassword = "Confirm password is required";
+        } else if (password !== confirmPassword) {
             errors.confirmPassword = "Passwords do not match";
         }
         return errors;
@@ -129,6 +144,13 @@ function Register() {
         }
     },[cancelTokenSource]);
     
+    const handleMobileInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        // Only allow numbers (0-9), Backspace, Delete, Arrow keys
+        if (!/^[0-9]$/.test(e.key) && !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab"].includes(e.key)) {
+            e.preventDefault();
+        }
+    };
+    
 
     return (
         <div className="flex justify-center items-center h-screen  bg-cover bg-center" style={{backgroundImage: `url(${backgroundImage})`}}>
@@ -154,12 +176,13 @@ function Register() {
                         <input
                             type="text"
                             id="name"
+                            name="name"
                             placeholder="Enter your name"
                             className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.name ? "border-red-500" : ""
                             }`}
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            required
+                            
                         />
                         {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                     </div>
@@ -168,12 +191,13 @@ function Register() {
                         <input
                             type="email"
                             id="email"
+                            name="email"
                             placeholder="Enter email address"
                             className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.email ? "border-red-500" : ""
                             }`}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            required
+                            
                         />
                         {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
                     </div>
@@ -182,14 +206,12 @@ function Register() {
                         <input
                             type="tel"
                             id="mobile"
+                            name="mobile"
                             placeholder="Enter mobile number"
-                            className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.mobile ? "border-red-500" : ""
-                            }`}
+                            className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.mobile ? "border-red-500" : ""}`}
                             value={mobile}
                             onChange={(e) => setMobile(e.target.value)}
-                            pattern="[0-9]{10}"
-                            title="Please enter a 10-digit mobile number"
-                            required
+                            onKeyDown={handleMobileInput}
                         />
                         {errors.mobile && <p className="text-red-500 text-sm">{errors.mobile}</p>}
                     </div>
@@ -198,13 +220,14 @@ function Register() {
                         <input
                             type="password"
                             id="password"
+                            name="password"
                             placeholder="Enter password"
                             className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.password ? "border-red-500" : ""
                             }`}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             minLength={6}
-                            required
+                            
                         />
                         {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
                     </div>
@@ -213,12 +236,13 @@ function Register() {
                         <input
                             type="password"
                             id="confirmPassword"
+                            name="confirmPassword"
                             placeholder="Confirm password"
                             className={`w-full px-3 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors.confirmPassword ? "border-red-500" : ""
                             }`}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
+                            
                         />
                         {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
                     </div>

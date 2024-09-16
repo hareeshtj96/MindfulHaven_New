@@ -3,13 +3,20 @@ import familyImg from "../../../Public/banner/family_therapy.jpg";
 import individualImg from "../../../Public/banner/individual_therapy.jpg"
 import childImg from '../../../Public/banner/child_therapy.jpg'
 import coupleImg from '../../../Public/banner/couple_therapy.jpg'
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
     const [activeIndex, setActiveIndex] = useState(null);
+    const navigate = useNavigate();
 
     const toggleFAQ = (index:any) => {
         setActiveIndex(activeIndex === index ? null : index);
     }
+
+    const goToChildTherapy = () => {
+        navigate('/childTherapy');
+    }
+
     return (
         <div className="p-6">
             <section className="mb-16">
@@ -38,7 +45,7 @@ function Dashboard() {
                         </div>
                     </div>
 
-                    <div className="relative">
+                    <div className="relative" onClick={goToChildTherapy}>
                         <img src={childImg} alt="image3" className="w-full h-auto rounded-lg" />
                         <div className="absolute inset-0 flex items-end justify-center">
                             <span className="text-white font-bold text-lg bg-black bg-opacity-50 px-3 py-1 rounded">

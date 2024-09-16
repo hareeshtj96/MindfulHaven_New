@@ -10,6 +10,8 @@ import UserDashboardPage from "../../Pages/User/UserDashboardPage";
 import UserForgotPassword from "../../Pages/User/UserForgotPassword";
 import ForgotPasswordOtpPage from "../../Pages/User/ForgotPasswordOtp"
 import PasswordResetPage from "../../Pages/User/PasswordReset";
+import UserProfilePage from "../../Pages/User/UserProfilePage";
+import ChildTherapistListPage from "../../Pages/User/ChildTherapistListPage";
 import ProtectedRoute from "../../ProtectedRoute/ProtectedRoute";
 
 function UserRoute() {
@@ -26,6 +28,8 @@ function UserRoute() {
             <Route path="/forgot-password" element={ <UserForgotPassword />} />
             <Route path="/forgotPasswordOtp" element={<ForgotPasswordOtpPage /> } />
             <Route path="/password_Reset" element={<PasswordResetPage /> } />
+            <Route path="/user_profile" element={<UserProfilePage /> } />
+            <Route path="/childTherapy" element={<ChildTherapistListPage /> } />
         </Routes>
         </>
     )
