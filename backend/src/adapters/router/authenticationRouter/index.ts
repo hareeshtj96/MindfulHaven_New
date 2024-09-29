@@ -1,7 +1,9 @@
 import express from "express";
 import { userController, adminController, therapistController } from "../../controller";
 import  roleMiddleware  from "../../../middleware/roleMiddleware";
+import { verifyAccessToken } from "../../../middleware/accessTokenMiddleware";
 import multer from 'multer';
+
 
 
 const storage = multer.diskStorage({
@@ -33,6 +35,14 @@ export default (dependencies: any) =>{
        refreshTokenController,
        userProfileController,
        childTherapistController,
+       slotManagementController,
+       appointmentController,
+       bookingStatusController,
+       sessionsViewController,
+       completedBookingController,
+       cancelledBookingController,
+       appointmentBookedController,
+       searchTherapistsController
     } = userController(dependencies);
 
 
@@ -45,8 +55,18 @@ export default (dependencies: any) =>{
     router.post('/forgot_password_otp',resetPasswordOtpcontroller);
     router.post('/password_reset', resetPassword);
     router.post('/refresh_token', refreshTokenController);
-    router.get("/user_profile", userProfileController);
+    router.get("/user_profile", verifyAccessToken, userProfileController);
     router.get("/childTherapy", childTherapistController);
+    router.get('/slot_management/:id', slotManagementController);
+    router.get('/booked_slots/:id', appointmentBookedController);
+    router.post('/create_appointment', appointmentController);
+    router.get('/booking_status/:id', bookingStatusController);
+    router.get('/booking_details', sessionsViewController);
+    router.get('/booking_Completeddetails', completedBookingController);
+    router.get('/booking_Cancelleddetails', cancelledBookingController);
+    router.get('/search_therapist', searchTherapistsController);
+    
+
 
 
 
@@ -56,12 +76,16 @@ export default (dependencies: any) =>{
         adminGetTherapist,
         adminGetUsers,
         adminTherapistVerification,
+        adminUserBlock,
+        getTherapistDetails,
     } = adminController(dependencies);
 
     router.post('/admin/admin_login', adminLoginController);
     router.get('/admin/admin_getTherapist', adminGetTherapist);
     router.get('/admin/admin_getUsers', adminGetUsers);
     router.patch('/admin/therapist_getVerified/:id', adminTherapistVerification);
+    router.patch('/admin/user_blockUnblock/:id', adminUserBlock);
+    router.get('/admin/admin_getTherapistDetails/:id', getTherapistDetails);
     router.use('/admin/*', roleMiddleware(['admin']));
 
 
@@ -72,6 +96,7 @@ export default (dependencies: any) =>{
         therapistLogin,
         therapistDetailsController,
         getTherapistProfile,
+        getBookingsController,
     } = therapistController(dependencies);
 
 
@@ -80,6 +105,7 @@ export default (dependencies: any) =>{
     router.post('/therapist/therapist_login', therapistLogin);
     router.put('/therapist/therapist_details', upload, therapistDetailsController);
     router.get('/therapist/therapist_profile', getTherapistProfile);
+    router.get('/therapist/therapist_bookings/:id', getBookingsController);
    
 
     router.use('/therapist/*', roleMiddleware(['therapist']));

@@ -10,13 +10,22 @@ import { USERREGISTER,
     PASSWORDRESET,
     RESENDOTP,
     GETUSERPROFILE,
-    GETCHILDTHERAPIST
+    GETCHILDTHERAPIST,
+    GETSLOTS,
+    BOOKEDSLOTS,
+    SAVEAPPOINTMENT,
+    GETBOOKINGDETAILS,
+    GETSCHEDULEDBOOKINGS,
+    GETCOMPLETEDBOOKINGS,
+    GETCANCELLEDBOOKINGS,
+    SEARCHTHERAPIST
  } from "../../../Services/userApi";
 
 
 
+
 interface User {
-    id: string;
+    userId: string;
     name: string;
     email: string;
     mobile: string;
@@ -39,19 +48,39 @@ interface ForgotPasswordResponse {
 }
 
 interface Therapist {
-    id: string;
+    fees: number;
+    _id: string;
     name: string;
     email: string;
     phone: string;
     specialization: string;
     professionalExperience: number;
     photo: string;
+    availableSlots: string[];
+    bookedSlots: string[]
+    timings: {
+        startTime: string;
+        endTime: string
+    }[]
 }
 
 
 interface PasswordResetPayload {
     newPassword: string;
     confirmPassword: string;
+}
+
+export interface Booking {
+    _id: string;
+    therapistId: string;
+    slot: string;
+    status: string;
+}
+
+interface AppointmentState {
+    bookings: Booking[];
+    loading: boolean;
+    error: string | null;
 }
 
 interface UserState {
@@ -71,6 +100,23 @@ interface UserState {
     forgotPasswordStatus : 'idle' | 'loading' | 'succeeded' | 'failed';
     forgotPasswordError: string | null;
     forgotPasswordSuccess: string | null;
+    availableSlots: string[];
+    bookedSlots: string[];
+    timings: any[] 
+    appointmentData: any
+    appointmentStatus: string | null
+    appointmentError: string | null
+    scheduledBookings: Booking[];
+    completedBookings: Booking[];
+    cancelledBookings: Booking[];
+    bookings: Booking[];
+    totalPages: number
+    currentPage: number
+    completedTotalPages: number
+    completedCurrentPage: number
+    cancelledTotalPages: number
+    cancelledCurrentPage: number
+   
 }
 
 
@@ -91,7 +137,23 @@ const initialState: UserState = {
     forgotPasswordStatus: 'idle',
     forgotPasswordError: null,
     forgotPasswordSuccess: null,
-}
+    availableSlots: [],
+    bookedSlots: [],
+    timings: [],
+    appointmentData: null,
+    appointmentStatus: null,
+    appointmentError: null,
+    scheduledBookings: [],
+    completedBookings: [],
+    cancelledBookings: [],
+    bookings:[],
+    totalPages: 0,
+    currentPage: 0,
+    completedTotalPages: 0,
+    completedCurrentPage: 0,
+    cancelledCurrentPage: 0,
+    cancelledTotalPages: 0
+}   
 
 export const registerUser = createAsyncThunk<RegisterResponse, {name: string, email: string, mobile:string, password: string}, {rejectValue: string}>(
     'user/registerUser',
@@ -307,7 +369,7 @@ export const PasswordResetSlice = createAsyncThunk<ForgotPasswordResponse, Passw
 )
 
 
-export const fetchUserProfile = createAsyncThunk<User[], void, {rejectValue: string}>(
+export const fetchUserProfile = createAsyncThunk<User, void, {rejectValue: string}>(
     "user/fetchuserProfile",
     async(_, thunkAPI) => {
         try {
@@ -318,12 +380,13 @@ export const fetchUserProfile = createAsyncThunk<User[], void, {rejectValue: str
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
             }
 
+
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 }
             }
-            const response = await axios.get(GETUSERPROFILE, config);
+            const response = await axiosInstance.get(GETUSERPROFILE, config);
             console.log("response from user slice:", response);
             console.log("response data data user", response.data.data.user);
             return response.data.data.user;
@@ -338,12 +401,223 @@ export const fetchChildTherapist = createAsyncThunk<Therapist[], void, {rejectVa
     'user/fetchChildTherapist',
     async(_, thunkAPI) => {
         try {
-            const response = await axios.get(GETCHILDTHERAPIST);
+            const response = await axiosInstance.get(GETCHILDTHERAPIST);
             console.log("Response from fetch child therapist slice:", response);
             return response.data.data;
         } catch (error: any) {
             const message = error.response?.data?.message || 'Failed to fetch child therapists';
             return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+export const fetchAvailableSlots = createAsyncThunk<{ availableSlots: string[], timings: any[] }, string, { rejectValue: string}>(
+    'user/fetchAvailableSlots',
+    async(therapistId, thunkAPI) => {
+        try {
+            const response = await axiosInstance.get(`${GETSLOTS}/${therapistId}`);
+            console.log("response from fetch availble slots:", response);
+            console.log("response.data.data.availableSlots:", response.data.data.availableSlots)
+            return {
+                availableSlots: response.data.data.availableSlots,
+                timings: response.data.data.timings
+            }
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch available slots";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+export const fetchBookedSlots = createAsyncThunk<{ bookedSlots: string[] }, string, { rejectValue: string}>(
+    'user/fetchBookedSlotes',
+    async(therapistId, thunkAPI) => {
+        try {
+            const response = await axiosInstance.get(`${BOOKEDSLOTS}/${therapistId}`);
+            console.log("response from fetch booked slots:", response);
+
+            return {
+                bookedSlots: response.data.data
+                
+            }
+            
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch available slots";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
+
+export const saveAppointment = createAsyncThunk<
+    { success: boolean; appointmentData: any }, 
+    { therapistId: string; userId: string; slot: Date; notes: string },
+    { rejectValue: string } 
+>(
+    'user/saveAppointment',
+    async ({ therapistId, userId, slot, notes }, thunkAPI) => {
+        try {
+            const response = await axiosInstance.post(SAVEAPPOINTMENT, { therapistId, userId, slot, notes });
+
+            console.log("response from save appointment:", response);
+
+            // Returning the appointment data upon success
+            return {
+                success: true,
+                appointmentData: response.data.data
+            };
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to save appointment";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+export const getBookingDetails = createAsyncThunk<{success: boolean, bookingData: any}, {bookingId: string}, { rejectValue: string}>(
+    'user/bookingDetails',
+    async ({ bookingId}, thunkAPI) => {
+        try {
+            const response = await axiosInstance.get(`${GETBOOKINGDETAILS}/${bookingId}`);
+            console.log("response from booking details slice....:", response);
+            
+            return {
+                success: true,
+                bookingData: response.data
+            }
+        } catch (error: any) {
+            const message = error?.data?.message || "Failed to fetch booking details";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
+
+
+export const fetchScheduledBookingDetails = createAsyncThunk<{
+    bookings: Booking[]; 
+    totalPages: number;
+    currentPage: number;
+    }, 
+    {  page: number; limit: number}, 
+    {rejectValue: string}>(
+    "user/fetchScheduledBookingDetails",
+    async({ page, limit }, thunkAPI) => {
+        console.log("fetching page:", page,  "with limit:", limit);
+        try {
+            const token = localStorage.getItem("token");
+            console.log("token received:", token);
+
+            if(!token) {
+                return thunkAPI.rejectWithValue("Token is missing or invalid");
+            }
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            }
+            const response = await axiosInstance.get(`${GETSCHEDULEDBOOKINGS}?page=${page}&limit=${limit}`, config);
+            console.log("response data.data...", response.data.data);
+
+            return {
+                bookings: response.data.data.data.bookings,
+                totalPages: response.data.data.data.totalPages,
+                currentPage: response.data.data.data.currentPage,
+            }
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch profile";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+export const fetchCompletedBookingDetails = createAsyncThunk<{
+    bookings: Booking[]; 
+    totalPages: number;
+    currentPage: number;
+    }, 
+    {  page: number; limit: number}, 
+    {rejectValue: string}>(
+    "user/fetchCompletedBookingDetails",
+    async({ page, limit }, thunkAPI) => {
+        console.log("fetching page:", page,  "with limit:", limit);
+        try {
+            const token = localStorage.getItem("token");
+            console.log("token received:", token);
+
+            if(!token) {
+                return thunkAPI.rejectWithValue("Token is missing or invalid");
+            }
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            }
+            const response = await axiosInstance.get(`${GETCOMPLETEDBOOKINGS}?page=${page}&limit=${limit}`, config);
+            console.log("response data.data...", response.data.data);
+
+            return {
+                bookings: response.data.data.data.bookings,
+                totalPages: response.data.data.data.totalPages,
+                currentPage: response.data.data.data.currentPage,
+            }
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch profile";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
+export const fetchCancelledBookingDetails = createAsyncThunk<{
+    bookings: Booking[]; 
+    totalPages: number;
+    currentPage: number;
+    }, 
+    {  page: number; limit: number}, 
+    {rejectValue: string}>(
+    "user/fetchCancelledBookingDetails",
+    async({ page, limit }, thunkAPI) => {
+        console.log("fetching page:", page,  "with limit:", limit);
+        try {
+            const token = localStorage.getItem("token");
+            console.log("token received:", token);
+
+            if(!token) {
+                return thunkAPI.rejectWithValue("Token is missing or invalid");
+            }
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                }
+            }
+            const response = await axiosInstance.get(`${GETCANCELLEDBOOKINGS}?page=${page}&limit=${limit}`, config);
+            console.log("response data.data...", response.data.data);
+
+            return {
+                bookings: response.data.data.data.bookings,
+                totalPages: response.data.data.data.totalPages,
+                currentPage: response.data.data.data.currentPage,
+            }
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch profile";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
+export const fetchTherapistBySearchTerm = createAsyncThunk(
+    "therapist/fetchTherapistsBySeachTerm",
+    async (searchTerm: string, { rejectWithValue}) => {
+        try {
+            const response = await axios.get(SEARCHTHERAPIST, { params: {search: searchTerm}});
+            console.log("response from search therapist slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch therapist")
         }
     }
 )
@@ -360,6 +634,21 @@ const userSlice = createSlice({
         clearError: (state) => {
             state.loginError = null;
             state.error = null;
+        },
+        clearAppointmentStatus:(state) => {
+            state.appointmentStatus = null;
+            state.appointmentError = null;
+        },
+        setBookings: (state, action: PayloadAction<Booking[]>) => {
+            state.bookings = action.payload;
+        },
+        clearBookings: (state) => {
+            state.scheduledBookings = [];
+            state.cancelledBookings = [];
+            state.completedBookings = [];
+        },
+        resetSearchResults: (state) => {
+            state.therapists = [];
         }
     },
     extraReducers: (builder) => {
@@ -454,16 +743,150 @@ const userSlice = createSlice({
             })
             .addCase(fetchChildTherapist.fulfilled, (state, action: PayloadAction<Therapist[]>) => {
                 state.status = 'succeeded';
-                state.therapists = action.payload; // Store the fetched therapists
+                state.therapists = action.payload; 
             })
             .addCase(fetchChildTherapist.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.status = 'failed';
                 state.error = action.payload || "Failed to fetch therapists";
+            })
+            .addCase(fetchUserProfile.fulfilled, (state, action) => {
+                state.user = action.payload;
+                console.log("Updated user in Redux:", state.user);
+            })
+            .addCase(fetchAvailableSlots.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchAvailableSlots.fulfilled, (state, action) => {
+                state.loading = false;
+                state.availableSlots = action.payload.availableSlots;
+                state.timings = action.payload.timings;
+               
+            })
+            .addCase(fetchAvailableSlots.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(fetchBookedSlots.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchBookedSlots.fulfilled, (state, action) => {
+                state.loading = false;
+                console.log("action paylod from fetch booked:", action.payload);
+                
+                state.bookedSlots = action.payload.bookedSlots
+            })
+            .addCase(saveAppointment.pending, (state) => {
+                state.loading = true;
+                state.appointmentStatus = null;
+                state.error = null;
+            })
+            .addCase(saveAppointment.fulfilled, (state, action) => {
+                state.loading = false;
+                state.appointmentData = action.payload.appointmentData;
+                state.appointmentStatus = 'success'
+                state.appointmentError = null;
+            })
+            .addCase(saveAppointment.rejected, (state, action) => {
+                state.loading = false;
+                state.appointmentStatus = 'failed';
+                state.appointmentError = action.payload as string
+            })
+            .addCase(fetchScheduledBookingDetails.fulfilled, (state, action: PayloadAction<{
+                bookings: Booking[];
+                totalPages: number;
+                currentPage: number;
+            }>) => {
+                const { bookings, totalPages, currentPage } = action.payload;
+            
+                // Reset only the scheduledBookings, since you are fetching only scheduled ones
+                state.scheduledBookings = [];
+            
+                // Loop through bookings and only add scheduled ones
+                bookings.forEach((booking) => {
+                    if (booking.status === "scheduled") {
+                        state.scheduledBookings.push(booking);
+                    }
+                });
+            
+                // Set pagination details
+                state.totalPages = totalPages; 
+                state.currentPage = currentPage;
+            
+                console.log("updated scheduledBookings state:", state.scheduledBookings);
+            })
+            .addCase(fetchCompletedBookingDetails.fulfilled, (state, action: PayloadAction<{
+                bookings: Booking[];
+                totalPages: number;
+                currentPage: number;
+            }>) => {
+                const { bookings, totalPages, currentPage } = action.payload;
+            
+                // Reset only the scheduledBookings, since you are fetching only scheduled ones
+                state.completedBookings = [];
+            
+                // Loop through bookings and only add scheduled ones
+                bookings.forEach((booking) => {
+                    if (booking.status === "completed") {
+                        state.completedBookings.push(booking);
+                    }
+                });
+            
+                // Set pagination details
+                state.completedTotalPages = totalPages; 
+                state.completedCurrentPage = currentPage;
+            
+                console.log("updated completed Bookings state:", state.completedBookings);
+            })
+            .addCase(fetchCancelledBookingDetails.fulfilled, (state, action: PayloadAction<{
+                bookings: Booking[];
+                totalPages: number;
+                currentPage: number;
+            }>) => {
+                const { bookings, totalPages, currentPage } = action.payload;
+            
+                
+                state.cancelledBookings = [];
+            
+                // Loop through bookings and only add scheduled ones
+                bookings.forEach((booking) => {
+                    if (booking.status === "cancelled") {
+                        state.cancelledBookings.push(booking);
+                    }
+                });
+            
+                // Set pagination details
+                state.cancelledTotalPages = totalPages; 
+                state.cancelledCurrentPage = currentPage;
+            
+                console.log("updated cancelled Bookings state:", state.cancelledBookings);
+            })
+            .addCase(fetchScheduledBookingDetails.pending, (state) => {
+                state.scheduledBookings = []; 
+            })
+            .addCase(fetchCompletedBookingDetails.pending, (state) => {
+                state.completedBookings = []; 
+            })
+            .addCase(fetchCancelledBookingDetails.pending, (state) => {
+                state.cancelledBookings = []; 
+            })
+            .addCase(fetchTherapistBySearchTerm.pending, (state) => {
+                state.status = 'loading'; 
+            })
+            .addCase(fetchTherapistBySearchTerm.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.therapists = action.payload; 
+            })
+            .addCase(fetchTherapistBySearchTerm.rejected, (state, action) => {
+                state.status = 'failed'; 
+                state.error = null; 
             });
+                      
             
     }
 })
 
-export const { logoutUser, clearError } = userSlice.actions;
+export const { logoutUser, clearError, clearAppointmentStatus, clearBookings, resetSearchResults } = userSlice.actions;
 
 export default userSlice.reducer;

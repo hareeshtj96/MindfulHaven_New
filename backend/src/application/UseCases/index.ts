@@ -7,6 +7,14 @@ import resetPassword from "./resetPassword";
 import refreshTokenUseCase from "./refreshTokenUseCase";
 import getUserProfileUsecase from "./getUserProfileUsecase";
 import getChildTherapistUsecase from "./getChildTherapistUsecase";
+import getSlotsUsecase from "./getSlotsUsecase";
+import getAppointmentUsecase from "./getAppointmentUsecase";
+import bookingDetailstUsecase from "./bookingDetailstUsecase";
+import getAllBookings from "./getAllBookings";
+import getCompletedBookings from "./getCompletedBookings";
+import getCancelledBookings from "./getCancelledBookings";
+import getBookedSlotsUsecase from "./getBookedSlotsUsecase";
+import searchTherapistUsecase from "./searchTherapistUsecase";
 
 export {
     userRegistration,
@@ -17,5 +25,13 @@ export {
     resetPassword,
     refreshTokenUseCase,
     getUserProfileUsecase,
-    getChildTherapistUsecase
+    getChildTherapistUsecase,
+    getSlotsUsecase,
+    getAppointmentUsecase,
+    bookingDetailstUsecase,
+    getAllBookings,
+    getCompletedBookings,
+    getCancelledBookings,
+    getBookedSlotsUsecase,
+    searchTherapistUsecase
 }

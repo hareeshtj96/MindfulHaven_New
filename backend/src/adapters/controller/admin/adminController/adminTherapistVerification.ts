@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import { sendVerificationEmail } from "../../../../utils/nodemailer";
 import dotenv from 'dotenv';
 dotenv.config()
 
@@ -21,7 +22,21 @@ export default (dependencies: any) => {
             const response = await getVerifiedUsecase(dependencies).executeFunction(therapistId);
 
             if(response && response.status) {
-                console.log("response form controller:", response)
+                const therapist = response.data;
+               
+                const isVerified = therapist.isVerified;
+
+                //send email notification
+                const emailResponse = await sendVerificationEmail(
+                    therapist.therapist.email,
+                    therapist.therapist.name,
+                    therapist.therapist.isVerified
+                )
+                console.log("emaill response:", emailResponse);
+                if (!emailResponse.status) {
+                    console.error("Failed to send email:", emailResponse.message)
+                }
+                
                 return res.status(200).json({ status: true, data: response.data});
             } else {
                 return res.status(404).json({ status: false, message: "Data not found"})

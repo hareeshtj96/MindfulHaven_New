@@ -2,16 +2,19 @@ import dependencies from "../../frameworks/config/dependencies";
 import generateToken, {verifyToken} from "../../utils/generateToken";
 import { JwtPayload } from "jsonwebtoken";
 
+
+const REFRESH_SECRET_KEY = process.env.JWT_REFRESH_SECRET || "your-refresh-secret-key";
+
 export default (dependencies: any) => {
     const { userRepository } = dependencies.repository;
 
-    const executionFunction = async (data: any) => {
+    const executionFunction = async (refreshToken: string) => {
         try {
-            const { refreshToken } = data;
-
+            
             const decoded = verifyToken(refreshToken) as JwtPayload;
 
             const userId = decoded.userId;
+            console.log("user id from use case refresh token:", userId);
 
             if(!userId) {
                 return { status: false, message: 'Invalid token payload'};

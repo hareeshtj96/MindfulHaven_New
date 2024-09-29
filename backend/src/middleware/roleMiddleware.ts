@@ -15,6 +15,7 @@ const roleMiddleware = (allowedRoles: string[]) => {
             console.log("decoded Token:", decodedToken);
 
             const role = decodedToken?.userData?.role;
+            console.log("role from rolemiddleware:", role);
             if(!role || !allowedRoles.includes(role)) {
                 return res.status(403).json({ message: 'Access denied: insufficient permissions'})
             }

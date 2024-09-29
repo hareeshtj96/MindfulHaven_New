@@ -25,6 +25,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@material-tailwind/react": "^2.1.10",
     "@types/multer": "^1.4.12",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
@@ -36,6 +37,7 @@
     "nodemailer": "^6.9.14",
     "nodemon": "^3.1.4",
     "react-modal": "^3.16.1",
+    "rrule": "^2.8.1",
     "twilio": "^5.2.2"
   }
 }

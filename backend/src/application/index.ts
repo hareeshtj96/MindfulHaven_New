@@ -1,4 +1,19 @@
-import { userRegistration, userLogin, userLoginGoogle, userRegistrationGoogle, forgotPassword, resetPassword, refreshTokenUseCase, getUserProfileUsecase } from "./UseCases";
+import { userRegistration, 
+    userLogin, 
+    userLoginGoogle, 
+    userRegistrationGoogle, 
+    forgotPassword, 
+    resetPassword, 
+    refreshTokenUseCase, 
+    getUserProfileUsecase,
+    getSlotsUsecase,
+    getAppointmentUsecase,
+    getAllBookings,
+    getCompletedBookings,
+    getCancelledBookings,
+    getBookedSlotsUsecase,
+    searchTherapistUsecase
+ } from "./UseCases";
 
 export {
     userRegistration,
@@ -8,16 +23,25 @@ export {
     forgotPassword,
     resetPassword,
     refreshTokenUseCase,
-    getUserProfileUsecase
+    getUserProfileUsecase,
+    getSlotsUsecase,
+    getAppointmentUsecase,
+    getAllBookings,
+    getCompletedBookings,
+    getCancelledBookings,
+    getBookedSlotsUsecase,
+    searchTherapistUsecase
 }
 
 
 
-import { adminLogin, getAllUsecase } from "./adminUseCases";
+import { adminLogin, getAllUsecase, getuserBlockUsecase, therapistDetailstUsecase} from "./adminUseCases";
 
 export {
     adminLogin,
     getAllUsecase,
+    getuserBlockUsecase,
+    therapistDetailstUsecase
 }
 
 

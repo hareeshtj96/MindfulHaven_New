@@ -8,7 +8,7 @@ export default (dependencies: any) => {
         console.log("Entered child therapist controller");
         try {
             const response = await getChildTherapistUsecase(dependencies).executeFunction()
-            console.log("response from child controler:", response);
+          
 
             if(response && response.status) {
                 res.status(200).json({ status: true, data: response.data });

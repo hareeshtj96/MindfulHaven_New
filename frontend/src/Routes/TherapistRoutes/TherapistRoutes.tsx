@@ -7,6 +7,7 @@ import TherapistLoginPage from "../../Pages/Therapist/TherapistLoginPage";
 import TherapistProtectedRoute from "../../ProtectedRoute/TherapistProtectedRoute";
 import TherapistDetailsPage from "../../Pages/Therapist/TherapistDetailsPage";
 import TherapistProfilePage from "../../Pages/Therapist/TherapistProfilePage";
+import BookingsListPage from "../../Pages/Therapist/BookingsListPage";
 
 
 function TherapistRoutes() {
@@ -19,6 +20,7 @@ function TherapistRoutes() {
             <Route path="/therapist_dashboard" element={<TherapistProtectedRoute> <TherapistDashboardPage /> </TherapistProtectedRoute> } />
             <Route path="/therapist_details" element={<TherapistProtectedRoute> <TherapistDetailsPage /> </TherapistProtectedRoute> }/>
             <Route path="/therapist_profile" element={<TherapistProtectedRoute> <TherapistProfilePage />  </TherapistProtectedRoute>  }/>
+            <Route path="/therapist_bookings/:therapistId" element={<BookingsListPage /> }/>
         </Routes>
         </>
     )

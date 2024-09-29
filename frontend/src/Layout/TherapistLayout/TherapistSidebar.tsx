@@ -1,12 +1,24 @@
 import React, { useState } from "react";
 import { FaCalendar, FaUser, FaHistory, FaFileAlt, FaCog } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { RootState, AppDispatch } from "../../Redux/Store/store";
 
 function TherapistSidebar() {
     const [isOpen, setIsOpen] = useState(false);
+    const therapist = useSelector((state: RootState) => state.therapist.currentTherapist);
+    const therapistId = therapist?.therapistId
+    console.log("therpist id:", therapistId);
+    
+    const navigate = useNavigate()
 
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
+
+    const handleNavigate = () => {
+        navigate(`/therapist/therapist_bookings/${therapistId}`);
+    }
 
     return (
         <div>
@@ -41,9 +53,9 @@ function TherapistSidebar() {
                         <FaUser className="inline-block mr-2" />
                         {isOpen && 'Patients'}
                     </button>
-                    <button className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
+                    <button onClick={handleNavigate} className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
                         <FaHistory className="inline-block mr-2" />
-                        {isOpen && 'Session History'}
+                        {isOpen && 'Bookings'}
                     </button>
                     <button className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
                         <FaFileAlt className="inline-block mr-2" />

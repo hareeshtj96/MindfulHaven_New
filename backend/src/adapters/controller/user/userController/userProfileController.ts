@@ -38,8 +38,7 @@ export default (dependencies: any) => {
             }
 
             const response = await getUserProfileUsecase(dependencies).executeFunction({ email });
-            console.log("response from user profile controller:", response);
-
+           
             if (response && response.status) {
                 console.log("response from controller:", response);
                 res.status(200).json({ status: true, data: response.data });

@@ -4,6 +4,7 @@ import verifyOTP from "./verifyOTP"
 import therapistLogin from "./therapistLoginController"
 import therapistDetailsController from "./therapistDetailsController"
 import getTherapistProfile from "./getTherapistProfile"
+import getBookingsController from "./getBookingsController"
 
 export default (dependencies: any) => {
     return {
@@ -12,5 +13,6 @@ export default (dependencies: any) => {
         therapistLogin: therapistLogin(dependencies),
         therapistDetailsController: therapistDetailsController(dependencies),
         getTherapistProfile: getTherapistProfile(dependencies),
+        getBookingsController: getBookingsController(dependencies)
     }
 }

@@ -1,4 +1,5 @@
 import { databaseSchema } from "../database";
+const mongoose = require('mongoose');
 import bcrypt from "bcryptjs";
 import dotenv from 'dotenv';
 dotenv.config();
@@ -57,43 +58,53 @@ export default {
         }
     },
 
+    
     saveTherapist: async (therapistData: any) => {
         try {
-
             console.log("therapist data:", therapistData);
-            const existingTherapist = await databaseSchema.Therapist.findById(therapistData.therapistId);
-            console.log("existing therapist:", existingTherapist);
-
-            if(existingTherapist) {
-                const updatedTherapist = await databaseSchema.Therapist.findByIdAndUpdate(
-                    therapistData.therapistId,
-                    {
-                        name: therapistData.name,
-                        phone: therapistData.phone,
-                        specialization: therapistData.specialization,
-                        gender: therapistData.gender,
-                        educationalQualifications: therapistData.educationalQualifications,
-                        identityProof: therapistData.identityProof,
-                        counsellingQualification: therapistData.counsellingQualification,
-                        professionalExperience: therapistData.professionalExperience,
-                        establishment: therapistData.establishment,
-                        location: therapistData.location,
-                        timings: therapistData.timings,
-                        fees: therapistData.fees,
-                        photo: therapistData.photo,
-                    },
-                    { new: true, runValidators: true}
-                );
-
-                return { status: true, data: updatedTherapist };
-            } else {
-                const therapist = new databaseSchema.Therapist(therapistData);
-                const savedTherapist = await therapist.save();
-                return { status: true, data: savedTherapist};
-            }
+    
+       
+                const existingTherapist = await databaseSchema.Therapist.findById(therapistData.therapistId);
+                console.log("existing therapist:", existingTherapist);
+    
+                // If therapist exists, update the therapist
+                if (existingTherapist) {
+                    const updatedTherapist = await databaseSchema.Therapist.findByIdAndUpdate(
+                        therapistData.therapistId,
+                        {
+                            name: therapistData.name,
+                            phone: therapistData.phone,
+                            specialization: therapistData.specialization,
+                            gender: therapistData.gender,
+                            educationalQualifications: therapistData.educationalQualifications,
+                            identityProof: therapistData.identityProof,
+                            counsellingQualification: therapistData.counsellingQualification,
+                            professionalExperience: therapistData.professionalExperience,
+                            establishment: therapistData.establishment,
+                            location: therapistData.location,
+                            timings: therapistData.timings,
+                            fees: therapistData.fees,
+                            photo: therapistData.photo,
+                            availableSlots: therapistData.availableSlots,
+                        },
+                        { new: true, runValidators: true }
+                    );
+    
+                    return { status: true, data: updatedTherapist };
+                }
+            
+            console.log("Creating a new therapist as no valid therapistId was provided or found.");
+            delete therapistData.therapistId; 
+    
+            const therapist = new databaseSchema.Therapist(therapistData);
+            const savedTherapist = await therapist.save();
+            
+            console.log("New therapist saved successfully:", savedTherapist);
+            return { status: true, data: savedTherapist };
+    
         } catch (error) {
             console.error("Error in saving Therapist:", error);
-            return { status: false, message: "Internal Server Error"}
+            return { status: false, message: "Internal Server Error" };
         }
     },
 
@@ -115,6 +126,49 @@ export default {
         }
     },
 
+
+    
+
+    getBookings: async(therapistId: string, page: number, limit: number) => {
+        console.log("therapist id from repository:", therapistId);
+
+        try {
+
+            const totalBookingsCount = await databaseSchema.Appointment.countDocuments({therapistId})
+            const totalPages = Math.ceil(totalBookingsCount / limit);
+
+            const bookings = await databaseSchema.Appointment.find( {therapistId} ).skip((page-1)*limit).limit(limit);
+         
+
+            if(!bookings) {
+                return {
+                    status: false, message: "Bookings not found"
+                }
+            }
+
+            // query to get the userdetails 
+            const bookingsWithUserDetails = await Promise.all(bookings.map(async (booking) => {
+                const user = await databaseSchema.User.findById(booking.userId).select('name email mobile');
+            
+                return {
+                    ...booking.toObject(),
+                    user: user ? {name: user.name, email: user.email, mobile: user.mobile} : 'Unknown user'
+                }
+            }))
+
+
+            return {
+                status: true, message: "Bookings retrieved successfully", data:bookingsWithUserDetails, totalPages
+            }
+            
+        } catch (error) {
+            console.error("Error fetching the bookings:", error);
+            return {
+                status: false, message: "Error fetching bookings"
+            }
+        }
+        
+    }
     
 }
 

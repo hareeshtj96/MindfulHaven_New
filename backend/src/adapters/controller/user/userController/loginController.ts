@@ -26,6 +26,9 @@ export default function userLogin (dependencies: any) {
             if (!user.status) {
                 return res.status(400).json({ message: "User not found" });
             }
+            if (user.data.isBlocked) {
+                return res.status(403).json({ message: "User is blocked. Please contact support." });
+            }
 
             // Compare provided password with the stored hashed password
             const validPassword = await bcrypt.compare(password, user.data.password);
@@ -51,7 +54,7 @@ export default function userLogin (dependencies: any) {
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
+                sameSite: 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000,
             })
 

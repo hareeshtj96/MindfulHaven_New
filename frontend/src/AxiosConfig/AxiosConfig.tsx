@@ -1,7 +1,48 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
+// Define types
+interface AuthInfo {
+    accessToken: string | null;
+    role: string | null;
+}
 
-const axiosInstance = axios.create({
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+    _retry?: boolean;
+}
+
+// Initialize authInfo
+let authInfo: AuthInfo = {
+    accessToken: null,
+    role: null
+};
+
+// Function to set auth info
+export const setAuthInfo = (token: string, role: string, refreshToken: string) => {
+    console.log('Setting auth info');
+    authInfo = { accessToken: token, role: role };
+    localStorage.setItem('authInfo', JSON.stringify(authInfo));
+    localStorage.setItem('refreshToken', refreshToken);
+};
+
+// Function to clear auth info
+export const clearAuthInfo = () => {
+    console.log('Clearing auth info');
+    authInfo = { accessToken: null, role: null };
+    localStorage.removeItem('authInfo');
+    localStorage.removeItem('refreshToken');
+};
+
+// Load stored auth info
+const storedAuthInfo = localStorage.getItem('authInfo');
+if (storedAuthInfo) {
+    console.log('Found stored auth info');
+    authInfo = JSON.parse(storedAuthInfo);
+} else {
+    console.log('No stored auth info found');
+}
+
+// Create Axios instance
+const axiosInstance: AxiosInstance = axios.create({
     baseURL: 'http://localhost:8080',
     timeout: 10000,
     headers: {
@@ -10,88 +51,75 @@ const axiosInstance = axios.create({
     withCredentials: true,
 });
 
-interface AuthInfo {
-    accessToken: string | null;
-    role: string | null;
-}
-
-let authInfo: AuthInfo = {
-    accessToken: null,
-    role: null
-}
-
-export const setAuthInfo = (token: string, role:string, refreshToken: string) => {
-    authInfo = {accessToken: token, role: role};
-    localStorage.setItem('authInfo', JSON.stringify(authInfo));
-    localStorage.setItem('refreshToken', refreshToken);
-}
-
-export const clearAuthInfo = () => {
-    authInfo = {accessToken:null, role:null};
-    localStorage.removeItem('authInfo');
-}
-
-const storedAuthInfo = localStorage.getItem('authInfo');
-if(storedAuthInfo) {
-    authInfo = JSON.parse(storedAuthInfo);
-}
-
-
+// // Request interceptor
 axiosInstance.interceptors.request.use(
     (config) => {
-        console.log("access token............", authInfo.accessToken);
-        if(authInfo.accessToken) {
-            config.headers['Authorization'] = `Bearer ${authInfo.accessToken}`;
-            config.headers['Role'] = authInfo.role;
+        console.log('Request interceptor executed.............');
+        const accessToken = localStorage.getItem('newToken');
+        console.log("access token :", accessToken);
+
+        if(accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
         }
         return config;
     },
-    (error) => {
+    (error: AxiosError) => {
+        console.error('Error in request interceptor:', error);
         return Promise.reject(error);
     }
 );
 
-
-axiosInstance.interceptors.response.use (
-    (response) => response,
+// Response interceptor
+axiosInstance.interceptors.response.use(
+    (response) => {
+        console.log('Response interceptor executed (success)');
+        return response;
+    },
     async (error: AxiosError) => {
-        const originalRequest: any = error.config;
-        if(error.response?.status === 401 && !originalRequest._retry) {
+        console.log('Response interceptor executed : Error');
+        const originalRequest = error.config as CustomAxiosRequestConfig;
+
+        if (error.response?.status === 401 && !originalRequest._retry) {
+            console.log('Access token expired, trying to refresh token....');
             originalRequest._retry = true;
+
             try {
-                const refreshToken = localStorage.getItem('refreshToken');
-                if(!refreshToken) {
-                    throw new Error('No refresh token available');
-                }
-
-                const {data} = await axios.post('/refresh_token', {token: refreshToken},
-                    {baseURL: "http://localhost:8080/", withCredentials: true}
+                console.log("inteceptors.....")
+                const refreshResponse = await axios.post(
+                    "http://localhost:8080/refresh_token",
+                    {},
+                    { withCredentials: true }
                 );
+                console.log('Refresh token response:', refreshResponse.data);
 
-                setAuthInfo(data.accessToken, data.role, data.refreshToken);
+                const newAccessToken = refreshResponse.data.accessToken;
 
-                originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
-                originalRequest.headers['Role'] = data.role;
+                if (newAccessToken) {
+                    console.log('Received new access token');
+                    authInfo.accessToken = newAccessToken;
+                    localStorage.setItem('authInfo', JSON.stringify(authInfo));
 
-                return axiosInstance(originalRequest)
+                    if (originalRequest.headers) {
+                        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                    }
+
+                    return axiosInstance(originalRequest);
+                } else {
+                    console.error('No new access token received');
+                    clearAuthInfo();
+                    window.location.href = '/login';
+                }
             } catch (refreshError) {
                 console.error('Token refresh failed:', refreshError);
                 clearAuthInfo();
                 window.location.href = '/login';
-                return Promise.reject(refreshError);
             }
-        } else if (error.response?.status === 401) {
-            clearAuthInfo();
-            window.location.href = '/401';
-            setTimeout(() => {
-                window.location.href = '/login'
-            }, 10000)
-            return Promise.reject(error);
         }
+
         return Promise.reject(error);
     }
-)
+);
 
+console.log('Axios configuration complete');
 
 export default axiosInstance;
-

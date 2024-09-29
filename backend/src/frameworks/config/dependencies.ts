@@ -7,11 +7,20 @@ import {
     forgotPassword, 
     resetPassword, 
     getUserProfileUsecase,
-    getChildTherapistUsecase } from "../../application/UseCases";
+    getChildTherapistUsecase, 
+    getSlotsUsecase, 
+    getAppointmentUsecase, 
+    bookingDetailstUsecase,
+    getAllBookings,
+    getCompletedBookings,
+    getCancelledBookings,
+    getBookedSlotsUsecase,
+    searchTherapistUsecase
+ } from "../../application/UseCases";
 
-import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase } from "../../application/adminUseCases";
+import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase } from "../../application/adminUseCases";
 
-import { therapistRegistration, getTherapistProfileUsecase } from "../../application/therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase } from "../../application/therapistUseCases";
 
 const useCase: any={
     userRegistration: userRegistration,
@@ -22,6 +31,15 @@ const useCase: any={
     resetPassword: resetPassword,
     getUserProfileUsecase:getUserProfileUsecase,
     getChildTherapistUsecase:getChildTherapistUsecase,
+    getSlotsUsecase: getSlotsUsecase,
+    getAppointmentUsecase: getAppointmentUsecase,
+    bookingDetailstUsecase: bookingDetailstUsecase,
+    getAllBookings: getAllBookings,
+    getCompletedBookings: getCompletedBookings,
+    getCancelledBookings: getCancelledBookings,
+    getBookedSlotsUsecase: getBookedSlotsUsecase,
+    searchTherapistUsecase: searchTherapistUsecase,
+
 
     
 
@@ -29,11 +47,16 @@ const useCase: any={
     getAllUsecase:getAllUsecase,
     getUsersUsecase: getUsersUsecase,
     getVerifiedUsecase: getVerifiedUsecase,
+    getuserBlockUsecase: getuserBlockUsecase,
+    therapistDetailstUsecase: therapistDetailstUsecase,
     
 
 
+
+
     therapistRegistration: therapistRegistration,
-    getTherapistProfileUsecase: getTherapistProfileUsecase
+    getTherapistProfileUsecase: getTherapistProfileUsecase,
+    bookingUsecase: bookingUsecase
 }
 
 const repository:any={

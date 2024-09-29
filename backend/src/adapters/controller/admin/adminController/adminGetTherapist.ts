@@ -7,7 +7,9 @@ export default (dependencies: any) => {
     const adminTherapistController = async (req:Request, res: Response) => {
         try {
             const page = parseInt(req.query.page as string, 10) || 1;
-            const limit = parseInt(req.query.limit as string, 10) || 8
+            console.log("page from controller:", page)
+            const limit = parseInt(req.query.limit as string, 10) || 2
+            console.log("limit from controller:", limit)
 
             const response = await getAllUsecase(dependencies).executeFunction({page, limit});
 

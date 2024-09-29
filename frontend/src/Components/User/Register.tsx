@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import backgroundImage from '../../../Public/banner/register_img.jpg';
 import { registerUser, googleRegister,  clearError } from "../../Redux/Store/Slices/userSlice";
 import googleLogo from '../../../Public/banner/Google_logo.png';
+import { ClipLoader } from "react-spinners";
 import {Link} from "react-router-dom"
 import {auth} from '../../FirebaseConfig/firebaseConfig';
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
@@ -30,6 +31,7 @@ function Register() {
     const [confirmPassword, setConfirmPassword] = useState<string>("")
     const [errors, setErrors] = useState<Errors>({})
     const [cancelTokenSource] = useState(axios.CancelToken.source);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
@@ -79,7 +81,7 @@ function Register() {
         const errors: Errors = {};
         const nameRegex = /^[A-Za-z\s]+$/;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const mobileRegex = /^[6-9]{9}$/;
+        const mobileRegex = /^[6-9][0-9]{9}$/;
 
         if(!name) {
             errors.name = "Name is required";
@@ -127,13 +129,18 @@ function Register() {
         console.log("After validation:", {name, email, mobile, password, confirmPassword});
 
         setErrors({});
+        setLoading(true);
+
         dispatch(registerUser({name, email, mobile, password}))
             .unwrap()
             .then(() => {
                 navigate("/otp_verify");
             })
             .catch((err) => {
-                setErrors({general: err.message || 'Registration failed, user already exists'});
+                setErrors({general: err.message || 'An error occured'});
+            })
+            .finally(() => {
+                setLoading(false);
             })
     }
 
@@ -251,8 +258,9 @@ function Register() {
                         <button
                             type="submit"
                             className="w-full bg-customGreen text-white font-bold py-2 px-4 rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-customGreen focus:ring-opacity-50"
+                            disabled={loading}
                         >
-                            Register
+                            {loading ? ( <ClipLoader size={24} color={"#ffffff"} loading={loading} /> ) : ( "Register")}
                         </button>
                     </div>
                     <div className="text-center">
@@ -262,7 +270,6 @@ function Register() {
                     </div>
                 </form>
 
-                {status === 'loading' && <p>Loading...</p>}
                 {status === 'failed' && <p className="text-red-500">{errors.general || error}</p>}
             </div>
         </div>

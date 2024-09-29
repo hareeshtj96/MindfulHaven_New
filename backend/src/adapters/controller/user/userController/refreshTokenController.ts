@@ -1,28 +1,60 @@
-import { Request, Response } from "express";
-import dependencies from "../../../../frameworks/config/dependencies";
+import { Request, Response } from 'express';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-export default (dependencies: any) => {
-    const { refreshTokenUsecase } = dependencies.useCase;
+dotenv.config();
 
-    return async(req: Request, res:Response) => {
-        try {
-            const refreshToken = req.cookies['refreshToken'];
+const SECRET_KEY = process.env.SECRET_KEY || "default";
+const REFRESH_SECRET_KEY = process.env.JWT_REFRESH_SECRET;
 
-        if(!refreshToken) {
-            return res.status(401).json({ status: false, message: 'No refresh token provided' });
-        }
-        const response = await refreshTokenUsecase(dependencies).executionFunction(refreshToken);
-
-        if(!response.status) {
-            return res.status(403).json({ status: false, message: response.message});
-        }
-
-        res.cookie('refreshToken', response.data.refreshToken, {httpOnly: true, secure: process.env.NODE_ENV === 'production'} );
-        return res.status(403).json({ status:false, message: response.message});
-
-        } catch (error) {
-            console.error('Error in refreshTokenContoller:', error);
-            return res.status(500).json({ status: false, message: 'Internal Server Error'})
-        }
-    }
+if (!REFRESH_SECRET_KEY) {
+    throw new Error('REFRESH_SECRET_KEY is not defined in the environment');
 }
+
+export const refreshTokenController = (dependencies: any) => {
+    return (req: Request, res: Response) => {
+        
+
+        console.log("cookied received:", req.cookies);
+
+        const refreshToken = req.cookies['refreshToken'];
+        console.log("refresh token from controller:", refreshToken);
+
+        if (!refreshToken) {
+            return res.status(403).json({ message: 'Refresh token not provided' });
+        }
+
+        // Verify refresh token
+        jwt.verify(refreshToken, REFRESH_SECRET_KEY, (err:any, decoded:any) => {
+            if (err) {
+                return res.status(403).json({ message: 'Invalid refresh token' });
+            }
+
+            // Check if decoded is JwtPayload to access its properties
+            if (decoded && typeof decoded !== 'string') {
+                const { email, role } = decoded as JwtPayload;
+
+                // Generate new access token
+                const newAccessToken = jwt.sign(
+                    { user: email, role: role },
+                    SECRET_KEY,
+                    { expiresIn: '20m' }
+                );
+
+                // Generate new refresh token
+                const newRefreshToken = jwt.sign(
+                    { user: email, role: role },
+                    REFRESH_SECRET_KEY,
+                    { expiresIn: '7d' }
+                );
+
+                // Set the new refresh token as a cookie
+                res.cookie('refreshToken', newRefreshToken, { httpOnly: true });
+
+                return res.json({ accessToken: newAccessToken });
+            }
+
+            return res.status(403).json({ message: 'Invalid refresh token payload' });
+        });
+    }
+};

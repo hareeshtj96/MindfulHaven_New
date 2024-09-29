@@ -1,11 +1,35 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { REGISTERTHERAPIST, VERIFYOTP, LOGINTHERAPIST, UPDATETHERAPIST, GETPROFILE  } from "../../../Services/therapistApi";
+import { REGISTERTHERAPIST, 
+    VERIFYOTP, 
+    LOGINTHERAPIST, 
+    UPDATETHERAPIST, 
+    GETPROFILE, 
+    GETAPPOINTMENT  } from "../../../Services/therapistApi";
 
 interface Timing {
     dayOfWeek: number,
     startTime: string,
     endTime: string
+}
+
+
+interface Booking {
+    slot: string;
+    user: any;
+    id: string;
+    userId: string;
+    date: string;
+    status: string;
+}
+
+
+
+// Define the payload object for fetching appointments
+interface FetchAppointmentsPayload {
+    therapistId: string;
+    page: number;
+    limit: number;
 }
 
 //Interfaces for state and Responses
@@ -56,24 +80,32 @@ interface LoginResponse {
 }
 
 interface TherapistState {
+    availableSlots: any;
+    bookings: Booking[];
     therapists: Therapist[];
     currentTherapist:Therapist | null;
     token: string | null;
+    isTherapistAuthenticated: boolean;
     loading: boolean;
     error: string | null;
     otpVerified: boolean;
     otpError: string | null;
+    totalPages: number;
 }
 
 //initial state
 const initialState: TherapistState = {
     therapists: [],
+    bookings:[],
     currentTherapist: null,
+    availableSlots:[],
     token: localStorage.getItem('therapistToken'),
+    isTherapistAuthenticated: false,
     loading: false,
     error: null,
     otpVerified: false,
     otpError: null,
+    totalPages: 0
 }
 
 // Thunk for therapist login
@@ -214,6 +246,25 @@ export const fetchProfile = createAsyncThunk<Therapist[], void, {rejectValue: st
 ) 
 
 
+export const fetchBookingAppointments = createAsyncThunk<{ bookings: Booking[], totalPages: number}, FetchAppointmentsPayload, {rejectValue: string}>(
+    "therapist/fetchBookingAppointment",
+    async({therapistId, page, limit}, thunkAPI) => {
+        try {
+            const response = await axios.get(`${GETAPPOINTMENT}/${therapistId}`, {params: { page, limit}});
+            console.log("response from fetch booking:", response);
+            // return response.data.data as Booking[];
+            return {
+                bookings: response.data.data,
+                totalPages: response.data.totalPages
+            }
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch booking appointment";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
 
 const therapistSlice = createSlice({
     name: 'therapist',
@@ -222,6 +273,7 @@ const therapistSlice = createSlice({
         logout: (state) => {
             state.currentTherapist = null;
             state.token = null;
+            state.isTherapistAuthenticated = false;
             localStorage.removeItem('therapistToken');
             localStorage.removeItem('therapist');
         },
@@ -260,10 +312,12 @@ const therapistSlice = createSlice({
             .addCase(logintherapist.fulfilled, (state, action: PayloadAction<LoginResponse>) => {
                 state.loading = false;
                 state.currentTherapist = action.payload.therapist;
+                state.isTherapistAuthenticated = true;
                 state.token = action.payload.token;
             })
             .addCase(logintherapist.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
+                state.isTherapistAuthenticated = false;
                 state.error = action.payload || "Login failed";
             })
             .addCase(updateTherapistDetails.pending, (state) => {
@@ -297,7 +351,21 @@ const therapistSlice = createSlice({
             .addCase(fetchProfile.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
                 state.error = action.payload || "Fetch profile failed";
-            });
+            })
+            .addCase(fetchBookingAppointments.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchBookingAppointments.fulfilled, (state, action: PayloadAction<{ bookings: Booking[]; totalPages: number}>) => {
+                console.log("action paylod.........", action.payload);
+                state.bookings = action.payload.bookings;
+                state.totalPages = action.payload.totalPages;
+                state.loading = false;
+            })
+            .addCase(fetchBookingAppointments.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Failed to fetch bookings";
+            })
     },
 }); 
 

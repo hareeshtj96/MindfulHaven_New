@@ -9,7 +9,7 @@ interface TherapistProtectedRouteProps {
 
 const TherapistProtectedRoute: React.FC<TherapistProtectedRouteProps> = ({ children }) => {
     const token = useSelector((state: RootState) => state.therapist.token);
-    console.log("therapist protected token:",token);
+    
     const navigate = useNavigate()
 
     useEffect(() => {

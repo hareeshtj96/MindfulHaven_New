@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { UseSelector, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../Redux/Store/store";
 
@@ -9,14 +9,17 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
-  console.log(isAuthenticated);
+  const state = useSelector((state: RootState) => state.user)
+  console.log("state:", state);
+  console.log("is authenticated:",isAuthenticated);
   
   const navigate = useNavigate();
 
   useEffect(() => {
 
     if (isAuthenticated) {
-      console.log("User not authenticated, redirecting to login...");
+      console.log("....authetnictd");
+      
       navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);

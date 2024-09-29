@@ -54,6 +54,8 @@ const therapistSchema = new Schema({
             required: true,
         },
     }],
+    availableSlots: [Date],
+    
     fees: {
         type: Number,
     },

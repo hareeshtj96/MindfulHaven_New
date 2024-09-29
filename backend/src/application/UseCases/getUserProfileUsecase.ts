@@ -6,8 +6,7 @@ export default (dependencies: any) => {
         console.log("entered use case:.....")
         try {
             const response = await userRepository.getUserProfile(requestData.email);
-            console.log("response from user profile use case:", response);
-
+           
             if(response.status) {
                 return { status: true, data: response.data};
             } else  {

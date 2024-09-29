@@ -7,6 +7,7 @@ const UserProfile = () => {
     const dispatch: AppDispatch = useDispatch();
 
     const user = useSelector((state: RootState) => state.user.user);
+    console.log("user.......", user);
     const loading = useSelector((state: RootState) => state.user.loading);
     const error = useSelector((state: RootState) => state.user.error);
 
@@ -35,7 +36,6 @@ const UserProfile = () => {
                     <p className="text-gray-600 text-sm mb-4">{user.email}</p>
 
                     <div className="w-full border-t border-gray-200 pt-4">
-                        <h3 className="text-lg font-semibold text-gray-800 mb-2">Contact Information</h3>
                         <div className="flex items-center text-gray-700">
                             <span className="font-medium mr-2">Phone:</span>
                             <span>{user.mobile}</span>

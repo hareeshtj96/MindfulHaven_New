@@ -1,4 +1,3 @@
-import dependencies from "../config/dependencies";
 import { databaseSchema } from "../database";
 import bcrypt from "bcryptjs";
 
@@ -95,7 +94,7 @@ export default {
                 specialization: 'Child Therapy',
                 isVerified: true
             });
-            console.log("child therapist found:", therapists);
+
             return {
                 status: true,
                 data: therapists
@@ -106,6 +105,210 @@ export default {
                 status: false, message: "Error fetching child therapists"
             }
         }
+    },
+
+    getSlot: async(therapistId: string) => {
+        try {
+            const therapist = await databaseSchema.Therapist.findOne({ _id: therapistId, isVerified: true});
+
+            if(!therapist) {
+                return {
+                    status: false,
+                    mesage: "Therapist not found or not verified"
+                }
+            }
+            const { timings, availableSlots } = therapist;
+
+            return {
+                status: true,
+                data: {
+                    timings, 
+                    availableSlots
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching therapist slots:", error);
+            return {
+                status: false,
+                message: "Error fetching therapist slots"
+            }
+        }
+    },
+
+
+    getBookedSlot: async(therapistId: string) => {
+        console.log("therapist id from user repository:", therapistId);
+        try {
+            const bookedSlots = await databaseSchema.Appointment.find({ therapistId });
+            console.log("booked slots:", bookedSlots);
+            
+            if(!bookedSlots ) {
+                return {
+                    status: false,
+                    message: "booked slot not found"
+                }
+            }
+            const slots = bookedSlots.map((appointment) => {
+                return appointment.slot
+            })
+            console.log("slots.....", slots);
+            
+            return {
+                status: true,
+                message: "Booked slots retrieved successfully",
+                data: slots
+            }
+        } catch (error) {
+            console.error("Error fetching booked slots:", error);
+            return {
+                status: false,
+                message: "Error fetching booked slots"
+            }
+        }
+    },
+
+
+
+    saveAppointment: async({ therapistId, userId, slot, notes}: {therapistId: string, userId: string, slot: Date, notes?: string}) => {
+        try {
+            const existingAppointment = await databaseSchema.Appointment.findOne({
+                therapistId, slot
+            });
+
+            if(existingAppointment) {
+                return {
+                    status: false,
+                    message: "The slot is already booked. Please choose a different slot"
+                }
+            }
+            const newAppointment = new databaseSchema.Appointment({
+                therapistId,
+                userId,
+                slot,
+                notes
+            });
+
+            const savedAppointment = await newAppointment.save();
+            console.log("asved appoint....",savedAppointment);
+            
+
+            return {
+                status: true, data: savedAppointment
+            }
+        } catch (error: any) {
+            console.error("Error saving appointment:", error);
+            return {
+                status: false,
+                message: "Failed to save the appointment"
+            }
+            
+        }
+    },
+
+    bookingDetails : async({ bookingId} : {bookingId: string}) => {
+        try {
+            const response = await databaseSchema.Appointment.findById(bookingId)
+            console.log("response from bookign details:", response);
+
+            return response;
+        } catch (error: any) {
+            console.error("Error fetching booking details:", error);
+            return {status: false, message:"Failed to find booking details"}
+        }
+    },
+
+    getAllBooking : async(email:string, page: number, limit:number) => {
+        try {
+            const skip = (page - 1) * limit;
+            const bookings = await databaseSchema.Appointment.find({ email: email, status: "scheduled" }).skip(skip).limit(limit);
+            console.log("response from getall booking:",bookings);
+
+            const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "scheduled" })
+
+            return {
+                status: true,
+                data:{
+                    bookings,
+                    total: totalBookings,
+                    currentPage: page,
+                    totalPages: Math.ceil(totalBookings/limit)
+                }
+            }
+        } catch (error: any) {
+            console.error("Error fetching all booking details:", error);
+            return { status: false, message: "Failed to find all booking details"}
+        }
+    },
+
+    getCompletedBooking : async(email:string, page: number, limit:number) => {
+        try {
+            const skip = (page - 1) * limit;
+            const bookings = await databaseSchema.Appointment.find({ email: email, status: "completed" }).skip(skip).limit(limit);
+            console.log("response from completed booking:",bookings);
+
+            const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "completed" })
+
+            return {
+                status: true,
+                data:{
+                    bookings,
+                    total: totalBookings,
+                    currentPage: page,
+                    totalPages: Math.ceil(totalBookings/limit)
+                }
+            }
+        } catch (error: any) {
+            console.error("Error fetching all booking details:", error);
+            return { status: false, message: "Failed to find all booking details"}
+        }
+    },
+
+
+    getCancelledBooking: async(email: string, page: number, limit: number) => {
+        try {
+            const skip = (page - 1) * limit;
+            const bookings = await databaseSchema.Appointment.find({ email: email, status: "cancelled"}).skip(skip).limit(limit);
+            console.log("response from cancelled bookings:", bookings);
+
+            const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "cancelled" })
+
+            return {
+                status: true,
+                data: {
+                    bookings,
+                    total: totalBookings,
+                    currentPage: page,
+                    totalPages: Math.ceil(totalBookings/limit)
+                }
+            }
+            
+        } catch (error: any) {
+            console.error("Error fetching all booking details:", error);
+            return { status: false, message: "Failed to find all booking details"}
+        }
+    },
+
+
+    getSearchResult: async (searchTerm: string) => {
+        const filter = {
+            $or:[
+                {name: {$regex: searchTerm, $options:'i'}},
+                { specialization: { $regex: searchTerm, $options: 'i'}}
+            ],
+        }
+
+        try {
+            const therapists = await databaseSchema.Therapist.find(filter);
+            console.log("result from repository....", therapists);
+
+            return therapists
+            
+        } catch (error) {
+            console.error("Error fetching search result:", error);
+            return { status: false, message: "Failed to fetch search results"}
+            
+        }
     }
+
 
 }

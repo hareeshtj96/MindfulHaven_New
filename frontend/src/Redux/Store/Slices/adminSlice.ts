@@ -3,7 +3,9 @@ import axios from "axios";
 import { ADMINLOGIN, 
     GETTHERAPIST, 
     GETUSERS,
-    GOTVERIFIED
+    GOTVERIFIED,
+    GOTBLOCKUNBLOCK,
+    GETTHERAPISTDETAILS
  } from "../../../Services/adminApi";
 
 
@@ -13,13 +15,23 @@ interface Admin {
     email: string;
 }
 
-interface Therapist {
+export interface Therapist {
+    photo: any;
+    gender: string;
+    location: string;
+    professionalExperience: string;
+    identityProof: any;
+    establishment: string;
+    fees: string;
+    counsellingQualification: string;
+    educationalQualifications: string;
     _id: string;
     name: string;
     email: string;
     phone: string;
     specialization: string
-    isVerified: boolean
+    isVerified: boolean;
+    
 }
 
 interface User {
@@ -39,18 +51,26 @@ interface AdminState {
     admin: Admin | null;
     token: string | null;
     loading: boolean;
+    isAdminAuthenticated: boolean;
     error: string | null;
     therapists: Therapist[];
+    selectedTherapist: Therapist | null;
     users: User[];
+    totalPages: number,
+    currentPage: number,
 }
 
 const initialState: AdminState = {
     admin: null,
-    token: localStorage.getItem('adminToken') || null,
+    token: localStorage.getItem('adminToken'),
     loading: false,
+    isAdminAuthenticated: false,
     error:null,
     therapists: [],
+    selectedTherapist: null,
     users: [],
+    totalPages: 0,
+    currentPage: 0,
 }
 
 export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, password: string }, { rejectValue: string }>(
@@ -75,19 +95,45 @@ export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, passwo
     }
 );
 
-export const fetchTherapists = createAsyncThunk<Therapist[], void, { rejectValue: string}>(
+export const fetchTherapists = createAsyncThunk<
+    { therapists: Therapist[], totalPages: number, currentPage: number }, 
+    { page: number, limit: number }, 
+    { rejectValue: string }
+>(
     "admin/fetchTherapists",
-    async(_, thunkAPI) => {
+    async ({ page, limit }, thunkAPI) => {
         try {
-            const response = await axios.get(GETTHERAPIST);
-          
-            return response.data.data.therapists;
+            console.log("Page:", page, "Limit:", limit);
+            const response = await axios.get(`${GETTHERAPIST}?page=${page}&limit=${limit}`);
+            return {
+                therapists: response.data.data.therapists,
+                totalPages: response.data.data.totalPages, 
+                currentPage: response.data.data.currentPage 
+            };
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch therapists";
             return thunkAPI.rejectWithValue(message);
         }
     }
 );
+
+
+export const fetchTherapistDetails = createAsyncThunk(
+    "admin/fetchTherapistDetails",
+    async (therapistId: string, thunkAPI) => {
+       try {
+        const response = await axios.get(`${GETTHERAPISTDETAILS}/${therapistId}`);
+        console.log("response from fetch therapist details:", response);
+
+        console.log("response data data:", response.data.data)
+
+        return response.data.data
+       } catch (error:any) {
+         const message = error.response?.data?.message || "Failed to fetch details";
+         return thunkAPI.rejectWithValue(message);
+       }
+    }
+)
 
 export const fetchUsers = createAsyncThunk<User[], void, {rejectValue: string}>(
     "admin/fetchUsers",
@@ -132,6 +178,37 @@ export const getTherapistVerified = createAsyncThunk<Therapist[], string, {rejec
     }
 )
 
+
+export const toggleUserBlockStatus = createAsyncThunk<User, { userId: string; isBlocked: boolean }, { rejectValue: string }>(
+    "admin/getBlockUnblock",
+    async ({ userId, isBlocked }, thunkAPI) => {
+      try {
+        const token = localStorage.getItem("newToken");
+        console.log("token received from block unblock user:", token);
+  
+        if (!token) {
+          return thunkAPI.rejectWithValue("No token found");
+        }
+  
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        };
+  
+        // Send isBlocked status along with the request
+        const response = await axios.patch(`${GOTBLOCKUNBLOCK}/${userId}`, { isBlocked }, config);
+  
+        return response.data.user;
+      } catch (error) {
+        console.error("Error in blocking/unblocking user:", error);
+        return thunkAPI.rejectWithValue("Failed to toggle block status");
+      }
+    }
+  );
+  
+
 const adminSlice = createSlice({
     name: 'admin',
     initialState,
@@ -139,6 +216,7 @@ const adminSlice = createSlice({
         logout: (state) => {
             state.admin = null;
             state.token = null;
+            state.isAdminAuthenticated = false;
             localStorage.removeItem('adminToken');
         },
     },
@@ -151,20 +229,26 @@ const adminSlice = createSlice({
             .addCase(loginAdmin.fulfilled, (state, action: PayloadAction<LoginResponse>) => {
                 state.loading = false;
                 state.admin = action.payload.admin;
+                state.isAdminAuthenticated = true;
                 state.token = action.payload.token;
             })
             .addCase(loginAdmin.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
+                state.isAdminAuthenticated = false;
                 state.error = action.payload || 'Login failed';
             })
             .addCase(fetchTherapists.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchTherapists.fulfilled, (state, action: PayloadAction<Therapist[]>) => {
+            .addCase(fetchTherapists.fulfilled, (state, action: PayloadAction<{ therapists: Therapist[], totalPages: number, currentPage: number }>) => {
                 state.loading = false;
-                console.log("Action paylod:", action.payload);
-                state.therapists = action.payload;
+                console.log("Action payload:", action.payload);
+            
+                // Set the therapists data and pagination information
+                state.therapists = action.payload.therapists;  // Access therapists from the payload
+                state.totalPages = action.payload.totalPages;  // Set totalPages from the payload
+                state.currentPage = action.payload.currentPage;  // Set currentPage from the payload
             })
             .addCase(fetchTherapists.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
@@ -183,6 +267,18 @@ const adminSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || "Failed to fetch users";
             })
+            .addCase(fetchTherapistDetails.pending, (state) => {
+                state.loading = true;
+                state.error = null;   
+            })
+            .addCase(fetchTherapistDetails.fulfilled, (state, action) => {
+                state.loading = false;
+                state.selectedTherapist = action.payload
+            })
+            .addCase(fetchTherapistDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            });
     },
 });
 

@@ -1,27 +1,56 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import { Therapist } from "../../../../frameworks/database/schema/therapistSchema";
-import multer, { StorageEngine } from "multer";
-import path from "path";
-import fs from "fs";
-
+import { RRule, RRuleSet } from "rrule";
+import { create } from "domain";
+import { Number } from "mongoose";
 
 dotenv.config();
 
-// const storage = multer.diskStorage({
-//     destination: (req, file, cb) => {
-//         const uploadDir = path.join(__dirname,"../../../../public/uploads");
-//         if(!fs.existsSync(uploadDir)) {
-//             fs.mkdirSync(uploadDir, { recursive: true });
-//         }
-//         cb(null, uploadDir);
-//     },
-//     filename: (req, file, cb) => {
-//         cb(null, Date.now() + path.extname(file.originalname));
-//     }
-// })
+interface Timing {
+    dayOfWeek: number[];  
+    startTime: string;    
+    endTime: string;      
+}
 
-// const upload = multer({ storage });
+
+//Existing function to convert "HH:mm" to Date object
+const timeToDate = (time: string, dayOffset: number) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const date = new Date();
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(0);
+    date.setDate(date.getDate() + dayOffset);
+    return date;
+}
+
+const createTherapistSlotRules = (timings: Timing[]) => {
+    const ruleSet = new RRuleSet();
+
+    timings.forEach((timing) => {
+        const dayOfWeeks = timing.dayOfWeek;
+
+        dayOfWeeks.forEach((dayOfWeek: number) => {
+            const startTimeDate = timeToDate(timing.startTime, (dayOfWeek + 7 - new Date().getDay()) % 7);
+            // const endTimeDate = timeToDate(timing.endTime, dayOfWeek - new Date().getDay());
+
+
+            console.log(`Generating slots for day: ${dayOfWeek}, start: ${startTimeDate}`);
+
+            const rrule = new RRule({
+                freq: RRule.WEEKLY,
+                byweekday: [dayOfWeek - 1],
+                dtstart: startTimeDate,
+                count: 52, 
+            });
+            ruleSet.rrule(rrule);
+        })
+    })
+    return ruleSet;
+}
+
+
 
 export default function therapistDetailsController(dependencies: any) {
     const { therapistRepository } = dependencies.repository;
@@ -52,6 +81,11 @@ export default function therapistDetailsController(dependencies: any) {
                 fees,
                 therapistId,
             } = therapistData;
+
+            //Generate slots using RRule
+            const slotRules = createTherapistSlotRules(timings);
+            const slots = slotRules.all();
+            console.log("Generated slots:", slots);
 
             let photoUrl = "";
 
@@ -89,7 +123,8 @@ export default function therapistDetailsController(dependencies: any) {
                 timings,
                 fees,
                 therapistId,
-                photo: photoUrl
+                photo: photoUrl,
+                availableSlots: slots
             }
 
             console.log("hiiiiiiiii................");

@@ -12,7 +12,11 @@ import ForgotPasswordOtpPage from "../../Pages/User/ForgotPasswordOtp"
 import PasswordResetPage from "../../Pages/User/PasswordReset";
 import UserProfilePage from "../../Pages/User/UserProfilePage";
 import ChildTherapistListPage from "../../Pages/User/ChildTherapistListPage";
+import SlotManagementPage from "../../Pages/User/SlotManagementPage";
+import BookingStatusPage from "../../Pages/User/BookingStatusPage";
+import SessionsPage from "../../Pages/User/SessionsPage";
 import ProtectedRoute from "../../ProtectedRoute/ProtectedRoute";
+
 
 function UserRoute() {
     return (
@@ -20,7 +24,7 @@ function UserRoute() {
         <Routes>
             <Route path="/" element={<ProtectedRoute> <UserLanding /> </ProtectedRoute> }/>
             <Route path="/register" element={<ProtectedRoute> <UserRegister /> </ProtectedRoute> } />
-            <Route path="/login" element={<ProtectedRoute> <UserLogin /> </ProtectedRoute> } />
+            <Route path="/login" element={<ProtectedRoute> <UserLogin /> </ProtectedRoute>   } />
             <Route path="/aboutus" element={<AboutUsPage />}/>
             <Route path="/location" element={<LocationPage />} />
             <Route path="/otp_Verify" element={<UserOTP />} />
@@ -30,6 +34,9 @@ function UserRoute() {
             <Route path="/password_Reset" element={<PasswordResetPage /> } />
             <Route path="/user_profile" element={<UserProfilePage /> } />
             <Route path="/childTherapy" element={<ChildTherapistListPage /> } />
+            <Route path="/slot_management/:therapistId" element={<SlotManagementPage />}/>
+            <Route path="/sessions" element={<SessionsPage />}/>
+            <Route path="/booking_status/:bookingId" element={<BookingStatusPage /> }/>
         </Routes>
         </>
     )

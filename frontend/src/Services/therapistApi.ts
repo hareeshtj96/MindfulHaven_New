@@ -5,3 +5,4 @@ export const VERIFYOTP = `${BASE_URL}/therapist/therapist_OTP`;
 export const LOGINTHERAPIST = `${BASE_URL}/therapist/therapist_login`;
 export const UPDATETHERAPIST = `${BASE_URL}/therapist/therapist_details`;
 export const GETPROFILE = `${BASE_URL}/therapist/therapist_profile`;
+export const GETAPPOINTMENT = `${BASE_URL}/therapist/therapist_bookings`;

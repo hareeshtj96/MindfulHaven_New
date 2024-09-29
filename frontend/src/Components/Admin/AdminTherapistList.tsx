@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTherapists, getTherapistVerified } from "../../Redux/Store/Slices/adminSlice";
+import { useNavigate } from "react-router-dom";
+import { fetchTherapists } from "../../Redux/Store/Slices/adminSlice";
 import { RootState, AppDispatch } from "../../Redux/Store/store";
 import { unwrapResult } from "@reduxjs/toolkit";
 
@@ -17,12 +18,17 @@ interface Therapist {
 
 const AdminTherapistList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
+    const navigate = useNavigate();
     
     
-    const { therapists, loading, error } = useSelector((state: RootState) => state.admin);
+    const { therapists, loading, error, totalPages } = useSelector((state: RootState) => state.admin);
     
 
     const [therapistData, setTherapistData] = useState<Therapist[]>([]);
+    const [selectedTherapist, setSelectedTherapist] = useState<Therapist | string>("");
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    
+
 
     useEffect(() => {
         if (therapists && therapists.length > 0) {
@@ -32,25 +38,32 @@ const AdminTherapistList: React.FC = () => {
 
     
     useEffect(() => {
-        dispatch(fetchTherapists());
-    }, [dispatch]);
+        dispatch(fetchTherapists({ page: currentPage, limit:2}))
+            .then((result) => {
+                const data = unwrapResult(result);
+                setTherapistData(data.therapists);
+            })
+            .catch((err) => console.log(err));
+    }, [dispatch, currentPage]);
 
-    const handleVerify = async ( therapistId: string, isVerified: boolean) => {
-        try {
-            const resultAction = await dispatch(getTherapistVerified(therapistId));
-            unwrapResult(resultAction);
+    const handleShowDetails = (therapist: Therapist) => {
+        console.log("therapist from show details:", therapist._id);
+        navigate(`/admin/admin_getTherapistDetails/${therapist._id}`)
+    }
 
-            //update therapist's verified status in local state
-            setTherapistData((prevData) => 
-                prevData.map((therapist) => 
-                    therapist._id === therapistId
-                    ? {...therapist, isVerified: !isVerified}
-                : therapist));
-        } catch (error) {
-            console.error("Verification failed:", error);
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(prevPage => prevPage + 1);
         }
     }
-   
+
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(prevPage => prevPage - 1);
+        }
+    }
+
+    
     console.log("Therapist Data for frontend:", therapistData);
 
     // Handling loading and error states
@@ -84,25 +97,38 @@ const AdminTherapistList: React.FC = () => {
                             <td className="border px-4 py-2">{therapist.email}</td>
                             <td className="border px-4 py-2">{therapist.phone}</td>
                             <td className="border px-4 py-2">{therapist.specialization}</td>
-                            <td className="border px-4 py-2">
+                             <td className="border px-4 py-2">
                                     {therapist.isVerified ? "Verified" : "Not Verified"}
-                                </td>
+                            </td> 
+                           
+                            
+                          
                             <td className="border px-4 py-2">
-                            <button
-                    className={`px-4 py-2 rounded text-white ${
-                        therapist.isVerified
-                            ? "bg-red-500 hover:bg-red-600"
-                            : "bg-green-500 hover:bg-green-600"
-                    }`}
-                    onClick={() => handleVerify(therapist._id, therapist.isVerified)}
-                >
-                    {therapist.isVerified ? "Unverify" : "Verify"}
-                </button>
+                                <button className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
+                                onClick={() => handleShowDetails(therapist)}
+                                >Show Details</button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+            <div className="flex justify-between items-center mt-4">
+                    <button
+                        className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                        onClick={handlePreviousPage}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <p>Page {currentPage} of {totalPages}</p>
+                    <button
+                        className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                        onClick={handleNextPage}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
+                </div>
         </div>
     </div>
     );

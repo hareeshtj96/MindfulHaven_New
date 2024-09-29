@@ -12,7 +12,7 @@ const expressConfig = (app: Express) => {
 
     app.use(express.json());
     app.use(express.urlencoded({extended: true}));
-    app.use(cookieParser(process.env.COOKIEPARSERSECRET || 'default_secret'));
+    app.use(cookieParser());
     app.use(express.static("public"));
     // app.use('/src/uploads', express.static('src/uploads'));
 
@@ -21,6 +21,8 @@ const expressConfig = (app: Express) => {
             origin: ["http://localhost:5173"],
             methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
             credentials: true,
+            allowedHeaders: ["Content-Type", "Authorization"],
+            
         })
     );
 };

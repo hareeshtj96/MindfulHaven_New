@@ -9,12 +9,12 @@ interface AdminProtectedRouteProps {
 
 const AdminProtectedRoute: React.FC<AdminProtectedRouteProps> = ({ children }) => {
     const token = useSelector((state: RootState) => state.admin.token);
+    
     const navigate = useNavigate()
 
     useEffect(() => {
         if(!token) {
-            console.log("Admin not authenticated, redirecting to login");
-            navigate("/admin/admin_login", {replace: true});
+            navigate("/admin/admin_login",{replace: true} );
             
         }
     },[token, navigate]);
