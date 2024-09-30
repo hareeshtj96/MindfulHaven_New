@@ -44,6 +44,8 @@ interface User {
 
 interface LoginResponse {
     token: string;
+    status: string;
+    message: string;
     admin: Admin;
 }
 

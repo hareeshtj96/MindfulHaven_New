@@ -49,22 +49,22 @@ const SlotManagement = () => {
         }
     },[therapistId, dispatch]);
 
-    useEffect(() => {
-        if(appointmentStatus === "success") {
-            toast.success("Appointment booked successfully")
-            setSelectedDate(null);
-            setSelectedTime(null);
-            setNotes("");
+    // useEffect(() => {
+    //     if(appointmentStatus === "success") {
+    //         toast.success("Appointment booked successfully")
+    //         setSelectedDate(null);
+    //         setSelectedTime(null);
+    //         setNotes("");
 
-            navigate(`/booking_status/${appointmentData._id}`)
+           
             
-        } else if ( appointmentStatus === "failed") {
-            toast.error(`Failed to book appointment: ${appointmentError}`)
-        }
-        return () => {
-            dispatch(clearAppointmentStatus())
-        }
-    }, [appointmentStatus, appointmentError, dispatch])
+    //     } else if ( appointmentStatus === "failed") {
+    //         toast.error(`Failed to book appointment: ${appointmentError}`)
+    //     }
+    //     return () => {
+    //         dispatch(clearAppointmentStatus())
+    //     }
+    // }, [appointmentStatus, appointmentError, dispatch])
 
     const handleDateSelection = (date: string) => {
         setSelectedDate(date.split('T')[0]);
@@ -89,6 +89,9 @@ const SlotManagement = () => {
             const slot = new Date(`${selectedDate}T${selectedTime}:00Z`);
             try {
                 await dispatch(saveAppointment({ therapistId, userId, slot, notes })).unwrap();
+
+                // navigate(`/payment/${appointmentData._id}`)
+                navigate(`/payment`)
                
             } catch (error) {
                 console.error("Appointment booking failed:", error);
@@ -98,30 +101,7 @@ const SlotManagement = () => {
         }
     };
 
-    // const getFilteredSlots = (slots: string[], booked: string[]): string[] => {
-    //     const now = new Date();
-    //     const threeMonthsLater = new Date();
-    //     threeMonthsLater.setMonth(now.getMonth() + 3);
 
-    //     return slots.filter(slot => {
-    //         const slotDate = new Date(slot);
-
-    //        // only consider slots within next 3 months
-    //        if (slotDate >= now && slotDate <= threeMonthsLater) {
-    //         return !booked.some(bookedSlot => {
-    //             const bookedDate = new Date(bookedSlot);
-
-    //             return (
-    //                 slotDate.getFullYear() === bookedDate.getFullYear() &&
-    //                 slotDate.getMonth() === bookedDate.getMonth() &&
-    //                 slotDate.getDate() === bookedDate.getDate() &&
-    //                 slotDate.getHours() === bookedDate.getHours()
-    //             );
-    //         });
-    //        }
-    //        return false;
-    //     })
-    // }
 
     const generateHourBlocks = (startTime: string, endTime: string): string[] => {
         const blocks: string[] = [];
@@ -275,17 +255,25 @@ const SlotManagement = () => {
 
                 {/* Fees and Submit */}
                 <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <span className="font-semibold">Fees: </span>
-                        <span className="text-black-600 font-bold">₹{therapist.fees}</span>
-                    </div>
-                    <button
-                        onClick={handleSubmit}
-                        className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg"
-                    >
-                        Submit Appointment
-                    </button>
-                </div>
+    <div className="flex flex-col">
+        <div>
+            <span className="font-semibold">Fees: </span>
+            <span className="text-black-600 font-bold">₹{therapist.fees}</span>
+        </div>
+        <div>
+            <span className="font-semibold">Convenience Fee: </span>
+            <span className="text-black-600 font-bold">₹80</span>
+        </div>
+    </div>
+
+    <button
+        onClick={handleSubmit}
+        className="bg-green-500 text-white font-semibold py-2 px-4 rounded-lg"
+    >
+        Submit Appointment
+    </button>
+</div>
+
             </div>
         </div>
     );

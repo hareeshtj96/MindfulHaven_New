@@ -8,6 +8,7 @@ import TherapistProtectedRoute from "../../ProtectedRoute/TherapistProtectedRout
 import TherapistDetailsPage from "../../Pages/Therapist/TherapistDetailsPage";
 import TherapistProfilePage from "../../Pages/Therapist/TherapistProfilePage";
 import BookingsListPage from "../../Pages/Therapist/BookingsListPage";
+import PageNotFoundPage from "../../Pages/User/PageNotFoundPage";
 
 
 function TherapistRoutes() {
@@ -21,6 +22,8 @@ function TherapistRoutes() {
             <Route path="/therapist_details" element={<TherapistProtectedRoute> <TherapistDetailsPage /> </TherapistProtectedRoute> }/>
             <Route path="/therapist_profile" element={<TherapistProtectedRoute> <TherapistProfilePage />  </TherapistProtectedRoute>  }/>
             <Route path="/therapist_bookings/:therapistId" element={<BookingsListPage /> }/>
+
+            <Route path="/*" element={<PageNotFoundPage />}/>
         </Routes>
         </>
     )

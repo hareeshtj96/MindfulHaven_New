@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../Redux/Store/store";
 import { loginAdmin } from "../../Redux/Store/Slices/adminSlice";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AdminLogin() {
     const [email, setEmail] = useState<string>("");
@@ -14,19 +16,25 @@ function AdminLogin() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-
-       
         const resultAction = await dispatch(loginAdmin({ email, password }));
+        console.log("result action....", resultAction);
 
         if (loginAdmin.fulfilled.match(resultAction)) {
-            const { token } = resultAction.payload; 
-            if (token) {
+            const { token, status, message } = resultAction.payload; 
+            if ( status && token) {
+                toast.success("Login successful", { position: 'top-right'})
+
+                setTimeout(() => {
+                    navigate("/admin/admin_dashboard");
+                },2000);
                 
-                navigate("/admin/admin_dashboard");
+            } else {
+                toast.error(message || "Login failed. Please check your credentials.",  { position: 'top-right'})
+                console.error("Login failed:", message);
             }
         } else {
-            
-            console.error("Login failed:", resultAction.error.message);
+            toast.error( "An unexpected error occured.", { position: 'top-right'})
+            console.error("Unexpected error:", resultAction.error.message);
         }
     };
 
@@ -85,6 +93,8 @@ function AdminLogin() {
                     </div>
                 </form>
             </div>
+
+            <ToastContainer />
         </div>
     );
 }

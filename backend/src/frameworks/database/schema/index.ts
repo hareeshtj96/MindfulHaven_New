@@ -2,6 +2,7 @@ import { User } from "./userSchema";
 import { Admin } from "./adminSchema";
 import { Therapist } from "./therapistSchema";
 import { Appointment } from "./appointmentSchema";
+import { Payment } from "./paymentSchema";
 
 
 interface DatabaseSchemaType {
@@ -9,6 +10,7 @@ interface DatabaseSchemaType {
     Admin: typeof Admin;
     Therapist: typeof Therapist;
     Appointment: typeof Appointment;
+    Payment: typeof Payment;
 }
 
 const databaseSchema: DatabaseSchemaType = {
@@ -16,6 +18,7 @@ const databaseSchema: DatabaseSchemaType = {
     Admin,
     Therapist,
     Appointment,
+    Payment,
 }
 
 export default databaseSchema;

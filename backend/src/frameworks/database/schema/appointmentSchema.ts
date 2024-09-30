@@ -39,6 +39,11 @@ const appointmentSchema = new Schema({
     reminderSent: {
         type: Boolean,
         default: false
+    },
+    payment: {
+        type: Schema.Types.ObjectId,
+        ref: 'Payment',
+        required: true
     }
 });
 

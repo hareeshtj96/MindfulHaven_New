@@ -7,11 +7,15 @@ import { loginUser,googleRegister, clearError } from "../../Redux/Store/Slices/u
 import {auth} from '../../FirebaseConfig/firebaseConfig';
 import { GoogleAuthProvider, signInWithPopup, getAuth } from "firebase/auth";
 import { RootState, AppDispatch } from "../../Redux/Store/store";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function Login() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [errors, setErrors] = useState<{general?: string}>({})
+    const [shouldNavigate, setShouldNavigate] = useState<boolean>(false);
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
     const {status, loginError} = useSelector((state: RootState) => state.user);
@@ -22,6 +26,8 @@ function Login() {
 
     useEffect(() => {
         if(errors.general || loginError) {
+            toast.error(errors.general || loginError, { position: 'top-right' })
+
             const timer = setTimeout(() => {
                 setErrors({});
                 dispatch(clearError());
@@ -29,6 +35,19 @@ function Login() {
             return () => clearTimeout(timer);
         }
     },[errors.general ,loginError, dispatch]);
+
+
+    //effect to trigger navigation after delay
+    useEffect(() => {
+        if(shouldNavigate) {
+            const timer = setTimeout(() => {
+                console.log("navigating to dashboard");
+                navigate("/dashboard");
+                
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    },[shouldNavigate, navigate]);
 
     const handleGoogleSignIn = async () => {
         const provider = new GoogleAuthProvider();
@@ -45,7 +64,7 @@ function Login() {
             }))
             .unwrap()
             .then(() => {
-                console.log(".....blahhh");
+                toast.success("Google Sign-In successfull!", { position: 'top-right' })
                 
                 navigate("/dashboard");
             })
@@ -68,15 +87,19 @@ function Login() {
             if(loginUser.fulfilled.match(action)) {
                 
                 if(action.payload.token) {
+                    toast.success("Login successful!", { position: 'top-right' })
                     console.log("login successful:", action.payload);
-                    navigate('/dashboard');
+                    
+                    setShouldNavigate(true);
                 }
             } else {
                 console.log("login failed:", action.payload);
+                toast.error("Login failed. Please check your credentials.", { position:'top-right'})
             }
             
         }).catch (error => {
             console.error("Dispath error:", error);
+            toast.error("An unexpected error occured:", { position: 'top-right' })
         })
     };
 
@@ -161,6 +184,8 @@ function Login() {
                     </div>
                 </form>
             </div>
+
+            <ToastContainer />
         </div>
     );
 }

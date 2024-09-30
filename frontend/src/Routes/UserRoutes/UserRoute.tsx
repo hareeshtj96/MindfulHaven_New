@@ -15,6 +15,8 @@ import ChildTherapistListPage from "../../Pages/User/ChildTherapistListPage";
 import SlotManagementPage from "../../Pages/User/SlotManagementPage";
 import BookingStatusPage from "../../Pages/User/BookingStatusPage";
 import SessionsPage from "../../Pages/User/SessionsPage";
+import PageNotFoundPage from "../../Pages/User/PageNotFoundPage";
+import PaymentManagementPage from "../../Pages/User/PaymentManagementPage";
 import ProtectedRoute from "../../ProtectedRoute/ProtectedRoute";
 
 
@@ -37,6 +39,9 @@ function UserRoute() {
             <Route path="/slot_management/:therapistId" element={<SlotManagementPage />}/>
             <Route path="/sessions" element={<SessionsPage />}/>
             <Route path="/booking_status/:bookingId" element={<BookingStatusPage /> }/>
+            <Route path="/payment" element={<PaymentManagementPage />}/>
+
+            <Route path="/*" element={<PageNotFoundPage />}/>
         </Routes>
         </>
     )

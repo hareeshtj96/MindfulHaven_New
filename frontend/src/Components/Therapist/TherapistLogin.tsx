@@ -5,6 +5,8 @@ import { logintherapist, clearError } from "../../Redux/Store/Slices/therapistSl
 import {Link} from "react-router-dom"
 import loginImg from "../../../Public/banner/therapist-login.png";
 import { RootState, AppDispatch } from "../../Redux/Store/store";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function TherapistLogin () {
     
@@ -23,6 +25,7 @@ function TherapistLogin () {
 
     useEffect(() => {
         if (errors.general || error) {
+            toast.error(errors.general || error, { position: 'top-right'})
             const timer = setTimeout(() => {
                 setErrors({});
                 dispatch(clearError());
@@ -40,12 +43,15 @@ function TherapistLogin () {
         if (logintherapist.fulfilled.match(resultAction)) {
             const { token } = resultAction.payload; 
             if (token) {
+                toast.success("Login successful", { position: 'top-right'})
+                setTimeout(() => {
+                    navigate("/therapist/therapist_dashboard");
+                },2000);
                 
-                navigate("/therapist/therapist_dashboard");
             }
         } else {
-            
             setErrors({general: resultAction.error.message});
+            toast.error(resultAction.error.message, { position: 'top-right'})
         }
     };
 
@@ -104,6 +110,7 @@ function TherapistLogin () {
                     </div>
                 </form>
             </div>
+            <ToastContainer />
         </div>
     )
 }
