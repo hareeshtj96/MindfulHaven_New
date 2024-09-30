@@ -12,7 +12,8 @@ import { userRegistration,
     getCompletedBookings,
     getCancelledBookings,
     getBookedSlotsUsecase,
-    searchTherapistUsecase
+    searchTherapistUsecase,
+    sortChildTherapistUsecase
  } from "./UseCases";
 
 export {
@@ -30,7 +31,8 @@ export {
     getCompletedBookings,
     getCancelledBookings,
     getBookedSlotsUsecase,
-    searchTherapistUsecase
+    searchTherapistUsecase,
+    sortChildTherapistUsecase
 }
 
 

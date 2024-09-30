@@ -15,7 +15,8 @@ import {
     getCompletedBookings,
     getCancelledBookings,
     getBookedSlotsUsecase,
-    searchTherapistUsecase
+    searchTherapistUsecase,
+    sortChildTherapistUsecase
  } from "../../application/UseCases";
 
 import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase } from "../../application/adminUseCases";
@@ -39,6 +40,7 @@ const useCase: any={
     getCancelledBookings: getCancelledBookings,
     getBookedSlotsUsecase: getBookedSlotsUsecase,
     searchTherapistUsecase: searchTherapistUsecase,
+    sortChildTherapistUsecase: sortChildTherapistUsecase,
 
 
     

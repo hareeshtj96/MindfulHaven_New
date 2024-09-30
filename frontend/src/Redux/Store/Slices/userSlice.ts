@@ -18,7 +18,8 @@ import { USERREGISTER,
     GETSCHEDULEDBOOKINGS,
     GETCOMPLETEDBOOKINGS,
     GETCANCELLEDBOOKINGS,
-    SEARCHTHERAPIST
+    SEARCHTHERAPIST,
+    SORTCHILDTHERAPIST
  } from "../../../Services/userApi";
 
 
@@ -48,6 +49,7 @@ interface ForgotPasswordResponse {
 }
 
 interface Therapist {
+    gender: string;
     fees: number;
     _id: string;
     name: string;
@@ -103,6 +105,7 @@ interface UserState {
     availableSlots: string[];
     bookedSlots: string[];
     timings: any[] 
+    sortedTherapists: Therapist[]
     appointmentData: any
     appointmentStatus: string | null
     appointmentError: string | null
@@ -140,6 +143,7 @@ const initialState: UserState = {
     availableSlots: [],
     bookedSlots: [],
     timings: [],
+    sortedTherapists: [],
     appointmentData: null,
     appointmentStatus: null,
     appointmentError: null,
@@ -622,6 +626,21 @@ export const fetchTherapistBySearchTerm = createAsyncThunk(
     }
 )
 
+
+export const fetchSortedChildTherapists = createAsyncThunk(
+    "therapist/fetchSortedChildTherapists",
+    async (sortBy: string, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(SORTCHILDTHERAPIST, { params: { sortBy } });
+            console.log("Response from sorted child therapists slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch sorted child therapists");
+        }
+    }
+);
+
 const userSlice = createSlice({
     name: 'user',
     initialState,
@@ -881,6 +900,17 @@ const userSlice = createSlice({
             .addCase(fetchTherapistBySearchTerm.rejected, (state, action) => {
                 state.status = 'failed'; 
                 state.error = null; 
+            })
+            .addCase(fetchSortedChildTherapists.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchSortedChildTherapists.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.sortedTherapists = action.payload; 
+            })
+            .addCase(fetchSortedChildTherapists.rejected, (state, action) => {
+                state.status = 'failed';
+               
             });
                       
             

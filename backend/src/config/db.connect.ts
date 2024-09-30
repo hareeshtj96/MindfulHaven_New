@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 mongoose.set("strictQuery", true);
 
-interface Config {
+interface config {
     mongo: {
         uri: string;
     };

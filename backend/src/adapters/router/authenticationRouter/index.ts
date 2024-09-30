@@ -42,7 +42,8 @@ export default (dependencies: any) =>{
        completedBookingController,
        cancelledBookingController,
        appointmentBookedController,
-       searchTherapistsController
+       searchTherapistsController,
+       childTherapistSorting
     } = userController(dependencies);
 
 
@@ -65,6 +66,7 @@ export default (dependencies: any) =>{
     router.get('/booking_Completeddetails', completedBookingController);
     router.get('/booking_Cancelleddetails', cancelledBookingController);
     router.get('/search_therapist', searchTherapistsController);
+    router.get('/sort_therapists', childTherapistSorting);
     
 
 

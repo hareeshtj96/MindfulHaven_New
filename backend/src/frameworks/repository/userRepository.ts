@@ -308,6 +308,23 @@ export default {
             return { status: false, message: "Failed to fetch search results"}
             
         }
+    },
+
+
+    getSortedTherapists: async ( sortCriteria: any) => {
+        try {
+            const sortedTherapists = await databaseSchema.Therapist.find({ 
+                specialization: 'Child Therapy',
+                isVerified: true
+            }).sort(sortCriteria);
+            console.log(" sorted from repository;", sortedTherapists);
+
+            return sortedTherapists
+            
+        } catch (error) {
+            console.error("Error fetching sorted therapists:", error);
+            return { status: false, message: "Error fetching sorted therapists"}
+        }
     }
 
 
