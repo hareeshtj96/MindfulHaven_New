@@ -52,9 +52,10 @@ export {
 }
 
 
-import { therapistRegistration, getTherapistProfileUsecase, } from "./therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase } from "./therapistUseCases";
 
 export {
     therapistRegistration,
-    getTherapistProfileUsecase
+    getTherapistProfileUsecase,
+    updateTherapistTimingsUsecase,
 }

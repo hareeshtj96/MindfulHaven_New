@@ -6,3 +6,4 @@ export const LOGINTHERAPIST = `${BASE_URL}/therapist/therapist_login`;
 export const UPDATETHERAPIST = `${BASE_URL}/therapist/therapist_details`;
 export const GETPROFILE = `${BASE_URL}/therapist/therapist_profile`;
 export const GETAPPOINTMENT = `${BASE_URL}/therapist/therapist_bookings`;
+export const UPDATETIMINGS = `${BASE_URL}/therapist/therapist_updateTimings`;
