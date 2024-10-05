@@ -23,7 +23,7 @@ import {
 
 import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase } from "../../application/adminUseCases";
 
-import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase } from "../../application/therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase } from "../../application/therapistUseCases";
 
 const useCase: any={
     userRegistration: userRegistration,
@@ -62,7 +62,8 @@ const useCase: any={
 
     therapistRegistration: therapistRegistration,
     getTherapistProfileUsecase: getTherapistProfileUsecase,
-    bookingUsecase: bookingUsecase
+    bookingUsecase: bookingUsecase,
+    updateTherapistTimingsUsecase: updateTherapistTimingsUsecase,
 }
 
 const repository:any={

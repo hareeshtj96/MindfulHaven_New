@@ -5,7 +5,9 @@ import { REGISTERTHERAPIST,
     LOGINTHERAPIST, 
     UPDATETHERAPIST, 
     GETPROFILE, 
-    GETAPPOINTMENT  } from "../../../Services/therapistApi";
+    GETAPPOINTMENT,
+    UPDATETIMINGS,
+  } from "../../../Services/therapistApi";
 
 interface Timing {
     dayOfWeek: number,
@@ -23,6 +25,12 @@ interface Booking {
     status: string;
 }
 
+
+interface AvailabilityForm {
+    date: string;
+    startTime: string;
+    endTime: string;
+}
 
 
 // Define the payload object for fetching appointments
@@ -259,6 +267,40 @@ export const fetchBookingAppointments = createAsyncThunk<{ bookings: Booking[], 
             }
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch booking appointment";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+export const updateTherapistAvailability = createAsyncThunk<
+Therapist,
+AvailabilityForm,
+{ rejectValue: string }
+>(
+    'therapist/updateTherapistAvailability',
+    async (formData, thunkAPI) => {
+        try {
+            const token = localStorage.getItem('therapistToken');
+
+            if (!token) {
+                return thunkAPI.rejectWithValue('No token found');
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+
+                },
+            }
+
+            const response = await axios.put(UPDATETIMINGS, formData, config);
+            console.log("response from update timing slice:", response);
+
+            return response.data.data;
+
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Update failed';
             return thunkAPI.rejectWithValue(message);
         }
     }

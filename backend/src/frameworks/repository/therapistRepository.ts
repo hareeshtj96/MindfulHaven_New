@@ -168,6 +168,33 @@ export default {
             }
         }
         
+    },
+
+    updateTimings: async (email: string, startTime: string, endTime: string, date: string) => {
+        try {
+            const therapist = await databaseSchema.Therapist.findOne({ email });
+            console.log("therapist found:", therapist);
+
+            if (!therapist) {
+                return { status: false, message: "Therapist not found"}
+            }
+
+            const newTiming = {
+                date: new Date(date),
+                startTime,
+                endTime
+            }
+
+            therapist.updatedTimings.push(newTiming);
+
+            await therapist.save();
+
+            return { status: true, data: therapist}
+            
+        } catch (error) {
+            console.log("Error in updating therapist timings:", error);
+            return { status: false, message:"Error occured during updatiing therapist timings"}
+        }
     }
     
 }

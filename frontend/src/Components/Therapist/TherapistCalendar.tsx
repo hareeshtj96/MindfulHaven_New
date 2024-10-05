@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Calendar, { CalendarProps } from 'react-calendar';
+import { useDispatch } from 'react-redux';
 import 'react-calendar/dist/Calendar.css';
+import { AppDispatch } from '../../Redux/Store/store';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
-import * as Yup from 'yup'; // for validation
+import { updateTherapistAvailability } from '../../Redux/Store/Slices/therapistSlice';
+import * as Yup from 'yup'; 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const TherapistCalendar: React.FC = () => {
+  const dispatch: AppDispatch = useDispatch();
   const [selectedDate, setSelectedDate] = useState<Date | [Date, Date] | null>(null);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
@@ -14,6 +21,7 @@ const TherapistCalendar: React.FC = () => {
       setIsCalendarOpen(false); 
     }
   };
+
 
   const initialValues = {
     date: '',
@@ -35,6 +43,22 @@ const TherapistCalendar: React.FC = () => {
     return '';
   };
 
+  const handleSubmit = async (values: { date: string; startTime: string; endTime: string}, resetForm: () => void) => {
+    const updatedValues = { ...values, date: formatSelectedDate() };
+    try {
+      const response = await dispatch(updateTherapistAvailability(updatedValues)).unwrap();
+      if (response) {
+        toast.success("Timings updated successfully!");
+        resetForm(); 
+        setSelectedDate(null);
+      } else {
+        toast.error("Failed to update timings.");
+      }
+    } catch (error) {
+      toast.error("Failed to update timings.");
+    }
+  }
+
   return (
     <div className="relative flex flex-col items-center h-screen p-6">
       {/* Heading */}
@@ -50,9 +74,8 @@ const TherapistCalendar: React.FC = () => {
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
-        onSubmit={(values) => {
-          console.log({ ...values, date: selectedDate });
-          alert('Form submitted successfully!');
+        onSubmit={(values, {resetForm}) => {
+          handleSubmit({ ...values, date: formatSelectedDate() }, resetForm)
         }}
       >
         {() => (
@@ -106,7 +129,7 @@ const TherapistCalendar: React.FC = () => {
                 </div>
 
                 {/* Submit Button */}
-                <button
+                <button 
                   type="submit"
                   className="w-full p-3 bg-green-300 text-white rounded hover:bg-green-400"
                 >
@@ -117,6 +140,9 @@ const TherapistCalendar: React.FC = () => {
           </div>
         )}
       </Formik>
+
+        <ToastContainer />
+
     </div>
   );
 };

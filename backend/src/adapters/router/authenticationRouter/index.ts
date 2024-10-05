@@ -92,6 +92,8 @@ export default (dependencies: any) =>{
     router.patch('/admin/therapist_getVerified/:id', adminTherapistVerification);
     router.patch('/admin/user_blockUnblock/:id', adminUserBlock);
     router.get('/admin/admin_getTherapistDetails/:id', getTherapistDetails);
+
+    
     router.use('/admin/*', roleMiddleware(['admin']));
 
 
@@ -103,6 +105,7 @@ export default (dependencies: any) =>{
         therapistDetailsController,
         getTherapistProfile,
         getBookingsController,
+        therapistUpdateTimingsController,
     } = therapistController(dependencies);
 
 
@@ -112,6 +115,7 @@ export default (dependencies: any) =>{
     router.put('/therapist/therapist_details', upload, therapistDetailsController);
     router.get('/therapist/therapist_profile', getTherapistProfile);
     router.get('/therapist/therapist_bookings/:id', getBookingsController);
+    router.put('/therapist/therapist_updateTimings', therapistUpdateTimingsController);
    
 
     router.use('/therapist/*', roleMiddleware(['therapist']));

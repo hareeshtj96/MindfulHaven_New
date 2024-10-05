@@ -88,6 +88,20 @@ const therapistSchema = new Schema({
         enum: ['therapist', 'user'],
         default: 'therapist',
     },
+    updatedTimings: [{
+        date: {
+            type: Date,
+            required: true,
+        },
+        startTime: {
+            type: String,
+            required: true,
+        },
+        endTime: {
+            type: String,
+            required: true,
+        },
+    }],
 });
 
 const Therapist = model('Therapist', therapistSchema);
