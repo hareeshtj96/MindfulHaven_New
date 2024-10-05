@@ -18,6 +18,8 @@ import cancelledBookingController from "./cancelledBookingController";
 import appointmentBookedController from "./appointmentBookedController";
 import searchTherapistsController from "./searchTherapistsController";
 import childTherapistSorting from "./childTherapistSorting";
+import paymentManagementController from "./paymentManagementController";
+import verifyPaymentController from "./verifyPaymentController";
 
 
 export default (dependencies:any) => {
@@ -42,6 +44,8 @@ export default (dependencies:any) => {
         appointmentBookedController: appointmentBookedController(dependencies),
         searchTherapistsController: searchTherapistsController(dependencies),
         childTherapistSorting: childTherapistSorting(dependencies),
+        paymentManagementController: paymentManagementController(dependencies),
+        verifyPaymentController: verifyPaymentController(dependencies),
         
     }
 }

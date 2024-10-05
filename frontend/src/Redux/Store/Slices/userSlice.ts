@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import { AxiosError } from "axios";
 import axiosInstance from "../../../AxiosConfig/AxiosConfig";
+import { setAuthInfo } from "../../../AxiosConfig/AxiosConfig";
 import { USERREGISTER,
     GOOGLEREGISTER,
     VERIFYOTP,
@@ -19,7 +21,9 @@ import { USERREGISTER,
     GETCOMPLETEDBOOKINGS,
     GETCANCELLEDBOOKINGS,
     SEARCHTHERAPIST,
-    SORTCHILDTHERAPIST
+    SORTCHILDTHERAPIST,
+    PAYMENTMETHOD,
+    VERIFYPAYMENT,
  } from "../../../Services/userApi";
 
 
@@ -268,7 +272,8 @@ export const loginUser = createAsyncThunk<LoginResponse, {email: string, passwor
     'user/loginUser',
     async (userData, thunkAPI) => {
         try {
-            const response = await axios.post(USERLOGIN, userData);
+            const response = await axios.post(USERLOGIN, userData, { withCredentials: true });
+            console.log("login response from slice:", response);
 
             const { token } = response.data;
             console.log("Token received from loginUser slice:", token);
@@ -287,6 +292,12 @@ export const loginUser = createAsyncThunk<LoginResponse, {email: string, passwor
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(decoded));
+
+            const refreshToken = response.data.refreshToken;
+            console.log("refresh token from slice:", refreshToken);
+            
+            setAuthInfo(token, decoded.role,'');
+
             return { token, user: decoded };
         } catch (error: any) {
             const message = error.response?.data?.message || "Login failed";
@@ -377,26 +388,38 @@ export const fetchUserProfile = createAsyncThunk<User, void, {rejectValue: strin
     "user/fetchuserProfile",
     async(_, thunkAPI) => {
         try {
-            const token = localStorage.getItem("token");
-            console.log("token recieved:", token);
+            const authInfoString = localStorage.getItem("authInfo");
+            console.log("auth info string....", authInfoString);
 
-            if(!token) {
+            if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
             }
 
+            const authInfo = JSON.parse(authInfoString);
+            const accessToken = authInfo.accessToken;
+            console.log("access token... in slice...", accessToken);
+
+            if (!accessToken) {
+                return thunkAPI.rejectWithValue("Access token is missing or invalid");
+            }
 
             const config = {
+                withCredentials: true,
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${accessToken}`,
                 }
             }
+            
+
             const response = await axiosInstance.get(GETUSERPROFILE, config);
+          
             console.log("response from user slice:", response);
             console.log("response data data user", response.data.data.user);
             return response.data.data.user;
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch profile";
             return thunkAPI.rejectWithValue(message);
+
         }
     }
 ) 
@@ -405,7 +428,7 @@ export const fetchChildTherapist = createAsyncThunk<Therapist[], void, {rejectVa
     'user/fetchChildTherapist',
     async(_, thunkAPI) => {
         try {
-            const response = await axiosInstance.get(GETCHILDTHERAPIST);
+            const response = await axios.get(GETCHILDTHERAPIST);
             console.log("Response from fetch child therapist slice:", response);
             return response.data.data;
         } catch (error: any) {
@@ -419,7 +442,7 @@ export const fetchAvailableSlots = createAsyncThunk<{ availableSlots: string[], 
     'user/fetchAvailableSlots',
     async(therapistId, thunkAPI) => {
         try {
-            const response = await axiosInstance.get(`${GETSLOTS}/${therapistId}`);
+            const response = await axios.get(`${GETSLOTS}/${therapistId}`);
             console.log("response from fetch availble slots:", response);
             console.log("response.data.data.availableSlots:", response.data.data.availableSlots)
             return {
@@ -437,7 +460,7 @@ export const fetchBookedSlots = createAsyncThunk<{ bookedSlots: string[] }, stri
     'user/fetchBookedSlotes',
     async(therapistId, thunkAPI) => {
         try {
-            const response = await axiosInstance.get(`${BOOKEDSLOTS}/${therapistId}`);
+            const response = await axios.get(`${BOOKEDSLOTS}/${therapistId}`);
             console.log("response from fetch booked slots:", response);
 
             return {
@@ -456,13 +479,13 @@ export const fetchBookedSlots = createAsyncThunk<{ bookedSlots: string[] }, stri
 
 export const saveAppointment = createAsyncThunk<
     { success: boolean; appointmentData: any }, 
-    { therapistId: string; userId: string; slot: Date; notes: string },
+    { therapistId: string; userId: string; slot: Date; notes: string, paymentId:string },
     { rejectValue: string } 
 >(
     'user/saveAppointment',
-    async ({ therapistId, userId, slot, notes }, thunkAPI) => {
+    async ({ therapistId, userId, slot, notes, paymentId }, thunkAPI) => {
         try {
-            const response = await axiosInstance.post(SAVEAPPOINTMENT, { therapistId, userId, slot, notes });
+            const response = await axios.post(SAVEAPPOINTMENT, { therapistId, userId, slot, notes, paymentId });
 
             console.log("response from save appointment:", response);
 
@@ -478,11 +501,70 @@ export const saveAppointment = createAsyncThunk<
     }
 );
 
+
+export const paymentMethod = createAsyncThunk<
+{success: boolean; appointmentData: any },
+{therapistId: string; userId: string; slot: Date; notes: string, totalAmount: number, paymentStatus: string},
+{rejectValue:string}
+>(
+    'user/paymentMethod',
+    async ({ therapistId, userId, slot, notes, totalAmount, paymentStatus }, thunkAPI) => {
+        try {
+            const response = await axios.post(PAYMENTMETHOD, { therapistId, userId, slot, notes, totalAmount, paymentStatus });
+            console.log("response from payment method:", response.data);
+
+            return {
+                success: true,
+                appointmentData: response.data
+            }
+            
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to do payment";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+export const sendPaymentStatus = createAsyncThunk<
+  { success: boolean; verifiedPayment: any }, 
+  { therapistId: string; userId: string; razorpayOrderId: string; paymentStatus: string; paymentDetails: any, slot: Date, notes: string, totalAmount: number }, // Parameters
+  { rejectValue: string }
+>(
+  'user/sendPaymentStatus',
+  async ({ therapistId, userId, razorpayOrderId, paymentStatus, paymentDetails, slot, notes, totalAmount }, thunkAPI) => {
+    try {
+      const response = await axios.post(VERIFYPAYMENT, {
+        therapistId,
+        userId,
+        razorpayOrderId,
+        paymentStatus,
+        paymentDetails,
+        slot,
+        notes,
+        totalAmount
+      });
+
+      // Log the response from the backend
+      console.log("Payment status response:", response);
+
+      return {
+        success: true,
+        verifiedPayment: response.data,
+        paymentId: response.data.paymentId
+      };
+
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Failed to verify payment";
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const getBookingDetails = createAsyncThunk<{success: boolean, bookingData: any}, {bookingId: string}, { rejectValue: string}>(
     'user/bookingDetails',
     async ({ bookingId}, thunkAPI) => {
         try {
-            const response = await axiosInstance.get(`${GETBOOKINGDETAILS}/${bookingId}`);
+            const response = await axios.get(`${GETBOOKINGDETAILS}/${bookingId}`);
             console.log("response from booking details slice....:", response);
             
             return {
@@ -510,17 +592,30 @@ export const fetchScheduledBookingDetails = createAsyncThunk<{
     async({ page, limit }, thunkAPI) => {
         console.log("fetching page:", page,  "with limit:", limit);
         try {
-            const token = localStorage.getItem("token");
-            console.log("token received:", token);
+            
+            const authInfoString = localStorage.getItem("authInfo");
+            console.log("auth info string....", authInfoString);
 
-            if(!token) {
+            if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
             }
+
+            const authInfo = JSON.parse(authInfoString);
+            const accessToken = authInfo.accessToken;
+            console.log("access token... in slice...", accessToken);
+
+            if (!accessToken) {
+                return thunkAPI.rejectWithValue("Access token is missing or invalid");
+            }
+
             const config = {
+                withCredentials: true,
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${accessToken}`,
                 }
             }
+            console.log("sending authorization header:", config.headers.Authorization);
+
             const response = await axiosInstance.get(`${GETSCHEDULEDBOOKINGS}?page=${page}&limit=${limit}`, config);
             console.log("response data.data...", response.data.data);
 
@@ -547,15 +642,25 @@ export const fetchCompletedBookingDetails = createAsyncThunk<{
     async({ page, limit }, thunkAPI) => {
         console.log("fetching page:", page,  "with limit:", limit);
         try {
-            const token = localStorage.getItem("token");
-            console.log("token received:", token);
+            const authInfoString = localStorage.getItem("authInfo");
+            console.log("auth info string....", authInfoString);
 
-            if(!token) {
+            if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
             }
+
+            const authInfo = JSON.parse(authInfoString);
+            const accessToken = authInfo.accessToken;
+            console.log("access token... in slice...", accessToken);
+
+            if (!accessToken) {
+                return thunkAPI.rejectWithValue("Access token is missing or invalid");
+            }
+
             const config = {
+                withCredentials: true,
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${accessToken}`,
                 }
             }
             const response = await axiosInstance.get(`${GETCOMPLETEDBOOKINGS}?page=${page}&limit=${limit}`, config);
@@ -585,15 +690,25 @@ export const fetchCancelledBookingDetails = createAsyncThunk<{
     async({ page, limit }, thunkAPI) => {
         console.log("fetching page:", page,  "with limit:", limit);
         try {
-            const token = localStorage.getItem("token");
-            console.log("token received:", token);
+            const authInfoString = localStorage.getItem("authInfo");
+            console.log("auth info string....", authInfoString);
 
-            if(!token) {
+            if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
             }
+
+            const authInfo = JSON.parse(authInfoString);
+            const accessToken = authInfo.accessToken;
+            console.log("access token... in slice...", accessToken);
+
+            if (!accessToken) {
+                return thunkAPI.rejectWithValue("Access token is missing or invalid");
+            }
+
             const config = {
+                withCredentials: true,
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${accessToken}`,
                 }
             }
             const response = await axiosInstance.get(`${GETCANCELLEDBOOKINGS}?page=${page}&limit=${limit}`, config);

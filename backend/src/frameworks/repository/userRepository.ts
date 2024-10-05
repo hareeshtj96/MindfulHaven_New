@@ -107,6 +107,26 @@ export default {
         }
     },
 
+    getTherapistDetails: async(therapistId: string) => {
+        console.log("therapist id:", therapistId);
+        try {
+            const therapists = await databaseSchema.Therapist.findOne({
+                _id: therapistId, 
+                isVerified: true
+            });
+
+            return {
+                status: true,
+                data: therapists
+            };
+        } catch (error) {
+            console.error("Error fetching therapists details:", error);
+            return {
+                status: false, message: "Error fetching therapists"
+            }
+        }
+    },
+
     getSlot: async(therapistId: string) => {
         try {
             const therapist = await databaseSchema.Therapist.findOne({ _id: therapistId, isVerified: true});
@@ -169,7 +189,7 @@ export default {
 
 
 
-    saveAppointment: async({ therapistId, userId, slot, notes}: {therapistId: string, userId: string, slot: Date, notes?: string}) => {
+    saveAppointment: async({ therapistId, userId, slot, notes, paymentId}: {therapistId: string, userId: string, slot: Date, notes?: string, paymentId:string}) => {
         try {
             const existingAppointment = await databaseSchema.Appointment.findOne({
                 therapistId, slot
@@ -181,11 +201,34 @@ export default {
                     message: "The slot is already booked. Please choose a different slot"
                 }
             }
+
+            const paymentDetails = await databaseSchema.Payment.findById(paymentId)
+
+            if (!paymentDetails) {
+                return {
+                    status: false,
+                    message: "Payment details not found."
+                };
+            }
+
             const newAppointment = new databaseSchema.Appointment({
                 therapistId,
                 userId,
                 slot,
-                notes
+                notes,
+                payment: {
+                    userId: paymentDetails.userId,
+                    therapistId: paymentDetails.therapistId,
+                    amount: paymentDetails.amount,
+                    convenienceFee: paymentDetails.convenienceFee,
+                    totalAmount: paymentDetails.totalAmount,
+                    paymentMethod: paymentDetails.paymentMethod,
+                    paymentStatus: paymentDetails.paymentStatus,
+                    paymentDate: paymentDetails.paymentDate,
+                    refundRequest: paymentDetails.refundRequest,
+                    refundReason: paymentDetails.refundReason,
+                    refundProcessedAt: paymentDetails.refundProcessedAt,
+                }
             });
 
             const savedAppointment = await newAppointment.save();
@@ -324,6 +367,21 @@ export default {
         } catch (error) {
             console.error("Error fetching sorted therapists:", error);
             return { status: false, message: "Error fetching sorted therapists"}
+        }
+    },
+
+
+    savePayment: async (paymentData: any) => {
+        try {
+            const result = await databaseSchema.Payment.create(paymentData);
+            console.log("result from repository:", result);
+
+            return { status: true, data: result, paymentId: result._id}
+            
+        } catch (error) {
+            console.error("Error saving payment:", error);
+            return { status: false, message: 'Failed to save payment'}
+            
         }
     }
 

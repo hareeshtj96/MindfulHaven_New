@@ -43,7 +43,9 @@ export default (dependencies: any) =>{
        cancelledBookingController,
        appointmentBookedController,
        searchTherapistsController,
-       childTherapistSorting
+       childTherapistSorting,
+       paymentManagementController,
+       verifyPaymentController,
     } = userController(dependencies);
 
 
@@ -56,17 +58,19 @@ export default (dependencies: any) =>{
     router.post('/forgot_password_otp',resetPasswordOtpcontroller);
     router.post('/password_reset', resetPassword);
     router.post('/refresh_token', refreshTokenController);
-    router.get("/user_profile", verifyAccessToken, userProfileController);
+    router.get("/user_profile", verifyAccessToken,userProfileController);
     router.get("/childTherapy", childTherapistController);
     router.get('/slot_management/:id', slotManagementController);
     router.get('/booked_slots/:id', appointmentBookedController);
     router.post('/create_appointment', appointmentController);
     router.get('/booking_status/:id', bookingStatusController);
-    router.get('/booking_details', sessionsViewController);
-    router.get('/booking_Completeddetails', completedBookingController);
-    router.get('/booking_Cancelleddetails', cancelledBookingController);
+    router.get('/booking_details', verifyAccessToken, sessionsViewController);
+    router.get('/booking_Completeddetails', verifyAccessToken, completedBookingController);
+    router.get('/booking_Cancelleddetails', verifyAccessToken, cancelledBookingController);
     router.get('/search_therapist', searchTherapistsController);
     router.get('/sort_therapists', childTherapistSorting);
+    router.post('/payment', paymentManagementController);
+    router.post('/verify_payment', verifyPaymentController);
     
 
 

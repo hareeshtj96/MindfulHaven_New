@@ -19,6 +19,9 @@ function TherapistSidebar() {
     const handleNavigate = () => {
         navigate(`/therapist/therapist_bookings/${therapistId}`);
     }
+    const handleCalendar = () => {
+        navigate(`/therapist/therapist_Calendar`)
+    }
 
     return (
         <div>
@@ -45,9 +48,9 @@ function TherapistSidebar() {
                     </button>
                 </div>
                 <div className={`flex flex-col items-center ${isOpen ? 'mt-8' : 'mt-4'}`}>
-                    <button className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
+                    <button onClick={handleCalendar} className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
                         <FaCalendar className="inline-block mr-2" />
-                        {isOpen && 'Calendar'}
+                        {isOpen && 'Update Availability'}
                     </button>
                     <button className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
                         <FaUser className="inline-block mr-2" />

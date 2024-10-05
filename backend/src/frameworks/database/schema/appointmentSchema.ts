@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { paymentSchema } from "./paymentSchema";
 
 const appointmentSchema = new Schema({
     therapistId: {
@@ -40,11 +41,7 @@ const appointmentSchema = new Schema({
         type: Boolean,
         default: false
     },
-    payment: {
-        type: Schema.Types.ObjectId,
-        ref: 'Payment',
-        required: true
-    }
+    payment: paymentSchema
 });
 
 const Appointment = model('Appointment', appointmentSchema);

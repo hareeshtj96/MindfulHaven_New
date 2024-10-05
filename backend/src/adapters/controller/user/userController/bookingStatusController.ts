@@ -21,7 +21,7 @@ export default (dependencies: any) => {
             }
         } catch (error) {
             console.error("Error in booking status controller:", error);
-            return res.status(500).json({status: false, message: "Internal Server Error"});
+            return res.status(401).json({status: false, message: "Token expired"});
         }
     }
     return bookingStatusController;

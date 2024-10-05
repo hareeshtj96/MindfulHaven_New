@@ -16,8 +16,11 @@ interface jwtPayload {
 
 const SECRET_KEY = process.env.JWT_SECRET || "default_key";
 
+console.log("secret key:", SECRET_KEY);
+
 export const verifyAccessToken = (req: CustomRequest, res: Response, next: NextFunction) => {
     const token = req.headers['authorization']?.split(' ')[1];
+    console.log("token from middleware:", token);
 
     if(!token) {
         return res.status(401).json({ message: "No access token provided" });
@@ -25,6 +28,8 @@ export const verifyAccessToken = (req: CustomRequest, res: Response, next: NextF
 
     jwt.verify(token, SECRET_KEY, (err, decoded) => {
         if(err) {
+            console.error("JWT verification error:", err.message);
+            
             if(err instanceof TokenExpiredError) {
                 console.log("Access token expired:", err.expiredAt);
                 return res.status(401).json({ message: "Access token expired", needRefresh: true})
@@ -32,6 +37,11 @@ export const verifyAccessToken = (req: CustomRequest, res: Response, next: NextF
             } else {
                 return res.status(403).json({ message: 'Invalid access token'})
             }
+        }
+
+        if (typeof decoded !== 'object' || !decoded) {
+            console.error("Decoded payload is not an object:", decoded);
+            return res.status(403).json({ message: 'Invalid token structure' });
         }
 
         const payload = decoded as JwtPayload; 

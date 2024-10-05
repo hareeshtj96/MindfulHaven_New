@@ -1,11 +1,6 @@
 import mongoose, { Schema, model } from "mongoose";
 
 const paymentSchema = new Schema({
-    appointmentId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Appointment',
-        required: true
-    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
@@ -35,7 +30,7 @@ const paymentSchema = new Schema({
     },
     paymentStatus: {
         type: String,
-        enum: ['pending', 'completed', 'failed', 'refunded'],
+        enum: ['pending', 'success', 'failed', 'refunded'],
         default: 'pending'
     },
     transactionId: {
@@ -65,4 +60,4 @@ const paymentSchema = new Schema({
 
 const Payment = model('Payment', paymentSchema);
 
-export { Payment }
+export { Payment, paymentSchema }

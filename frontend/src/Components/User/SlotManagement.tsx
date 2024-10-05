@@ -30,10 +30,7 @@ const SlotManagement = () => {
     const timings = useSelector((state: RootState) => state.user.timings || []);
     const loading = useSelector((state: RootState) => state.user.loading);
     const error = useSelector((state: RootState) => state.user.error);
-    const appointmentStatus = useSelector((state: RootState) => state.user.appointmentStatus)
-    const appointmentError = useSelector((state: RootState) => state.user.appointmentError)
-    const appointmentData = useSelector((state: RootState) => state.user.appointmentData);
-    console.log("...appointement data:", appointmentData)
+ 
     console.log("avaialble slots from slot management:", availableSlots);
     console.log("booked slots from slot management:", bookedSlots);
 
@@ -87,11 +84,18 @@ const SlotManagement = () => {
             const userId = userIdentity || "undefined"
 
             const slot = new Date(`${selectedDate}T${selectedTime}:00Z`);
-            try {
-                await dispatch(saveAppointment({ therapistId, userId, slot, notes })).unwrap();
+            const convenienceFees = 80;
+            const totalAmount = (therapist?.fees ?? 0) + convenienceFees;
 
-                // navigate(`/payment/${appointmentData._id}`)
-                navigate(`/payment`)
+            const appointmentData = {
+                userId,
+                therapistId,
+                slot,
+                totalAmount,
+            }
+
+            try {
+                navigate(`/payment`, {state: appointmentData});
                
             } catch (error) {
                 console.error("Appointment booking failed:", error);

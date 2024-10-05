@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const SECRET_KEY = process.env.SECRET_KEY || "default";
+const SECRET_KEY = process.env.JWT_SECRET || "default";
 const REFRESH_SECRET_KEY = process.env.JWT_REFRESH_SECRET;
 
 if (!REFRESH_SECRET_KEY) {
@@ -12,6 +12,8 @@ if (!REFRESH_SECRET_KEY) {
 }
 
 export const refreshTokenController = (dependencies: any) => {
+    console.log("entered refresh token controller............");
+    
     return (req: Request, res: Response) => {
         
 
@@ -36,20 +38,23 @@ export const refreshTokenController = (dependencies: any) => {
 
                 // Generate new access token
                 const newAccessToken = jwt.sign(
-                    { user: email, role: role },
+                    {  email,  role },
                     SECRET_KEY,
                     { expiresIn: '20m' }
                 );
+                console.log("new access token:", newAccessToken);
 
                 // Generate new refresh token
                 const newRefreshToken = jwt.sign(
-                    { user: email, role: role },
+                    { email,  role },
                     REFRESH_SECRET_KEY,
                     { expiresIn: '7d' }
                 );
 
+                console.log("new refresh token:", newRefreshToken);
+
                 // Set the new refresh token as a cookie
-                res.cookie('refreshToken', newRefreshToken, { httpOnly: true });
+                res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'strict', maxAge: 7 * 24 * 60 * 60 * 1000 });
 
                 return res.json({ accessToken: newAccessToken });
             }

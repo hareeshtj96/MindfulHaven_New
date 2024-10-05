@@ -7,6 +7,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
+console.log("secret key:", SECRET_KEY);
+
 
 export default (dependencies: any) => {
     const { getAllBookings } = dependencies.useCase;
@@ -27,6 +29,8 @@ export default (dependencies: any) => {
             if (!authHeader || !authHeader.startsWith('Bearer ')) {
                 return res.status(401).json({ status: false, message: "Authorization header is missing or invalid" });
             }
+
+            console.log("secret key:", SECRET_KEY);
 
             const token = authHeader.split(' ')[1];
             console.log("token:", token);
@@ -57,7 +61,7 @@ export default (dependencies: any) => {
             }
         } catch (error) {
             console.error("Error in  sessions view controller:", error);
-            return res.status(500).json({status: false, message: "Internal Server Error"});
+            return res.status(401).json({status: false, message: "Token expired"});
         }
     }
     return sessionsViewController;

@@ -30,6 +30,8 @@ export default function userLogin (dependencies: any) {
                 return res.status(403).json({ message: "User is blocked. Please contact support." });
             }
 
+            console.log("secret key....", SECRET_KEY);
+
             // Compare provided password with the stored hashed password
             const validPassword = await bcrypt.compare(password, user.data.password);
             if (!validPassword) {
@@ -57,6 +59,8 @@ export default function userLogin (dependencies: any) {
                 sameSite: 'lax',
                 maxAge: 7 * 24 * 60 * 60 * 1000,
             })
+
+            console.log("setting refresh token cookie:", refreshToken);
 
             // Send response
             res.json({ status: true, token });

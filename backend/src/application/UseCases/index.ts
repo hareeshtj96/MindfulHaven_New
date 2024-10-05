@@ -16,6 +16,8 @@ import getCancelledBookings from "./getCancelledBookings";
 import getBookedSlotsUsecase from "./getBookedSlotsUsecase";
 import searchTherapistUsecase from "./searchTherapistUsecase";
 import sortChildTherapistUsecase from "./sortChildTherapistUsecase";
+import getPaymentUsecase from "./getPaymentUsecase";
+import savePaymentUsecase from "./savePaymentUsecase";
 
 export {
     userRegistration,
@@ -35,5 +37,7 @@ export {
     getCancelledBookings,
     getBookedSlotsUsecase,
     searchTherapistUsecase,
-    sortChildTherapistUsecase
+    sortChildTherapistUsecase,
+    getPaymentUsecase,
+    savePaymentUsecase
 }

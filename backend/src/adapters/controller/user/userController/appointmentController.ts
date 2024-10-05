@@ -8,13 +8,14 @@ export default (dependencies: any) => {
 
         console.log(" entered appointment controller.........")
         try {
-            const { therapistId, userId, slot, notes } = req.body;
+            const { therapistId, userId, slot, notes, paymentId } = req.body;
+            console.log(" re body appointemnt ocontroller....", req.body);
             
-           
             const response = await getAppointmentUsecase(dependencies).executeFunction({ therapistId,
                 userId,
                 slot,
-                notes, });
+                notes,
+            paymentId });
 
             if( response && response.status) {
                 res.status(200).json({ status: true, data: response.data });

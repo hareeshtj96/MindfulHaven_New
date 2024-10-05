@@ -13,7 +13,9 @@ import { userRegistration,
     getCancelledBookings,
     getBookedSlotsUsecase,
     searchTherapistUsecase,
-    sortChildTherapistUsecase
+    sortChildTherapistUsecase,
+    getPaymentUsecase,
+    savePaymentUsecase
  } from "./UseCases";
 
 export {
@@ -32,7 +34,10 @@ export {
     getCancelledBookings,
     getBookedSlotsUsecase,
     searchTherapistUsecase,
-    sortChildTherapistUsecase
+    sortChildTherapistUsecase,
+    getPaymentUsecase,
+    savePaymentUsecase
+    
 }
 
 
