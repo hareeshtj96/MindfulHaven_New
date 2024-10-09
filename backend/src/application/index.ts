@@ -15,7 +15,10 @@ import { userRegistration,
     searchTherapistUsecase,
     sortChildTherapistUsecase,
     getPaymentUsecase,
-    savePaymentUsecase
+    savePaymentUsecase,
+    joinVideoSessionUsecase,
+    searchChildTherapistUsecase,
+    cancelAppointmentUsecase
  } from "./UseCases";
 
 export {
@@ -36,8 +39,10 @@ export {
     searchTherapistUsecase,
     sortChildTherapistUsecase,
     getPaymentUsecase,
-    savePaymentUsecase
-    
+    savePaymentUsecase,
+    joinVideoSessionUsecase,
+    searchChildTherapistUsecase,
+    cancelAppointmentUsecase
 }
 
 
@@ -52,10 +57,11 @@ export {
 }
 
 
-import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase } from "./therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase } from "./therapistUseCases";
 
 export {
     therapistRegistration,
     getTherapistProfileUsecase,
     updateTherapistTimingsUsecase,
+    therapistSessionUsecase,
 }

@@ -260,13 +260,36 @@ export default {
         }
     },
 
+    cancelAppointment: async ({ bookingId, userId} : {bookingId: string, userId: string}) => {
+        try {
+            const appointment = await databaseSchema.Appointment.findById(bookingId);
+
+            if (!appointment) {
+                return { status: false, message: "Appointment not found or invalid details"}
+            }
+
+            appointment.status = "cancelled";
+            await appointment.save();
+
+            return { status: true, message: "Appointment cancelled successfuly"}
+        } catch (error) {
+            console.error("Error while cancelling appointment:", error);
+            return { status: false, message: "Failed to cancel appointment"};
+        }
+    },
+
+
     getAllBooking : async(email:string, page: number, limit:number) => {
         try {
             const skip = (page - 1) * limit;
-            const bookings = await databaseSchema.Appointment.find({ email: email, status: "scheduled" }).skip(skip).limit(limit);
+
+            const currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+
+            const bookings = await databaseSchema.Appointment.find({ email: email, status: "scheduled", slot: {$gte : currentDate} }).skip(skip).limit(limit);
             console.log("response from getall booking:",bookings);
 
-            const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "scheduled" })
+            const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "scheduled", slot: { $gte: currentDate} })
 
             return {
                 status: true,
@@ -350,6 +373,25 @@ export default {
             console.error("Error fetching search result:", error);
             return { status: false, message: "Failed to fetch search results"}
             
+        }
+    },
+
+    getChildTherapistSearchResult: async (searchTerm: string) => {
+        const filter = {
+            $or:[
+                {name: {$regex: searchTerm, $options:'i'}},
+                { specialization: { $regex: searchTerm, $options: 'i'}}
+            ],
+        };
+        try {
+            const therapists = await databaseSchema.Therapist.find(filter);
+            console.log("child therapists:", therapists);
+
+            return therapists;
+            
+        } catch (error) {
+            console.error("Error fetching child therapists:", error);
+            return { status: false, message: "Failed to fetch search child therapists"}
         }
     },
 

@@ -1,4 +1,5 @@
 import http from 'http';
+import WebSocket from 'ws';
 import express from 'express';
 import dotenv from 'dotenv';
 import session, { MemoryStore } from 'express-session';
@@ -30,5 +31,29 @@ app.use((req, res, next) => {
 })
 
 app.use('/', routes(dependencies))
+
+// WebSocket server using the same HTTP server
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws: WebSocket) => {
+    console.log('New client connected');
+
+    ws.on('message', (message: string) => {
+        console.log(`Received message: ${message}`)
+
+        ws.send(JSON.stringify({ message: 'Message received' }));
+    });
+
+    ws.on('close', () => {
+        console.log('Client disconnected');
+    });
+
+    ws.send(JSON.stringify({ message: 'Welcome to the WebSocket server' }));
+
+    ws.onerror = (error) => {
+        console.error(`WebSocket error: ${error.message}`);
+    };
+    
+})
 
 serverConfig(server, config).startServer()

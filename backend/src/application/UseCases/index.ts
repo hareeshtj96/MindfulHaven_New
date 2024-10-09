@@ -18,6 +18,9 @@ import searchTherapistUsecase from "./searchTherapistUsecase";
 import sortChildTherapistUsecase from "./sortChildTherapistUsecase";
 import getPaymentUsecase from "./getPaymentUsecase";
 import savePaymentUsecase from "./savePaymentUsecase";
+import joinVideoSessionUsecase from "./joinVideoSessionUsecase";
+import searchChildTherapistUsecase from "./searchChildTherapistUsecase";
+import cancelAppointmentUsecase from "./cancelAppointmentUsecase";
 
 export {
     userRegistration,
@@ -39,5 +42,8 @@ export {
     searchTherapistUsecase,
     sortChildTherapistUsecase,
     getPaymentUsecase,
-    savePaymentUsecase
+    savePaymentUsecase,
+    joinVideoSessionUsecase,
+    searchChildTherapistUsecase,
+    cancelAppointmentUsecase
 }

@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchScheduledBookingDetails, fetchCompletedBookingDetails, fetchCancelledBookingDetails, clearBookings } from "../../Redux/Store/Slices/userSlice";
+import { fetchScheduledBookingDetails, fetchCompletedBookingDetails, fetchCancelledBookingDetails, clearBookings,  joinSession, cancelAppointment } from "../../Redux/Store/Slices/userSlice";
 import { RootState, AppDispatch } from "../../Redux/Store/store";
 import { Booking } from "../../Redux/Store/Slices/userSlice";
 import  DefaultSkeleton  from '../../Components/MaterialUI/Shimmer';
+import { ZegoExpressEngine } from "zego-express-engine-webrtc";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const formatDateTime = (slot: string) => {
     const date = new Date(slot);
@@ -29,16 +34,16 @@ const formatDateTime = (slot: string) => {
 
 const Session = () => {
     const dispatch: AppDispatch = useDispatch();
+    const navigate = useNavigate();
+    const zegoEngineRef = useRef<ZegoExpressEngine | null>(null);
     const { scheduledBookings, cancelledBookings, completedBookings, error, status, totalPages, currentPage, completedCurrentPage, completedTotalPages, cancelledCurrentPage, cancelledTotalPages } = useSelector((state: RootState) => state.user);
 
-    const states = useSelector((state: RootState) => state.user)
-    console.log("states....", states);
+    const user = useSelector((state: RootState) => state.user.user)
+    console.log("states....", user);
+
+    const userId = user?.userId;
+    const name =user?.name;
     
-
-    // const [upcomingPage, setUpcomingPage] = useState(1);
-    // const [completedPage, setCompletedPage] = useState(1);
-    // const [cancelledPage, setCancelledPage] = useState(1);
-
     const [activeTab, setActiveTab] = useState<'upcoming' | 'completed' | 'cancelled'>('upcoming');
     const limit = 6;
 
@@ -91,69 +96,210 @@ const Session = () => {
                 }`}>
                     Status: {booking.status}
                 </p>
+
+                {booking.status === "scheduled" && (
+                <div className="flex justify-end mt-4">
+                    <button 
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all mx-2"
+                        onClick={() => handleJoinSession(booking._id, userId || "defaultUserId")}
+                        
+                    >
+                        Join
+                    </button>
+
+                    <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-all"
+                    onClick={() => handleCancelBooking(booking._id, userId || "defaultUserId")}>
+                        Cancel Appointment
+                    </button>
+                   
+
+                </div>
+            )}
             </div>
         );
+    };
+
+
+    const getFilteredUpcomingBookings = () => {
+        const upcoming =  scheduledBookings.filter(booking => {
+            const bookingDate = new Date(booking.slot); 
+          
+            bookingDate.setMinutes(bookingDate.getMinutes() - (5 * 60 + 30))
+
+            const currentDate = new Date();
+
+
+            return bookingDate.getTime() > currentDate.getTime(); 
+        });
+        console.log("filtered upcoming bookings:", scheduledBookings);
+        return upcoming;
+        
     };
 
    
 
     const getCurrentBookings = () => {
+        let bookings:any = [];
         switch (activeTab) {
             case 'upcoming':
-                return scheduledBookings;
+                bookings = getFilteredUpcomingBookings()
+                break;
             case 'completed':
-                return completedBookings;
+                bookings = completedBookings;
+                break;
             case 'cancelled':
-                return cancelledBookings;
+                bookings = cancelledBookings;
+                break;
             default:
-                return [];
+                bookings = [];
+                break;
         }
+        const startIndex = (currentPage - 1) * limit;
+        const endIndex = startIndex + limit;
+        return bookings.slice(startIndex, endIndex)
     };
 
     const currentBookings = getCurrentBookings();
 
-    const getCurrentPage = () => {
-        switch (activeTab) {
-            case 'upcoming':
-                return currentPage;
-            case 'completed':
-                return completedCurrentPage;
-            case 'cancelled':
-                return cancelledCurrentPage;
-            default:
-                return 1;
-        }
+  
+
+    const getTotalPages = () => {
+        const totalBookings = activeTab === 'upcoming' ? getFilteredUpcomingBookings().length :
+                              activeTab === 'completed' ? completedBookings.length :
+                              cancelledBookings.length;
+       
+        return Math.max(Math.ceil(totalBookings / limit), 1);
     };
 
-    // Retrieve the total pages based on the active tab
-    const getTotalPages = () => {
-        switch (activeTab) {
-            case 'upcoming':
-                return totalPages;
-            case 'completed':
-                return completedTotalPages;
-            case 'cancelled':
-                return cancelledTotalPages;
-            default:
-                return 1;
-        }
-    };
 
     const setCurrentPage = (newPage: number) => {
+        const totalPages = getTotalPages();
+        const validatedPage = Math.min(Math.max(newPage, 1), totalPages);
+
         switch (activeTab) {
             case 'upcoming':
-                dispatch(fetchScheduledBookingDetails({ page: newPage, limit }));
+                dispatch(fetchScheduledBookingDetails({ page: validatedPage, limit }));
                 break;
             case 'completed':
-                dispatch(fetchCompletedBookingDetails({ page: newPage, limit }));
+                dispatch(fetchCompletedBookingDetails({ page: validatedPage, limit }));
                 break;
             case 'cancelled':
-                dispatch(fetchCancelledBookingDetails({ page: newPage, limit }));
+                dispatch(fetchCancelledBookingDetails({ page: validatedPage, limit }));
                 break;
             default:
                 break;
         }
     };
+
+    
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage)
+    }
+
+    // SOCKET CREATION
+
+    let socket: WebSocket | null = null;
+
+    const createSocket = () => {
+        if (!socket || socket.readyState === WebSocket.CLOSED) {
+           socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+
+            // event handler for successful connection
+            socket.onopen = () => {
+                console.log("Socket connection established");
+                socket?.send('Hello from client');
+            }
+
+            // event handler for receiving messages
+            socket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('Message received from server:', data);
+            }
+
+            // event handler for connection closure
+            socket.onclose = (event) => {
+                console.log('socket closed:', event);
+                setTimeout(createSocket, 1000); 
+            }
+
+            // event handler for errors
+            socket.onerror = (error) => {
+                console.error('Socket error:', error);
+            }
+        } else {
+            console.log('Socket already exists');
+        }
+    };
+
+   
+    const handleJoinSession = async (bookingId: string, userId: string) => {
+        try {
+            const APP_ID = Number(import.meta.env.VITE_APP_ID) || 12345;
+            console.log("App id:", APP_ID);
+
+            const SECRET_URL = import.meta.env.VITE_APP_SERVER_URL || 'wss://webrtc.example.com'
+            console.log("app secret:", SECRET_URL);
+
+            // create a socket before joining the session
+            createSocket();
+           
+            const resultAction = await dispatch(joinSession({ bookingId, role:'user', userId }))
+            console.log("result action.....", resultAction);
+
+            const { data: { roomId, roomToken }, status } = resultAction.payload;
+            const token = roomToken;
+
+            console.log("token..........", token)
+
+            console.log("status......", status);
+            console.log("room id:", roomId)
+
+            if (status !== true) {
+                throw new Error(`Failed to fetch room details: ${status}`)
+            }
+
+            6
+            navigate(`/video-call/${roomId}`);
+        } catch (error) {
+            console.error('Failed to join session:', error);
+        }
+    }
+
+    const handleEndSession = async () => {
+        try {
+            // Stop publishing local stream
+            if (zegoEngineRef.current) {
+                const localVideoRef = document.getElementById('localVideo') as HTMLVideoElement;
+                const streamID = `stream_${userId}`;
+                
+                zegoEngineRef.current.stopPublishingStream(streamID);
+                localVideoRef.srcObject = null; // Clear the local video element
+
+                // Logout from the room
+                await zegoEngineRef.current.logoutRoom();
+                console.log("Successfully left the room");
+            }
+        } catch (error) {
+            console.error('Failed to end session:', error);
+        }
+    };
+
+
+    const handleCancelBooking = (bookingId: string, userId: string) => {
+        dispatch(cancelAppointment({bookingId, userId}))
+            .unwrap()
+            .then((response) => {
+                toast.success("Appointment cancelled successfully", {position:'top-right', autoClose:3000})
+            })
+            .catch((error) => {
+                toast.error(`Failed to cancel appointment: ${error}`, {
+                    position: 'top-right',
+                    autoClose: 3000,
+                })
+            })
+    };
+   
+
 
     return (
         <div className="container mx-auto px-4 py-8 space-y-12">
@@ -190,19 +336,26 @@ const Session = () => {
             </div>
 
 
+            
+            <div className="video-container">
+                <video id="localVideo" autoPlay muted style={{ width: '400px', height: '300px'}}></video>
+                <video id="remoteVideo" autoPlay style={{ width: '400px', height: '300px'}}></video>
+            </div>
+
+
             {/* Pagination */}
             <div className="flex justify-between mt-4">
                 <button
-                    onClick={() => setCurrentPage(Math.max(getCurrentPage() - 1, 1))}
-                    disabled={getCurrentPage() === 1}
+                    onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                    disabled={currentPage === 1}
                     className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
                 >
                     Previous
                 </button>
-                <span>Page {getCurrentPage()} of {getTotalPages()}</span>
+                <span>Page {currentPage} of {getTotalPages()}</span>
                 <button
-                    onClick={() => setCurrentPage(Math.min(getCurrentPage() + 1, getTotalPages()))}
-                    disabled={getCurrentPage() === getTotalPages()}
+                    onClick={() => handlePageChange(Math.min(currentPage + 1, getTotalPages()))}
+                    disabled={currentPage === getTotalPages()}
                     className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
                 >
                     Next

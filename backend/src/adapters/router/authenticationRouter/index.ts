@@ -46,6 +46,9 @@ export default (dependencies: any) =>{
        childTherapistSorting,
        paymentManagementController,
        verifyPaymentController,
+       joinVideoController,
+       searchChildTherapistController,
+       cancelAppointment
     } = userController(dependencies);
 
 
@@ -68,9 +71,12 @@ export default (dependencies: any) =>{
     router.get('/booking_Completeddetails', verifyAccessToken, completedBookingController);
     router.get('/booking_Cancelleddetails', verifyAccessToken, cancelledBookingController);
     router.get('/search_therapist', searchTherapistsController);
+    router.get('/search_childTherapist', searchChildTherapistController);
     router.get('/sort_therapists', childTherapistSorting);
     router.post('/payment', paymentManagementController);
     router.post('/verify_payment', verifyPaymentController);
+    router.post('/join_session', joinVideoController);
+    router.patch('/cancel_appointment', cancelAppointment);
     
 
 
@@ -106,6 +112,7 @@ export default (dependencies: any) =>{
         getTherapistProfile,
         getBookingsController,
         therapistUpdateTimingsController,
+        therapistVideoController
     } = therapistController(dependencies);
 
 
@@ -116,6 +123,7 @@ export default (dependencies: any) =>{
     router.get('/therapist/therapist_profile', getTherapistProfile);
     router.get('/therapist/therapist_bookings/:id', getBookingsController);
     router.put('/therapist/therapist_updateTimings', therapistUpdateTimingsController);
+    router.post('/therapist/therapist_video_call', therapistVideoController)
    
 
     router.use('/therapist/*', roleMiddleware(['therapist']));

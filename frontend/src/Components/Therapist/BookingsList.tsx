@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBookingAppointments } from "../../Redux/Store/Slices/therapistSlice";
+import { fetchBookingAppointments, joinTherapistVideo } from "../../Redux/Store/Slices/therapistSlice";
 import { RootState, AppDispatch } from "../../Redux/Store/store";
 import { unwrapResult } from "@reduxjs/toolkit";
 
 interface Booking {
-    id: string;
+    _id: string;
     user: {
         name: string;
         email: string;
@@ -21,24 +21,64 @@ function BookingsList() {
     const dispatch: AppDispatch = useDispatch();
     const { therapistId } = useParams<{ therapistId: string }>();
 
-    const { bookings, loading, error, totalPages } = useSelector((state: RootState) => state.therapist);
+    const { bookings, loading, error } = useSelector((state: RootState) => state.therapist);
+    console.log("bookings...........", bookings)
+
+    const therapist = useSelector((state: RootState) => state)
+    console.log("state:", therapist);
+    
 
     const [bookingData, setBookingData] = useState<Booking[]>([]);
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [itemsPerPage] = useState<number>(6);
 
     useEffect(() => {
         if (therapistId) {
-            dispatch(fetchBookingAppointments({ therapistId, page: currentPage, limit: 6 }))
+            dispatch(fetchBookingAppointments({ therapistId, page: currentPage, limit: 20 }))
                 .then((result) => {
                     const data = unwrapResult(result);
-                    setBookingData(data.bookings);
+
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    
+
+                    const upcomingBookings = data.bookings.filter(booking => {
+                        const bookingDate = new Date(booking.slot);
+                        return bookingDate >= today;
+                    })
+                    setBookingData(upcomingBookings);
+                    setTotalPages(Math.ceil(upcomingBookings.length / itemsPerPage));
                 })
                 .catch((err) => console.log(err));
         }
     }, [therapistId, dispatch, currentPage]);
 
-    const handleViewBooking = (bookingId: string) => {
-        navigate(`/therapist/booking_details/${bookingId}`, { state: { therapistId } });
+
+
+    const handleViewBooking = async (bookingId: string) => {
+
+        try {
+
+            if (!therapistId) {
+                throw new Error("Therapist ID is missing.");
+            }
+            
+            console.log("booking id.....", bookingId);
+            console.log("therapist id......", therapistId);
+            const bookingDetails = await dispatch(joinTherapistVideo({ bookingId, therapistId }))
+            console.log("booking details....", bookingDetails);
+
+            const roomId = bookingDetails.payload?.data.roomId;
+
+            if (!roomId) {
+                throw new Error("Room ID not found for this booking.")
+            }
+
+            navigate(`/therapist/therapist_video_call/${roomId}`, {state: { therapistId }})
+        } catch (error) {
+            console.error("Failed to retrieve room Id:", error);
+        }
     };
 
     const handleNextPage = () => {
@@ -52,6 +92,10 @@ function BookingsList() {
             setCurrentPage((prevPage) => prevPage - 1);
         }
     };
+
+    const paginatedBookings = bookingData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    console.log("Paginated Bookings:", paginatedBookings);
+
 
     if (loading) {
         return <p>Loading bookings...</p>;
@@ -67,14 +111,14 @@ function BookingsList() {
                 <h2 className="text-2xl font-bold mb-4 text-center">Appointments</h2>
 
                 {/* Booking list */}
-                {Array.isArray(bookings) && bookings.length === 0 ? (
+                {Array.isArray(paginatedBookings) && paginatedBookings.length === 0 ? (
                     <p className="text-center">No bookings found.</p>
                 ) : (
-                    Array.isArray(bookings) && (
+                    Array.isArray(paginatedBookings) && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {bookings.map((booking) => (
+                            {paginatedBookings.map((booking) => (
                                 <div
-                                    key={booking.id}
+                                    key={booking._id}
                                     className="border border-gray-300 shadow-lg rounded-lg p-4 bg-white"
                                 >
                                     <div className="flex flex-col">
@@ -126,10 +170,10 @@ function BookingsList() {
                                             </p>
                                         </div>
                                         <button
-                                            onClick={() => handleViewBooking(booking.id)}
-                                            className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-full hover:bg-blue-600 transition"
+                                            onClick={() => handleViewBooking(booking._id)}
+                                            className="w-full bg-green-500 text-white font-bold py-2 px-4 rounded-full hover:bg-green-600 transition"
                                         >
-                                            View Details
+                                            Attend
                                         </button>
                                     </div>
                                 </div>
