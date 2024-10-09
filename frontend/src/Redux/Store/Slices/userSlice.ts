@@ -21,9 +21,12 @@ import { USERREGISTER,
     GETCOMPLETEDBOOKINGS,
     GETCANCELLEDBOOKINGS,
     SEARCHTHERAPIST,
+    SEARCHCHILDTHERAPIST,
     SORTCHILDTHERAPIST,
     PAYMENTMETHOD,
     VERIFYPAYMENT,
+    JOINSESSION,
+    CANCELAPPOINTMENT
  } from "../../../Services/userApi";
 
 
@@ -742,6 +745,21 @@ export const fetchTherapistBySearchTerm = createAsyncThunk(
 )
 
 
+export const fetchChildTherapistBySearchTerm = createAsyncThunk(
+    "therapist/fetchChildTherapistsBySeachTerm",
+    async (searchTerm: string, { rejectWithValue}) => {
+        try {
+            const response = await axios.get(SEARCHCHILDTHERAPIST, { params: {search: searchTerm}});
+            console.log("response from search child therapist slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch child therapist")
+        }
+    }
+)
+
+
 export const fetchSortedChildTherapists = createAsyncThunk(
     "therapist/fetchSortedChildTherapists",
     async (sortBy: string, { rejectWithValue }) => {
@@ -755,6 +773,60 @@ export const fetchSortedChildTherapists = createAsyncThunk(
         }
     }
 );
+
+
+export const joinSession = createAsyncThunk(
+    "session/joinSession",
+    async ({ bookingId, role, userId}: { bookingId: string; role: string, userId: string}, thunkAPI ) => {
+        try {
+            const authInfoString = localStorage.getItem("authInfo");
+            console.log("auth info string....", authInfoString);
+
+            if (!authInfoString) {
+                return thunkAPI.rejectWithValue("Token is missing or invalid");
+            }
+
+            const authInfo = JSON.parse(authInfoString);
+            const accessToken = authInfo.accessToken;
+            console.log("access token... in slice...", accessToken);
+
+            if (!accessToken) {
+                return thunkAPI.rejectWithValue("Access token is missing or invalid");
+            }
+
+            const config = {
+                withCredentials: true,
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                }
+            }
+
+            const response = await axios.post(JOINSESSION, { bookingId, role, userId }, config);
+
+            console.log("response from join session slice:", response);
+
+            return response.data;
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(error.response?.data?.message || "Failed to join session");
+        }
+    }
+)
+
+
+export const cancelAppointment = createAsyncThunk(
+    "user/cancelAppointment",
+    async ({ bookingId, userId }: { bookingId: string; userId: string }, { rejectWithValue }) => {
+        try {
+            const response = await axios.patch(CANCELAPPOINTMENT, { bookingId, userId})
+            console.log("reponse from slice:",response);
+            return response;
+            
+        } catch (error:any) {
+            return rejectWithValue(error.response?.data?.message || "Failed to cancel appointment");
+        }
+    }
+)
+
 
 const userSlice = createSlice({
     name: 'user',
@@ -1026,6 +1098,17 @@ const userSlice = createSlice({
             .addCase(fetchSortedChildTherapists.rejected, (state, action) => {
                 state.status = 'failed';
                
+            })
+            .addCase(fetchChildTherapistBySearchTerm.fulfilled, (state, action) => {
+                state.therapists = action.payload; 
+                state.status = 'succeeded';
+            })
+            .addCase(fetchChildTherapistBySearchTerm.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchChildTherapistBySearchTerm.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = null
             });
                       
             

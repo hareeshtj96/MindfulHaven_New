@@ -9,7 +9,9 @@ import TherapistDetailsPage from "../../Pages/Therapist/TherapistDetailsPage";
 import TherapistProfilePage from "../../Pages/Therapist/TherapistProfilePage";
 import BookingsListPage from "../../Pages/Therapist/BookingsListPage";
 import TherapistCalendarPage from "../../Pages/Therapist/TherapistCalendarPage"
+import TherapistVideoCall from "../../Components/Therapist/TherapistVideoComponent";
 import PageNotFoundPage from "../../Pages/User/PageNotFoundPage";
+
 
 
 
@@ -25,6 +27,8 @@ function TherapistRoutes() {
             <Route path="/therapist_profile" element={<TherapistProtectedRoute> <TherapistProfilePage />  </TherapistProtectedRoute>  }/>
             <Route path="/therapist_Calendar" element={<TherapistCalendarPage />}/>
             <Route path="/therapist_bookings/:therapistId" element={<BookingsListPage /> }/>
+            <Route path="/therapist_video_call/:roomId" element={<TherapistVideoCall />} />
+
 
             <Route path="/*" element={<PageNotFoundPage />}/>
         </Routes>

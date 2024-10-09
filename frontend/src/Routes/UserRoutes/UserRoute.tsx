@@ -18,6 +18,7 @@ import SessionsPage from "../../Pages/User/SessionsPage";
 import PageNotFoundPage from "../../Pages/User/PageNotFoundPage";
 import PaymentManagementPage from "../../Pages/User/PaymentManagementPage";
 import ProtectedRoute from "../../ProtectedRoute/ProtectedRoute";
+import VideoCall from "../../Components/User/VideoComponent";
 
 
 function UserRoute() {
@@ -40,6 +41,7 @@ function UserRoute() {
             <Route path="/sessions" element={<SessionsPage />}/>
             <Route path="/booking_status/:bookingId" element={<BookingStatusPage /> }/>
             <Route path="/payment" element={<PaymentManagementPage />}/>
+            <Route path="/video-call/:roomId" element={<VideoCall /> } />
 
             <Route path="/*" element={<PageNotFoundPage />}/>
         </Routes>

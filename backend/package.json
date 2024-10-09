@@ -21,6 +21,7 @@
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22.4.1",
     "@types/nodemailer": "^6.4.15",
+    "@types/ws": "^8.5.12",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
   },
@@ -39,6 +40,8 @@
     "razorpay": "^2.9.4",
     "react-modal": "^3.16.1",
     "rrule": "^2.8.1",
-    "twilio": "^5.2.2"
+    "twilio": "^5.2.2",
+    "ws": "^8.18.0",
+    "zego-express-engine-webrtc": "^3.6.0"
   }
 }

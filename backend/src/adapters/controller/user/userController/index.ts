@@ -20,6 +20,9 @@ import searchTherapistsController from "./searchTherapistsController";
 import childTherapistSorting from "./childTherapistSorting";
 import paymentManagementController from "./paymentManagementController";
 import verifyPaymentController from "./verifyPaymentController";
+import joinVideoController from "./joinVideoController";
+import searchChildTherapistController from "./searchChildTherapistController";
+import cancelAppointment from "./cancelAppointment";
 
 
 export default (dependencies:any) => {
@@ -46,6 +49,9 @@ export default (dependencies:any) => {
         childTherapistSorting: childTherapistSorting(dependencies),
         paymentManagementController: paymentManagementController(dependencies),
         verifyPaymentController: verifyPaymentController(dependencies),
+        joinVideoController: joinVideoController(dependencies),
+        searchChildTherapistController: searchChildTherapistController(dependencies),
+        cancelAppointment: cancelAppointment(dependencies),
         
     }
 }

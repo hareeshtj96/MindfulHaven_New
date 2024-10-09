@@ -20,4 +20,7 @@ export const GETSCHEDULEDBOOKINGS = `${BASE_URL}/booking_details`;
 export const GETCOMPLETEDBOOKINGS = `${BASE_URL}/booking_Completeddetails`;
 export const GETCANCELLEDBOOKINGS = `${BASE_URL}/booking_Cancelleddetails`;
 export const SEARCHTHERAPIST = `${BASE_URL}/search_therapist`;
+export const SEARCHCHILDTHERAPIST = `${BASE_URL}/search_childTherapist`;
 export const SORTCHILDTHERAPIST = `${BASE_URL}/sort_therapists`;
+export const JOINSESSION = `${BASE_URL}/join_session`;
+export const CANCELAPPOINTMENT = `${BASE_URL}/cancel_appointment`;

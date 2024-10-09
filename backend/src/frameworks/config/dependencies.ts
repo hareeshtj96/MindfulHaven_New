@@ -18,12 +18,15 @@ import {
     searchTherapistUsecase,
     sortChildTherapistUsecase,
     getPaymentUsecase,
-    savePaymentUsecase
+    savePaymentUsecase,
+    joinVideoSessionUsecase,
+    searchChildTherapistUsecase,
+    cancelAppointmentUsecase
  } from "../../application/UseCases";
 
 import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase } from "../../application/adminUseCases";
 
-import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase } from "../../application/therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase } from "../../application/therapistUseCases";
 
 const useCase: any={
     userRegistration: userRegistration,
@@ -45,6 +48,10 @@ const useCase: any={
     sortChildTherapistUsecase: sortChildTherapistUsecase,
     getPaymentUsecase: getPaymentUsecase,
     savePaymentUsecase: savePaymentUsecase,
+    joinVideoSessionUsecase: joinVideoSessionUsecase,
+    searchChildTherapistUsecase: searchChildTherapistUsecase,
+    cancelAppointmentUsecase: cancelAppointmentUsecase,
+
 
 
     
@@ -64,6 +71,7 @@ const useCase: any={
     getTherapistProfileUsecase: getTherapistProfileUsecase,
     bookingUsecase: bookingUsecase,
     updateTherapistTimingsUsecase: updateTherapistTimingsUsecase,
+    therapistSessionUsecase: therapistSessionUsecase
 }
 
 const repository:any={

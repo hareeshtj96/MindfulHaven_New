@@ -66,6 +66,7 @@ axiosInstance.interceptors.request.use(
         const authInfoString = localStorage.getItem('authInfo');
         const authInfo = authInfoString ? JSON.parse(authInfoString) : null;
         const accessToken = authInfo ? authInfo.accessToken : null;
+        const role = authInfo ? authInfo.role : null;
         console.log("access token :", accessToken);
 
         if(accessToken) {
@@ -106,6 +107,7 @@ axiosInstance.interceptors.response.use(
             }
 
             const authInfo = JSON.parse(authInfoString);
+            const role = authInfo.role;
             console.log("from config....", authInfo);
 
             try {

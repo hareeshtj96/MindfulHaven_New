@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
+import axiosInstance from "../../../AxiosConfig/AxiosConfig";
 import { REGISTERTHERAPIST, 
     VERIFYOTP, 
     LOGINTHERAPIST, 
@@ -7,7 +8,10 @@ import { REGISTERTHERAPIST,
     GETPROFILE, 
     GETAPPOINTMENT,
     UPDATETIMINGS,
+    JOINTHERAPISTVIDEO
   } from "../../../Services/therapistApi";
+
+
 
 interface Timing {
     dayOfWeek: number,
@@ -19,7 +23,7 @@ interface Timing {
 interface Booking {
     slot: string;
     user: any;
-    id: string;
+    _id: string;
     userId: string;
     date: string;
     status: string;
@@ -302,6 +306,39 @@ AvailabilityForm,
         } catch (error: any) {
             const message = error.response?.data?.message || 'Update failed';
             return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+export const joinTherapistVideo = createAsyncThunk(
+    "therapist/joinTherapistVideo",
+    async ({ bookingId, therapistId} : { bookingId: string; therapistId: string}, thunkAPI) => {
+        try {
+            const token = localStorage.getItem('therapistToken');
+
+            if (!token) {
+                return thunkAPI.rejectWithValue('No token found');
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+
+                },
+            }
+
+            const response = await axios.post(JOINTHERAPISTVIDEO, { bookingId, role: "therapist", therapistId}, config);
+
+            console.log("Response from join thrapist slice:", response);
+
+            return response.data;
+            
+        } catch (error: any) {
+            return thunkAPI.rejectWithValue(
+                error.response?.data?.message || "Failed to join session"
+            )
+            
         }
     }
 )
