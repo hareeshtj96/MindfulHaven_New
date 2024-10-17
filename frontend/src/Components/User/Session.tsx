@@ -10,6 +10,8 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
+
+
 const formatDateTime = (slot: string) => {
     const date = new Date(slot);
 
@@ -85,7 +87,7 @@ const Session = () => {
 
         return (
             <div key={booking._id} className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
-                <h4 className="text-lg font-semibold mb-2">Therapist ID: {booking.therapistId}</h4>
+                <h4 className="text-lg font-semibold mb-2">Therapist: {booking.therapist.name}</h4>
                 <p className="text-gray-600">Booking Id: {booking._id}</p>
                 <p className="text-gray-600">Date: {date}</p>
                 <p className="text-gray-600">Time: {time}</p>
@@ -316,6 +318,8 @@ const Session = () => {
                 </button>
             </div>
 
+            
+
             {/* Render Current Bookings */}
             <div className="space-y-4">
                  <h2 className="text-2xl font-bold text-gray-800">
@@ -335,14 +339,6 @@ const Session = () => {
             </div>
             </div>
 
-
-            
-            <div className="video-container">
-                <video id="localVideo" autoPlay muted style={{ width: '400px', height: '300px'}}></video>
-                <video id="remoteVideo" autoPlay style={{ width: '400px', height: '300px'}}></video>
-            </div>
-
-
             {/* Pagination */}
             <div className="flex justify-between mt-4">
                 <button
@@ -361,6 +357,9 @@ const Session = () => {
                     Next
                 </button>
             </div>
+
+
+            
         </div>
     );
 };

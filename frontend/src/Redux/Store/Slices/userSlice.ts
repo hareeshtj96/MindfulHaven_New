@@ -70,7 +70,8 @@ interface Therapist {
     timings: {
         startTime: string;
         endTime: string
-    }[]
+    }[];
+   
 }
 
 
@@ -80,6 +81,7 @@ interface PasswordResetPayload {
 }
 
 export interface Booking {
+    therapist: any;
     _id: string;
     therapistId: string;
     slot: string;
@@ -91,6 +93,8 @@ interface AppointmentState {
     loading: boolean;
     error: string | null;
 }
+
+
 
 interface UserState {
     user: User | null;
@@ -125,7 +129,9 @@ interface UserState {
     completedTotalPages: number
     completedCurrentPage: number
     cancelledTotalPages: number
-    cancelledCurrentPage: number
+    cancelledCurrentPage: number,
+    total: number,
+    
    
 }
 
@@ -163,7 +169,8 @@ const initialState: UserState = {
     completedTotalPages: 0,
     completedCurrentPage: 0,
     cancelledCurrentPage: 0,
-    cancelledTotalPages: 0
+    cancelledTotalPages: 0,
+    total: 0
 }   
 
 export const registerUser = createAsyncThunk<RegisterResponse, {name: string, email: string, mobile:string, password: string}, {rejectValue: string}>(
@@ -427,12 +434,13 @@ export const fetchUserProfile = createAsyncThunk<User, void, {rejectValue: strin
     }
 ) 
 
-export const fetchChildTherapist = createAsyncThunk<Therapist[], void, {rejectValue: string}>(
+export const fetchChildTherapist = createAsyncThunk<Therapist[], {page: number; limit: number}, {rejectValue: string}>(
     'user/fetchChildTherapist',
-    async(_, thunkAPI) => {
+    async({page, limit}, thunkAPI) => {
         try {
-            const response = await axios.get(GETCHILDTHERAPIST);
+            const response = await axios.get(GETCHILDTHERAPIST, { params: {page, limit}});
             console.log("Response from fetch child therapist slice:", response);
+
             return response.data.data;
         } catch (error: any) {
             const message = error.response?.data?.message || 'Failed to fetch child therapists';
@@ -949,7 +957,8 @@ const userSlice = createSlice({
             })
             .addCase(fetchChildTherapist.fulfilled, (state, action: PayloadAction<Therapist[]>) => {
                 state.status = 'succeeded';
-                state.therapists = action.payload; 
+                state.therapists = action.payload
+              
             })
             .addCase(fetchChildTherapist.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.status = 'failed';

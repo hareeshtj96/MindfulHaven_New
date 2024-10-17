@@ -12,7 +12,7 @@ export default (dependencies: any) => {
             }
             
             const sortedTherapists = await userRepository.getSortedTherapists(sortCriteria);
-            console.log("sortedTheerapisst.....", sortedTherapists);
+            
 
             return { status: true, data: sortedTherapists };
             

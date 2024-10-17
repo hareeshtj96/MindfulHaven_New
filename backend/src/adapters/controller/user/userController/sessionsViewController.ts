@@ -51,10 +51,8 @@ export default (dependencies: any) => {
 
            
             const response = await getAllBookings(dependencies).executeFunction({ email, page, limit });
-            console.log(" response from view controller:", response);
 
             if( response && response.status) {
-                console.log("response from controller:", response);
                 res.status(200).json({ status: true, data: response.data });
             } else {
                 res.status(400).json({ status: false, message: response.message ||"Data not found" })

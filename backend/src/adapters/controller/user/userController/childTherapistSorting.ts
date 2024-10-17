@@ -13,7 +13,7 @@ export default (dependencies: any) => {
             console.log("sort by parameter from query params:", sortBy);
 
             const response = await sortChildTherapistUsecase(dependencies).executeFunction(sortBy);
-            console.log("Response from sorting controller:", response);
+         
 
             if (response && response.status) {
                 res.status(200).json({ status: true, data: response.data})

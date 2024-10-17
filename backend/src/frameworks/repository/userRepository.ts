@@ -88,16 +88,25 @@ export default {
         }
     },
 
-    getChildTherapist: async() => {
+    getChildTherapist: async( page: number, limit: number) => {
         try {
+            const skip = (page - 1) * limit;
+
             const therapists = await databaseSchema.Therapist.find({ 
                 specialization: 'Child Therapy',
                 isVerified: true
-            });
+            }).skip(skip).limit(limit);
 
+            const totalTherapists = await databaseSchema.Therapist.countDocuments({ specialization: 'Child Therapy', isVerified: true});
+            
             return {
                 status: true,
-                data: therapists
+                data: {
+                    therapists,
+                    total: totalTherapists,
+                    currentPage: page, 
+                    totalPages: Math.ceil(totalTherapists / limit)
+                }
             };
         } catch (error) {
             console.error("Error fetching child therapists:", error);
@@ -287,14 +296,24 @@ export default {
             currentDate.setHours(0, 0, 0, 0);
 
             const bookings = await databaseSchema.Appointment.find({ email: email, status: "scheduled", slot: {$gte : currentDate} }).skip(skip).limit(limit);
-            console.log("response from getall booking:",bookings);
+           
+
+            // Fetch therapist details for each booking
+            const bookingWithTherapists = await Promise.all(bookings.map(async (booking: any) => {
+                const therapistDetails = await databaseSchema.Therapist.findById(booking.therapistId);
+                return {
+                    ...booking._doc,
+                    therapist: therapistDetails
+                }
+            }))
+           
 
             const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "scheduled", slot: { $gte: currentDate} })
 
             return {
                 status: true,
                 data:{
-                    bookings,
+                    bookings: bookingWithTherapists,
                     total: totalBookings,
                     currentPage: page,
                     totalPages: Math.ceil(totalBookings/limit)
@@ -310,14 +329,22 @@ export default {
         try {
             const skip = (page - 1) * limit;
             const bookings = await databaseSchema.Appointment.find({ email: email, status: "completed" }).skip(skip).limit(limit);
-            console.log("response from completed booking:",bookings);
+         
+            // Fetch therapist details for each booking
+            const bookingWithTherapists = await Promise.all(bookings.map(async (booking: any) => {
+                const therapistDetails = await databaseSchema.Therapist.findById(booking.therapistId);
+                return {
+                    ...booking._doc,
+                    therapist: therapistDetails
+                }
+            }))
 
             const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "completed" })
 
             return {
                 status: true,
                 data:{
-                    bookings,
+                    bookings: bookingWithTherapists,
                     total: totalBookings,
                     currentPage: page,
                     totalPages: Math.ceil(totalBookings/limit)
@@ -334,14 +361,22 @@ export default {
         try {
             const skip = (page - 1) * limit;
             const bookings = await databaseSchema.Appointment.find({ email: email, status: "cancelled"}).skip(skip).limit(limit);
-            console.log("response from cancelled bookings:", bookings);
+     
+            // Fetch therapist details for each booking
+            const bookingWithTherapists = await Promise.all(bookings.map(async (booking: any) => {
+                const therapistDetails = await databaseSchema.Therapist.findById(booking.therapistId);
+                return {
+                    ...booking._doc,
+                    therapist: therapistDetails
+                }
+            }))
 
             const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "cancelled" })
 
             return {
                 status: true,
                 data: {
-                    bookings,
+                    bookings: bookingWithTherapists,
                     total: totalBookings,
                     currentPage: page,
                     totalPages: Math.ceil(totalBookings/limit)
@@ -383,10 +418,9 @@ export default {
                 { specialization: { $regex: searchTerm, $options: 'i'}}
             ],
         };
-        try {
-            const therapists = await databaseSchema.Therapist.find(filter);
-            console.log("child therapists:", therapists);
 
+        try {
+            const therapists = await databaseSchema.Therapist.find(filter)
             return therapists;
             
         } catch (error) {
@@ -402,7 +436,7 @@ export default {
                 specialization: 'Child Therapy',
                 isVerified: true
             }).sort(sortCriteria);
-            console.log(" sorted from repository;", sortedTherapists);
+           
 
             return sortedTherapists
             

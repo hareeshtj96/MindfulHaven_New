@@ -14,6 +14,9 @@ function Dashboard() {
     const navigate = useNavigate();
     const { therapists, status, error } = useSelector((state: RootState) => state.user);
 
+    const stateIss = useSelector((state: RootState) => state.user)
+    console.log("state is....dashboard", stateIss)
+
     const [searchTerm, setSearchTerm] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
     const [hasSearched, setHasSearched] = useState(false);
@@ -93,7 +96,7 @@ function Dashboard() {
                             {hasSearched && (
                                 <h2 className="text-2xl font-bold text-center">Therapists Available</h2>
                             )}
-                            {therapists.map((therapist) => (
+                            {Array.isArray(therapists) && therapists.map((therapist) => (
                                 <div key={therapist._id} className="flex bg-white rounded-lg shadow-md p-4">
                                     <div className="flex flex-col items-center justify-center p-4">
                                         {therapist.photo ? (

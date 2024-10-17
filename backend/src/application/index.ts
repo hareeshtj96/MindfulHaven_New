@@ -57,11 +57,12 @@ export {
 }
 
 
-import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase } from "./therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase } from "./therapistUseCases";
 
 export {
     therapistRegistration,
     getTherapistProfileUsecase,
     updateTherapistTimingsUsecase,
     therapistSessionUsecase,
+    cancelAppointmentTherapistUsecase
 }

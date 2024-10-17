@@ -7,8 +7,11 @@ export default (dependencies: any) => {
     const childTherapistController = async (req: Request, res: Response) => {
         console.log("Entered child therapist controller");
         try {
-            const response = await getChildTherapistUsecase(dependencies).executeFunction()
-          
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 10;
+            console.log("page,limit:", page, limit);
+            const response = await getChildTherapistUsecase(dependencies).executeFunction({page, limit})
+            console.log("response from controller:", response);
 
             if(response && response.status) {
                 res.status(200).json({ status: true, data: response.data });

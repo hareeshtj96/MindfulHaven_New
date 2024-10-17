@@ -77,57 +77,6 @@ export default (dependencies: any) =>{
     router.post('/verify_payment', verifyPaymentController);
     router.post('/join_session', joinVideoController);
     router.patch('/cancel_appointment', cancelAppointment);
-    
-
-
-
-
-
-    const {
-        adminLoginController,
-        adminGetTherapist,
-        adminGetUsers,
-        adminTherapistVerification,
-        adminUserBlock,
-        getTherapistDetails,
-    } = adminController(dependencies);
-
-    router.post('/admin/admin_login', adminLoginController);
-    router.get('/admin/admin_getTherapist', adminGetTherapist);
-    router.get('/admin/admin_getUsers', adminGetUsers);
-    router.patch('/admin/therapist_getVerified/:id', adminTherapistVerification);
-    router.patch('/admin/user_blockUnblock/:id', adminUserBlock);
-    router.get('/admin/admin_getTherapistDetails/:id', getTherapistDetails);
-
-    
-    router.use('/admin/*', roleMiddleware(['admin']));
-
-
-
-    const {
-        therapistRegisterController,
-        verifyOTP,
-        therapistLogin,
-        therapistDetailsController,
-        getTherapistProfile,
-        getBookingsController,
-        therapistUpdateTimingsController,
-        therapistVideoController
-    } = therapistController(dependencies);
-
-
-    router.post('/therapist/therapist_register', therapistRegisterController);
-    router.post('/therapist/therapist_OTP', verifyOTP);
-    router.post('/therapist/therapist_login', therapistLogin);
-    router.put('/therapist/therapist_details', upload, therapistDetailsController);
-    router.get('/therapist/therapist_profile', getTherapistProfile);
-    router.get('/therapist/therapist_bookings/:id', getBookingsController);
-    router.put('/therapist/therapist_updateTimings', therapistUpdateTimingsController);
-    router.post('/therapist/therapist_video_call', therapistVideoController)
-   
-
-    router.use('/therapist/*', roleMiddleware(['therapist']));
-
 
     return router;
 }

@@ -10,8 +10,7 @@ export default (dependencies: any) => {
         try {
             const {email, page, limit} = requestData;
             const response = await userRepository.getAllBooking(email, page, limit);
-            console.log("response from get all bookings use case:", response);
-
+            
             if(response) {
                 return { status: true, data: response};
             } else  {

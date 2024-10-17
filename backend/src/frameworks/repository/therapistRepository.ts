@@ -138,6 +138,7 @@ export default {
             const totalPages = Math.ceil(totalBookingsCount / limit);
 
             const bookings = await databaseSchema.Appointment.find( {therapistId} ).skip((page-1)*limit).limit(limit);
+            
          
 
             if(!bookings) {
@@ -173,16 +174,34 @@ export default {
     updateTimings: async (email: string, startTime: string, endTime: string, date: string) => {
         try {
             const therapist = await databaseSchema.Therapist.findOne({ email });
-            console.log("therapist found:", therapist);
-
+          
             if (!therapist) {
                 return { status: false, message: "Therapist not found"}
+            }
+           
+         
+            const startDateTime = new Date(`${date} ${startTime}`)
+            const endDateTime = new Date(`${date} ${endTime}`);
+
+           
+            const currentDateTime = new Date();
+
+            console.log("stat date time:", startDateTime.toISOString());
+            console.log("end date time:", endDateTime.toISOString());
+            console.log("current date time:", currentDateTime.toISOString());
+
+            if (startDateTime >= endDateTime) {
+                return { status: false, message: "Start time must be before end time"};
+            }
+
+            if (startDateTime <= currentDateTime) {
+                return { status: false, message: "Start time must be in the future"};
             }
 
             const newTiming = {
                 date: new Date(date),
-                startTime,
-                endTime
+                startTime: startDateTime,
+                endTime: endDateTime
             }
 
             therapist.updatedTimings.push(newTiming);
@@ -195,7 +214,25 @@ export default {
             console.log("Error in updating therapist timings:", error);
             return { status: false, message:"Error occured during updatiing therapist timings"}
         }
-    }
+    },
+
+    cancelAppointmentTherapist:  async ({ bookingId} : {bookingId: string}) => {
+        try {
+            const appointment = await databaseSchema.Appointment.findById(bookingId);
+
+            if (!appointment) {
+                return { status: false, message: "Appointment not found or invalid details"}
+            }
+
+            appointment.status = "cancelled";
+            await appointment.save();
+
+            return { status: true, message: "Appointment cancelled successfuly"}
+        } catch (error) {
+            console.error("Error while cancelling appointment:", error);
+            return { status: false, message: "Failed to cancel appointment"};
+        }
+    },
     
 }
 

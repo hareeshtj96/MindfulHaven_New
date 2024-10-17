@@ -12,9 +12,14 @@ import DefaultSkeleton from "../../Components/MaterialUI/Shimmer";
 const ChildTherapistList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { therapists, sortedTherapists, status, error } = useSelector(
+    const { therapists, totalPages, currentPage, sortedTherapists, status, error, } = useSelector(
         (state: RootState) => state.user
     );
+
+    
+
+    const state = useSelector((state: RootState) => state.user);
+    console.log("state is..........", state )
 
     const [sortOption, setSortOption] = useState<string>("experience");
     const [genderFilter, setGenderFilter] = useState<string>("all");
@@ -22,10 +27,16 @@ const ChildTherapistList: React.FC = () => {
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
     const [hasSearched, setHasSearched] = useState<boolean>(false);
 
+    const [therapistsPerPage] = useState<number>(5);
+
     // Fetch all therapists on mount
     useEffect(() => {
-        dispatch(fetchChildTherapist());
-    }, [dispatch]);
+        dispatch(fetchChildTherapist({ page: currentPage, limit: therapistsPerPage }));
+    }, [dispatch, currentPage, therapistsPerPage]);
+
+     
+    const getTotalPages = () => totalPages || 1;
+
 
     // Fetch sorted therapists based on sort option
     useEffect(() => {
@@ -178,7 +189,7 @@ const ChildTherapistList: React.FC = () => {
 
             {/* Therapist List */}
             <div className="space-y-4">
-                {!hasSearched && therapists.length === 0 ? (
+                {!hasSearched && (!therapists || therapists.length === 0) ? (
                     <div className="text-center text-gray-700">
                         <p>No therapists found based on your criteria. Please try a different term.</p>
                     </div>
@@ -237,6 +248,8 @@ const ChildTherapistList: React.FC = () => {
                     ))
                 )}
             </div>
+
+                
         </div>
     );
 };

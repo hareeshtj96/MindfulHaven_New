@@ -8,7 +8,8 @@ import { REGISTERTHERAPIST,
     GETPROFILE, 
     GETAPPOINTMENT,
     UPDATETIMINGS,
-    JOINTHERAPISTVIDEO
+    JOINTHERAPISTVIDEO,
+    CANCELAPPOINTMENTBYTHERAPIST
   } from "../../../Services/therapistApi";
 
 
@@ -342,6 +343,19 @@ export const joinTherapistVideo = createAsyncThunk(
         }
     }
 )
+
+export const cancelAppointmentByTherapist = createAsyncThunk(
+    "therapist/cancelAppointment",
+    async ({ bookingId}: { bookingId: string }, { rejectWithValue }) => {
+      try {
+        const response = await axios.patch(CANCELAPPOINTMENTBYTHERAPIST, { bookingId });
+        return response.data;
+      } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || "Failed to cancel appointment");
+      }
+    }
+  );
+  
 
 
 
