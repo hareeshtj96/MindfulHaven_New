@@ -4,12 +4,12 @@ export default (dependencies: any) => {
 
      
 
-    const executeFunction = async (requestData: { email: string, page: number, limit: number}) => {
+    const executeFunction = async (requestData: { userId: string, page: number, limit: number}) => {
         console.log("entered use case:.....")
         console.log("request data:", requestData);
         try {
-            const {email, page, limit} = requestData;
-            const response = await userRepository.getAllBooking(email, page, limit);
+            const {userId, page, limit} = requestData;
+            const response = await userRepository.getAllBooking(userId, page, limit);
             
             if(response) {
                 return { status: true, data: response};

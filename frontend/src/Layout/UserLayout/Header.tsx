@@ -1,19 +1,25 @@
 import React, { useState } from "react";
 import logoImage from '../../../Public/banner/MindfulHaven_logo.png';
+import { useNavigate } from "react-router-dom";
 
 function Header() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    const navigate = useNavigate();
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen)
     };
+
+    const handleLogoClick = () => {
+        navigate("/");
+    }
 
     return (
         <>
         <header className="bg-headercolor shadow-md sticky top-0 z-50">
     <div className="container mx-auto flex justify-between items-center py-2 px-4 md:px-6">
 
-        <div className="flex items-center space-x-2 flex-shrink-0">
+        <div className="flex items-center space-x-2 flex-shrink-0 cursor-pointer" onClick={handleLogoClick}>
             <img src={logoImage} alt="MindfulHaven Logo" className="h-12 w-auto md:h-20" />
             <div className="text-lg md:text-2xl font-bold text-btncolor whitespace-nowrap">MindfulHaven</div>
         </div>

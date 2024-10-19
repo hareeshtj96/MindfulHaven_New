@@ -24,3 +24,6 @@ export const SEARCHCHILDTHERAPIST = `${BASE_URL}/search_childTherapist`;
 export const SORTCHILDTHERAPIST = `${BASE_URL}/sort_therapists`;
 export const JOINSESSION = `${BASE_URL}/join_session`;
 export const CANCELAPPOINTMENT = `${BASE_URL}/cancel_appointment`;
+export const GEMINIAPI = `${BASE_URL}/search`;
+export const CHANGEPASSWORD = `${BASE_URL}/changePassword`;
+export const WALLETDETAILS = `${BASE_URL}/walletDetails`;

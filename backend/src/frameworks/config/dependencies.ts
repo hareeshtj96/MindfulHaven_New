@@ -21,7 +21,10 @@ import {
     savePaymentUsecase,
     joinVideoSessionUsecase,
     searchChildTherapistUsecase,
-    cancelAppointmentUsecase
+    cancelAppointmentUsecase,
+    geminiAPIUsecase,
+    changePasswordUsecase,
+    walletDetailsUsecase
  } from "../../application/UseCases";
 
 import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase } from "../../application/adminUseCases";
@@ -51,6 +54,9 @@ const useCase: any={
     joinVideoSessionUsecase: joinVideoSessionUsecase,
     searchChildTherapistUsecase: searchChildTherapistUsecase,
     cancelAppointmentUsecase: cancelAppointmentUsecase,
+    geminiAPIUsecase: geminiAPIUsecase,
+    changePasswordUsecase: changePasswordUsecase,
+    walletDetailsUsecase: walletDetailsUsecase,
 
 
 

@@ -7,10 +7,13 @@ export default {
 
             console.log("create user data:", data);
             const { name, email, password, mobile, role } = data;
-            
+
             let hashedPassword = null;
             if (password) {
                  hashedPassword = await bcrypt.hash(password, 10);
+            } else {
+                console.error("Password is missing or invalid");
+                return { status: false, message: "Password is required"}
             }
 
             const user = new databaseSchema.User({
@@ -19,15 +22,33 @@ export default {
                 password: hashedPassword,
                 mobile,
                 role,
-                isVerified: true
+                isVerified: true,
             });
 
-            const response = await user.save();
-            if (response) {
-                return { status: true, data: response };
-            } else {
-                return { status: false, message: "User creation failed" };
-            }
+            const savedUser = await user.save()
+            console.log("New user created:", savedUser);
+
+            //creating wallet for user
+            const newWallet = new databaseSchema.Wallet({
+                userId: savedUser._id,
+                balance: 0,
+                transactionHistory:[],
+                currency: 'INR'
+            });
+
+            
+
+            // saving wallet
+            const savedWallet = await newWallet.save();
+            console.log("new wallet created:", savedWallet);
+
+            // update user with the wallet reference
+            savedUser.wallet = savedWallet._id;
+            await savedUser.save();
+
+            const userWithWallet = await databaseSchema.User.findById(savedUser._id).populate('wallet')
+
+           return { status: true, data: { user: userWithWallet, wallet: savedWallet}}
         } catch (error) {
             console.error("Error in creating user:", error);
             return { status: false, message: "Internal server error" };
@@ -70,6 +91,49 @@ export default {
             throw new Error("Internal Server Error");
         }
     },   
+
+    changePassword: async ({email, currentPassword, newPassword, confirmPassword}: { email: string; currentPassword: string; newPassword: string; confirmPassword: string}) => {
+        try {
+            const user = await databaseSchema.User.findOne({email});
+          
+            if (!user) {
+                return { status: false, message: "User not found"}
+            }
+
+            if (user && user.password) {
+                // comparing current password with hashed password in the database
+            const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+           
+                if (!isPasswordValid) {
+                    return { status: false, message: "Current password is incorrect"};
+                }
+            }
+
+            if (newPassword !== confirmPassword) {
+                console.log(" passwords do not match");
+                
+                return { status: false, message: "New password and confim password do not match"}
+            }
+
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+            
+            const updatedUser = await databaseSchema.User.findOneAndUpdate(
+                {email},
+                { password: hashedNewPassword },
+                {new: true}
+            );
+
+            if (updatedUser) {
+                return { status: true, message: "Password updated successfully"};
+            } else {
+                return { status: false, message: "Failed to update password"}
+            }
+
+        } catch (error) {
+            console.error("Error in change password:", error);
+            return { status: false, message: "Error occured while changing password"}
+        }
+    },
 
     getUserProfile: async(email: string) => {
         try {
@@ -269,6 +333,8 @@ export default {
         }
     },
 
+    
+
     cancelAppointment: async ({ bookingId, userId} : {bookingId: string, userId: string}) => {
         try {
             const appointment = await databaseSchema.Appointment.findById(bookingId);
@@ -277,25 +343,51 @@ export default {
                 return { status: false, message: "Appointment not found or invalid details"}
             }
 
+            if (appointment.status === "cancelled") {
+                return { status: false, message: "Appointment already cancelled"}
+            }
+
             appointment.status = "cancelled";
             await appointment.save();
 
-            return { status: true, message: "Appointment cancelled successfuly"}
+            const userWallet = await databaseSchema.Wallet.findOne({ userId });
+
+            if (!userWallet) {
+                return { status: false, message :"user wallet not found"}
+            }
+
+            const refundAmount = appointment.payment?.amount;
+
+            if (!refundAmount) {
+                return { status: false, message : "Refund amount not found"}
+            }
+
+            userWallet.balance += refundAmount;
+
+            userWallet.transactionHistory.push({
+                type: "refund",
+                amount: refundAmount,
+                date: new Date()
+            });
+
+            await userWallet.save();
+
+            return { status: true, message: "Appointment cancelled successfuly and amount refunded successfully"}
         } catch (error) {
             console.error("Error while cancelling appointment:", error);
-            return { status: false, message: "Failed to cancel appointment"};
+            return { status: false, message: "Failed to cancel appointment and refund amount"};
         }
     },
 
 
-    getAllBooking : async(email:string, page: number, limit:number) => {
+    getAllBooking : async(userId:string, page: number, limit:number) => {
         try {
             const skip = (page - 1) * limit;
 
             const currentDate = new Date();
             currentDate.setHours(0, 0, 0, 0);
 
-            const bookings = await databaseSchema.Appointment.find({ email: email, status: "scheduled", slot: {$gte : currentDate} }).skip(skip).limit(limit);
+            const bookings = await databaseSchema.Appointment.find({ userId : userId , status: "scheduled", slot: {$gte : currentDate} }).skip(skip).limit(limit);
            
 
             // Fetch therapist details for each booking
@@ -308,7 +400,7 @@ export default {
             }))
            
 
-            const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "scheduled", slot: { $gte: currentDate} })
+            const totalBookings = await databaseSchema.Appointment.countDocuments({ userId : userId, status: "scheduled", slot: { $gte: currentDate} })
 
             return {
                 status: true,
@@ -325,10 +417,10 @@ export default {
         }
     },
 
-    getCompletedBooking : async(email:string, page: number, limit:number) => {
+    getCompletedBooking : async(userId:string, page: number, limit:number) => {
         try {
             const skip = (page - 1) * limit;
-            const bookings = await databaseSchema.Appointment.find({ email: email, status: "completed" }).skip(skip).limit(limit);
+            const bookings = await databaseSchema.Appointment.find({ userId : userId, status: "completed" }).skip(skip).limit(limit);
          
             // Fetch therapist details for each booking
             const bookingWithTherapists = await Promise.all(bookings.map(async (booking: any) => {
@@ -339,7 +431,7 @@ export default {
                 }
             }))
 
-            const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "completed" })
+            const totalBookings = await databaseSchema.Appointment.countDocuments({ userId : userId, status: "completed" })
 
             return {
                 status: true,
@@ -357,10 +449,10 @@ export default {
     },
 
 
-    getCancelledBooking: async(email: string, page: number, limit: number) => {
+    getCancelledBooking: async(userId: string, page: number, limit: number) => {
         try {
             const skip = (page - 1) * limit;
-            const bookings = await databaseSchema.Appointment.find({ email: email, status: "cancelled"}).skip(skip).limit(limit);
+            const bookings = await databaseSchema.Appointment.find({ userId : userId, status: "cancelled"}).skip(skip).limit(limit);
      
             // Fetch therapist details for each booking
             const bookingWithTherapists = await Promise.all(bookings.map(async (booking: any) => {
@@ -371,7 +463,7 @@ export default {
                 }
             }))
 
-            const totalBookings = await databaseSchema.Appointment.countDocuments({ email: email, status: "cancelled" })
+            const totalBookings = await databaseSchema.Appointment.countDocuments({ userId : userId, status: "cancelled" })
 
             return {
                 status: true,
@@ -459,7 +551,26 @@ export default {
             return { status: false, message: 'Failed to save payment'}
             
         }
-    }
+    },
+
+    walletDetails: async ({userId} : {userId: string}) => {
+        try {
+            const result = await databaseSchema.Wallet.findOne({userId})
+            
+            if (!result) {
+                console.log("No wallet found for this user");
+                return { status: false, message: "Wallet not found"};
+                
+            }
+            console.log("result from wallet repository:", result);
+            return { status: true, data: result }
+            
+        } catch (error) {
+            console.error("Error retrieving wallet details:", error);
+            return { status: false, message : "Failed to retrieve wallet details"}
+        }
+
+    },
 
 
 }

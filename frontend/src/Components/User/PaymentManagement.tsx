@@ -25,7 +25,7 @@ const PaymentPage = () => {
     const { totalAmount, userId, therapistId, slot } = location.state || { totalAmount: 0 };
 
     const therapist = useSelector((state: RootState) =>
-        state.user.therapists.find((t) => t._id === therapistId)
+        state.user.therapists.therapists.find((t) => t._id === therapistId)
     );
 
     const loadRazorpayScript = () => {

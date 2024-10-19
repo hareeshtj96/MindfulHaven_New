@@ -48,7 +48,10 @@ export default (dependencies: any) =>{
        verifyPaymentController,
        joinVideoController,
        searchChildTherapistController,
-       cancelAppointment
+       cancelAppointment,
+       geminiAPIController,
+       changePasswordController,
+       walletDetailsController
     } = userController(dependencies);
 
 
@@ -77,6 +80,9 @@ export default (dependencies: any) =>{
     router.post('/verify_payment', verifyPaymentController);
     router.post('/join_session', joinVideoController);
     router.patch('/cancel_appointment', cancelAppointment);
+    router.post('/search', geminiAPIController);
+    router.put('/changePassword', changePasswordController);
+    router.get('/walletDetails', walletDetailsController);
 
     return router;
 }

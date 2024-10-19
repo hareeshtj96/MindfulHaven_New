@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { Wallet } from "./walletSchema";
 
 const userSchema = new Schema({
     name: {
@@ -35,6 +36,10 @@ const userSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    wallet: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'Wallet'
+    }
 
     
 })

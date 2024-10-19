@@ -19,6 +19,8 @@ import PageNotFoundPage from "../../Pages/User/PageNotFoundPage";
 import PaymentManagementPage from "../../Pages/User/PaymentManagementPage";
 import ProtectedRoute from "../../ProtectedRoute/ProtectedRoute";
 import VideoCall from "../../Components/User/VideoComponent";
+import ChangePassword from "../../Components/User/ChangePassword";
+import UserWallet from "../../Components/User/UserWallet";
 
 
 function UserRoute() {
@@ -35,7 +37,14 @@ function UserRoute() {
             <Route path="/forgot-password" element={ <UserForgotPassword />} />
             <Route path="/forgotPasswordOtp" element={<ForgotPasswordOtpPage /> } />
             <Route path="/password_Reset" element={<PasswordResetPage /> } />
-            <Route path="/user_profile" element={<UserProfilePage /> } />
+            
+            <Route path="/user_profile" element={<UserProfilePage /> } >
+
+            <Route path="changePassword" element={<ChangePassword />} />
+            <Route path="wallet" element={<UserWallet />} />
+            <Route path="basicDetails" element={<></>} />
+            </Route>
+
             <Route path="/childTherapy" element={<ChildTherapistListPage /> } />
             <Route path="/slot_management/:therapistId" element={<SlotManagementPage />}/>
             <Route path="/sessions" element={<SessionsPage />}/>

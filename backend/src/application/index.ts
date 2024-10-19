@@ -18,7 +18,10 @@ import { userRegistration,
     savePaymentUsecase,
     joinVideoSessionUsecase,
     searchChildTherapistUsecase,
-    cancelAppointmentUsecase
+    cancelAppointmentUsecase,
+    geminiAPIUsecase,
+    changePasswordUsecase,
+    walletDetailsUsecase
  } from "./UseCases";
 
 export {
@@ -42,7 +45,10 @@ export {
     savePaymentUsecase,
     joinVideoSessionUsecase,
     searchChildTherapistUsecase,
-    cancelAppointmentUsecase
+    cancelAppointmentUsecase,
+    geminiAPIUsecase,
+    changePasswordUsecase,
+    walletDetailsUsecase
 }
 
 

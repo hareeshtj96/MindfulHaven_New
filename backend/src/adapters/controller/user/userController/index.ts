@@ -23,16 +23,19 @@ import verifyPaymentController from "./verifyPaymentController";
 import joinVideoController from "./joinVideoController";
 import searchChildTherapistController from "./searchChildTherapistController";
 import cancelAppointment from "./cancelAppointment";
+import geminiAPIController from "./geminiAPIController";
+import changePasswordController from "./changePasswordController";
+import walletDetailsController from "./walletDetailsController";
 
 
 export default (dependencies:any) => {
     return {
-        registrationController:registrationController(dependencies),
-        googleAuthController:googleAuthController(dependencies),
-        verifyOtpController:verifyOtpController(dependencies),
+        registrationController: registrationController(dependencies),
+        googleAuthController: googleAuthController(dependencies),
+        verifyOtpController: verifyOtpController(dependencies),
         resendOTPController: resendOTPController(dependencies),
-        loginController:loginController(dependencies),
-        forgotPasswordController:forgotPasswordController(dependencies),
+        loginController: loginController(dependencies),
+        forgotPasswordController: forgotPasswordController(dependencies),
         resetPassword: resetPassword(dependencies),
         resetPasswordOtpcontroller: resetPasswordOtpcontroller(dependencies),
         refreshTokenController: refreshTokenController(dependencies),
@@ -52,6 +55,9 @@ export default (dependencies:any) => {
         joinVideoController: joinVideoController(dependencies),
         searchChildTherapistController: searchChildTherapistController(dependencies),
         cancelAppointment: cancelAppointment(dependencies),
+        geminiAPIController: geminiAPIController(dependencies),
+        changePasswordController: changePasswordController(dependencies),
+        walletDetailsController: walletDetailsController(dependencies),
         
     }
 }

@@ -3,6 +3,7 @@ import { SendOtp } from "../../utils";
 import dotenv from 'dotenv';
 dotenv.config();
 
+
 const SECRET_KEY = process.env.JWT_SECRET || 'undefined';
 
 export default function userRegistration(dependencies: any) {
@@ -11,8 +12,9 @@ export default function userRegistration(dependencies: any) {
 
     const executionFunction = async (data: any) => {
         try {
-            const {email, role} = data;
+            const {email, role,password} = data;
             console.log("email:", email);
+            console.log("password from register use case :", password)
 
             const userExists = await userRepository.getUserByEmail({email});
             console.log("userExists:", userExists);
@@ -31,6 +33,7 @@ export default function userRegistration(dependencies: any) {
                     SECRET_KEY,
                     {expiresIn: "10m"}
                 );
+
                 return {status: true, token};
             } else {
                 return {status: false, data: response.message}

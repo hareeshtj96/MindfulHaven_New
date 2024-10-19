@@ -288,12 +288,15 @@ const Session = () => {
 
 
     const handleCancelBooking = (bookingId: string, userId: string) => {
+        console.log("Dispatching cancel appointment...");
         dispatch(cancelAppointment({bookingId, userId}))
             .unwrap()
             .then((response) => {
+                console.log("Cancellation response:", response);
                 toast.success("Appointment cancelled successfully", {position:'top-right', autoClose:3000})
             })
             .catch((error) => {
+                console.error("Error cancelling appointment:", error);
                 toast.error(`Failed to cancel appointment: ${error}`, {
                     position: 'top-right',
                     autoClose: 3000,

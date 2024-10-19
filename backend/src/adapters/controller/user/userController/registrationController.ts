@@ -51,7 +51,7 @@ export default (dependencies: any) => {
 
                 // Generate a new token
                 const token = jwt.sign(
-                    { otp: decodedToken.otp, userData: {name, email, role} }, 
+                    { otp: decodedToken.otp, userData: {name, email, role, password, mobile} }, 
                     SECRET_KEY, 
                     { expiresIn: '10m' }
                 );

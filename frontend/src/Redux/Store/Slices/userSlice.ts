@@ -26,13 +26,18 @@ import { USERREGISTER,
     PAYMENTMETHOD,
     VERIFYPAYMENT,
     JOINSESSION,
-    CANCELAPPOINTMENT
+    CANCELAPPOINTMENT,
+    GEMINIAPI,
+    CHANGEPASSWORD,
+    WALLETDETAILS
  } from "../../../Services/userApi";
+import { act } from "react";
 
 
 
 
 interface User {
+    _id: string;
     userId: string;
     name: string;
     email: string;
@@ -71,11 +76,18 @@ interface Therapist {
         startTime: string;
         endTime: string
     }[];
-   
+    
 }
 
 
 interface PasswordResetPayload {
+    newPassword: string;
+    confirmPassword: string;
+}
+
+interface ChangePasswordPayload {
+    email: string;
+    currentPassword: string;
     newPassword: string;
     confirmPassword: string;
 }
@@ -94,11 +106,26 @@ interface AppointmentState {
     error: string | null;
 }
 
+interface Transaction {
+    type: 'credit' | 'debit' | 'refund';
+    amount: number;
+    status: string;
+    date: string;
+}
+
+interface walletData {
+    balance: number;
+    currency: string;
+    transactionHistory: Transaction[]
+    userId: string;
+    _id: string;
+}
 
 
 interface UserState {
     user: User | null;
-    therapists: Therapist[];
+    search_Result: string | null;
+    therapists: Therapist[];  
     token: string | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
@@ -129,15 +156,15 @@ interface UserState {
     completedTotalPages: number
     completedCurrentPage: number
     cancelledTotalPages: number
-    cancelledCurrentPage: number,
-    total: number,
-    
-   
+    cancelledCurrentPage: number;
+    total: number;
+    walletData: walletData | null;
 }
 
 
 const initialState: UserState = {
     user: null,
+    search_Result : null,
     therapists: [],
     token: localStorage.getItem('token'),
     status: 'idle',
@@ -170,7 +197,8 @@ const initialState: UserState = {
     completedCurrentPage: 0,
     cancelledCurrentPage: 0,
     cancelledTotalPages: 0,
-    total: 0
+    total: 0,
+    walletData: null
 }   
 
 export const registerUser = createAsyncThunk<RegisterResponse, {name: string, email: string, mobile:string, password: string}, {rejectValue: string}>(
@@ -596,11 +624,12 @@ export const fetchScheduledBookingDetails = createAsyncThunk<{
     bookings: Booking[]; 
     totalPages: number;
     currentPage: number;
+    
     }, 
     {  page: number; limit: number}, 
     {rejectValue: string}>(
     "user/fetchScheduledBookingDetails",
-    async({ page, limit }, thunkAPI) => {
+    async({ page, limit, }, thunkAPI) => {
         console.log("fetching page:", page,  "with limit:", limit);
         try {
             
@@ -752,6 +781,23 @@ export const fetchTherapistBySearchTerm = createAsyncThunk(
     }
 )
 
+export const fetchWalletDetails = createAsyncThunk(
+    "user/walletDetails",
+    async (userId: string, { rejectWithValue}) => {
+        try {
+            const response = await axios.get(WALLETDETAILS, {
+                params: { userId },  
+            });
+            console.log("response from wallet slice:", response.data.data);
+            
+            return response.data.data
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Failed to fetch wallet details");
+            
+        }
+    }
+)
+
 
 export const fetchChildTherapistBySearchTerm = createAsyncThunk(
     "therapist/fetchChildTherapistsBySeachTerm",
@@ -781,6 +827,22 @@ export const fetchSortedChildTherapists = createAsyncThunk(
         }
     }
 );
+
+
+export const changePassword = createAsyncThunk<string, ChangePasswordPayload, { rejectValue: string }>(
+    'user/changePassword',
+    async (passwordDetails, thunkAPI) => {
+        try {
+            const response = await axios.put(CHANGEPASSWORD, passwordDetails);
+            console.log("Response from change password slice:", response);
+
+            return response.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to change password";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
 
 
 export const joinSession = createAsyncThunk(
@@ -836,6 +898,24 @@ export const cancelAppointment = createAsyncThunk(
 )
 
 
+
+export const geminiAPIResponse = createAsyncThunk<string, string, { rejectValue: string }>(
+    'user/geminiAPIResponse',
+    async (searchText, thunkAPI) => {
+      try {
+       
+        const response = await axios.post(GEMINIAPI, { query: searchText });
+        console.log("Response from slice:", response);
+  
+        return response.data.data; 
+      } catch (error: any) {
+        const message = error.response?.data?.message || 'Failed to fetch response from Gemini API';
+        return thunkAPI.rejectWithValue(message);
+      }
+    }
+  );
+
+
 const userSlice = createSlice({
     name: 'user',
     initialState,
@@ -863,6 +943,9 @@ const userSlice = createSlice({
         },
         resetSearchResults: (state) => {
             state.therapists = [];
+        },
+        resetResult: (state) => {
+            state.search_Result = null;
         }
     },
     extraReducers: (builder) => {
@@ -1118,12 +1201,28 @@ const userSlice = createSlice({
             .addCase(fetchChildTherapistBySearchTerm.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = null
-            });
-                      
+            })
+            .addCase(geminiAPIResponse.pending, (state) => {
+                state.loading = true;
+                state.error = null; 
+            })
+            .addCase(geminiAPIResponse.fulfilled, (state, action) => {
+                state.loading = false;
+                state.search_Result = action.payload; 
+            })
+            .addCase(geminiAPIResponse.rejected, (state, action) => {
+                state.loading = false;
+            })  
+            .addCase(fetchWalletDetails.fulfilled, (state, action) => {
+                state.loading = false;
+                console.log("action payload:", action.payload);
+                
+                state.walletData = action.payload;
+            })        
             
     }
 })
 
-export const { logoutUser, clearError, clearAppointmentStatus, clearBookings, resetSearchResults } = userSlice.actions;
+export const { logoutUser, clearError, clearAppointmentStatus, clearBookings, resetSearchResults, resetResult } = userSlice.actions;
 
 export default userSlice.reducer;

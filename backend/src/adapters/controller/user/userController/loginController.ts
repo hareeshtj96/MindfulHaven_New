@@ -40,7 +40,7 @@ export default function userLogin (dependencies: any) {
 
             // Generate JWT token upon successful login
             const token = jwt.sign(
-                { userId: user.data._id, email: user.data.email, name: user.data.name, role: user.data.role },
+                { userId: user.data._id, email: user.data.email, name: user.data.name, role: user.data.role, mobile: user.data.mobile },
                 SECRET_KEY,
                 { expiresIn: "20m" }
             );

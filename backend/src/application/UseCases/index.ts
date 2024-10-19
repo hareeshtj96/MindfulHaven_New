@@ -21,6 +21,9 @@ import savePaymentUsecase from "./savePaymentUsecase";
 import joinVideoSessionUsecase from "./joinVideoSessionUsecase";
 import searchChildTherapistUsecase from "./searchChildTherapistUsecase";
 import cancelAppointmentUsecase from "./cancelAppointmentUsecase";
+import geminiAPIUsecase from "./geminiAPIUsecase";
+import changePasswordUsecase from "./changePasswordUsecase";
+import walletDetailsUsecase from "./walletDetailsUsecase";
 
 export {
     userRegistration,
@@ -45,5 +48,8 @@ export {
     savePaymentUsecase,
     joinVideoSessionUsecase,
     searchChildTherapistUsecase,
-    cancelAppointmentUsecase
+    cancelAppointmentUsecase,
+    geminiAPIUsecase,
+    changePasswordUsecase,
+    walletDetailsUsecase
 }

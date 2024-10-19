@@ -16,7 +16,7 @@ const SlotManagement = () => {
     const [notes, setNotes] = useState<string>("");
 
     const therapist = useSelector((state: RootState) =>
-        state.user.therapists.find(t => t._id === therapistId)
+        state.user.therapists.therapists.find(t => t._id === therapistId)
     );
 
     
@@ -122,50 +122,71 @@ const SlotManagement = () => {
     };
 
 
-    const getFilteredSlots = (slots: string[], booked: string[], timings: { startTime: string, endTime: string }[]): string[] => {
+    const filterBookedSlots = (availableSlots: string[], bookedSlots: string[]): string[] => {
+        const bookedSet = new Set(bookedSlots.map(slot => new Date(slot).toISOString()));
+
+        return availableSlots.filter(slot => {
+            const slotDate = new Date(slot);
+            return !bookedSet.has(slotDate.toISOString())
+        })
+    }
+
+
+    const getFilteredSlots = (slots: string[], booked: string[]): string[] => {
         const now = new Date();
         const threeMonthsLater = new Date();
         threeMonthsLater.setMonth(now.getMonth() + 3);
 
-        const bookedMap = new Map<string, Set<number>>();
+        // const bookedMap = new Map<string, Set<string>>();
 
-        booked.forEach(bookedSlot => {
-            const bookedDate = new Date(bookedSlot);
-            const bookedLocal = new Date(bookedDate.getTime() - (5.5 * 60 * 60 * 1000));
+        // booked.forEach(bookedSlot => {
+        //     const bookedDate = new Date(bookedSlot);
+        //     const bookedLocal = new Date(bookedDate.getTime() + (5.5 * 60 * 60 * 1000));
 
-            const bookedDateString = bookedLocal.toISOString().split('T')[0];
-            const bookedHour = bookedLocal.getHours();
+        //     const bookedDateString = bookedLocal.toISOString().split('T')[0];
+        //     const bookedHour = bookedLocal.toISOString().substring(11, 16);
 
-            if (!bookedMap.has(bookedDateString)) {
-                bookedMap.set(bookedDateString, new Set<number>());
-            }
-            bookedMap.get(bookedDateString)?.add(bookedHour);
-        })
+        //     if (!bookedMap.has(bookedDateString)) {
+        //         bookedMap.set(bookedDateString, new Set<string>());
+        //     }
+        //     bookedMap.get(bookedDateString)?.add(bookedHour);
+        // })
 
        
-        return slots.filter(slot => {
-            const slotDate = new Date(slot);
-            const slotUTC = new Date(slotDate.toISOString());
+        // return slots.filter(slot => {
+        //     const slotDate = new Date(slot);
+        //     const slotUTC = new Date(slotDate.getTime() + (5.5 * 60 * 60 * 1000));
     
-            // Log the slot date for debugging
-            console.log("slotDate:", slotDate, "slotUTC:", slotUTC);
+        //     // Log the slot date for debugging
+        //     console.log("slotDate:", slotDate, "slotUTC:", slotUTC);
     
-            // Only consider slots within the next 3 months
-            if (slotUTC >= now && slotUTC <= threeMonthsLater) {
+        //     // Only consider slots within the next 3 months
+        //     if (slotUTC >= now && slotUTC <= threeMonthsLater) {
             
-                const slotDateString = slotUTC.toISOString().split('T')[0];
-                const slotHour = slotUTC.getHours();
+        //         const slotDateString = slotUTC.toISOString().split('T')[0];
+        //         const slotHour = slotUTC.toISOString().substring(11, 16);
 
-                const isBooked = bookedMap.has(slotDateString) && bookedMap.get(slotDateString)?.has(slotHour);
+        //         const isBooked = bookedMap.has(slotDateString) && bookedMap.get(slotDateString)?.has(slotHour);
 
-                return !isBooked;                
-            }
-            return false;
+        //         return !isBooked;                
+        //     }
+        //     return false;
+        // });
+
+
+
+        const slotsWithinRange = slots.filter(slot => {
+            const slotDate = new Date(slot);
+            return slotDate >= now && slotDate <= threeMonthsLater;
         });
+    
+        // Then, remove booked slots
+        return filterBookedSlots(slotsWithinRange, booked);
+
     };
     
 
-    const filteredSlots = getFilteredSlots(availableSlots, bookedSlots, timings);
+    const filteredSlots = getFilteredSlots(availableSlots, bookedSlots);
 
     
 

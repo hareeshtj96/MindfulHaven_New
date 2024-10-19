@@ -34,6 +34,7 @@ export default (dependencies: any) => {
             // Compare the OTP from the token with the OTP provided in the request body
             if (decoded.otp === otp) {
                 const userData = decoded.userData;
+                console.log("user data from otp controller", userData);
 
                 if (!userData) {
                     return res.status(400).json({ status: false, message: "User data is missing" });

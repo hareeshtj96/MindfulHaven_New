@@ -42,15 +42,15 @@ export default (dependencies: any) => {
             // Verify and decode the token
             const decodedToken: any = jwt.verify(token, SECRET_KEY);
             console.log("decoded token:", decodedToken);
-            const email = decodedToken.email;
-            console.log("email from decoded token:", email);
+            const userId = decodedToken.userId;
+            console.log("userId from decoded token:", userId);
 
-            if (!email) {
-                return res.status(400).json({ status: false, message: "Email not found in the token" });
+            if (!userId) {
+                return res.status(400).json({ status: false, message: "userId not found in the token" });
             }
 
            
-            const response = await getAllBookings(dependencies).executeFunction({ email, page, limit });
+            const response = await getAllBookings(dependencies).executeFunction({ userId, page, limit });
 
             if( response && response.status) {
                 res.status(200).json({ status: true, data: response.data });

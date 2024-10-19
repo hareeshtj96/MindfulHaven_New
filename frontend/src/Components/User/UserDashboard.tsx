@@ -6,13 +6,13 @@ import coupleImg from '../../../Public/banner/couple_therapy.jpg'
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../Redux/Store/store"
-import { fetchTherapistBySearchTerm, resetSearchResults } from "../../Redux/Store/Slices/userSlice";
+import { fetchTherapistBySearchTerm, resetSearchResults, geminiAPIResponse, resetResult } from "../../Redux/Store/Slices/userSlice";
 
 function Dashboard() {
     const [activeIndex, setActiveIndex] = useState(null);
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { therapists, status, error } = useSelector((state: RootState) => state.user);
+    const { therapists, status, error, search_Result } = useSelector((state: RootState) => state.user);
 
     const stateIss = useSelector((state: RootState) => state.user)
     console.log("state is....dashboard", stateIss)
@@ -40,6 +40,22 @@ function Dashboard() {
             dispatch(fetchTherapistBySearchTerm(debouncedSearchTerm))
         }
     }, [debouncedSearchTerm, dispatch]);
+
+
+    // geminiAPIResponse
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            dispatch(geminiAPIResponse(debouncedSearchTerm));
+            setHasSearched(true);
+        }
+    },[debouncedSearchTerm, dispatch]);
+
+    useEffect(() => {
+        if (searchTerm.trim() === "") {
+            dispatch(resetResult())
+        }
+    }, [searchTerm, dispatch]);
+
 
     const toggleFAQ = (index: any) => {
         setActiveIndex(activeIndex === index ? null : index);
@@ -87,7 +103,7 @@ function Dashboard() {
             <section className="mb-8">
 
                 <div className="space-y-4">
-                    {hasSearched && therapists.length === 0 ? (
+                    {hasSearched && therapists.therapists.length === 0 ? (
                         <div className="text-center text-gray-700">
                             <p>No therapists found based on your search criteria. Please try a different term.</p>
                         </div>
@@ -188,6 +204,27 @@ function Dashboard() {
             <section className="mb-8">
                 <h2 className="text-2xl font-bold text-center">MindfulHaven FAQs</h2>
 
+                <div className="mb-4 flex justify-center">
+                    <div className="flex items-center space-x-2">
+                    <input type="text" placeholder="Search anything related to Mental Health and Wellness"
+                    className="p-4 border border-gray-300 rounded-lg w-[500px]" value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <button className="bg-btncolor text-white p-4 rounded-lg hover:bg-btncolor-dark"
+                    onClick={() => dispatch(geminiAPIResponse(searchTerm))}
+                    >Search</button>
+                    </div>
+                </div>
+
+                {search_Result && (
+                <div className="result bg-gray-100 p-4 rounded-lg shadow-md mt-4">
+                    <h3 className="text-lg font-semibold">Search Result:</h3>
+                    <p className="mt-2 text-gray-700">
+                        {typeof search_Result === "string" ? search_Result : JSON.stringify(search_Result)}
+                    </p>
+                </div>
+                 )}
+
                 <ul className="list-none pl-0 mt-4 flex flex-col items-center mx-auto">
                     {[
                         {
@@ -213,8 +250,9 @@ function Dashboard() {
                         </li>
                     ))}
                 </ul>
-
             </section>
+
+
         </div>
     )
 }
