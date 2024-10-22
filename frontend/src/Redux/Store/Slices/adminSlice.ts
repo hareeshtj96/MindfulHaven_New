@@ -5,7 +5,8 @@ import { ADMINLOGIN,
     GETUSERS,
     GOTVERIFIED,
     GOTBLOCKUNBLOCK,
-    GETTHERAPISTDETAILS
+    GETTHERAPISTDETAILS,
+    GETDASHBOARDDETAILS
  } from "../../../Services/adminApi";
 
 
@@ -60,7 +61,11 @@ interface AdminState {
     users: User[];
     totalPages: number,
     currentPage: number,
-}
+    totalUsers: number,
+    totalTherapists: number,
+    totalAppointments: number,
+    totalRevenue: number,
+    }
 
 const initialState: AdminState = {
     admin: null,
@@ -73,6 +78,10 @@ const initialState: AdminState = {
     users: [],
     totalPages: 0,
     currentPage: 0,
+    totalUsers: 0,
+    totalTherapists: 0,
+    totalAppointments: 0,
+    totalRevenue: 0,
 }
 
 export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, password: string }, { rejectValue: string }>(
@@ -152,6 +161,21 @@ export const fetchUsers = createAsyncThunk<User[], void, {rejectValue: string}>(
 )
 
 
+export const fetchDashboardDetails = createAsyncThunk("admin/dashboardDetails",
+    async (_, thunkAPI) => {
+        try {
+            const response = await axios.get(GETDASHBOARDDETAILS);
+            console.log("response from fetch dashboard slice:", response);
+            return response.data
+            
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch dashboard details";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
 
 
 export const getTherapistVerified = createAsyncThunk<Therapist[], string, {rejectValue: string}>(
@@ -209,6 +233,8 @@ export const toggleUserBlockStatus = createAsyncThunk<User, { userId: string; is
       }
     }
   );
+
+
   
 
 const adminSlice = createSlice({
@@ -278,6 +304,23 @@ const adminSlice = createSlice({
                 state.selectedTherapist = action.payload
             })
             .addCase(fetchTherapistDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(fetchDashboardDetails.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchDashboardDetails.fulfilled, (state, action) => {
+                state.loading = false;
+                const { totalUsers, totalTherapists, totalAppointments, totalRevenue } =
+                  action.payload.data; 
+                state.totalUsers = totalUsers;
+                state.totalTherapists = totalTherapists;
+                state.totalAppointments = totalAppointments;
+                state.totalRevenue = totalRevenue;
+            })
+            .addCase(fetchDashboardDetails.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });

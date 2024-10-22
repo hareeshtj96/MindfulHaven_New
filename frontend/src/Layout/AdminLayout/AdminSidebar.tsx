@@ -14,7 +14,8 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isSidebarOpen }) => {
                     <div className="text-green-800 text-xl font-bold mb-4">Admin Panel</div>
                     <ul className="flex flex-col space-y-4">
                         <li>
-                            <button className="w-full text-left bg-green-600 text-white py-3 px-4 rounded-full hover:bg-green-700">
+                            <button className="w-full text-left bg-green-600 text-white py-3 px-4 rounded-full hover:bg-green-700"
+                            onClick={() => navigate("/admin/admin_dashboard")}>
                                 Dashboard
                             </button>
                         </li>

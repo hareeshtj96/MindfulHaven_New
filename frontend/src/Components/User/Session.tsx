@@ -110,7 +110,7 @@ const Session = () => {
                     </button>
 
                     <button className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-all"
-                    onClick={() => handleCancelBooking(booking._id, userId || "defaultUserId")}>
+                    onClick={() => showConfirmationToast(booking._id, userId || "defaultUserId")}>
                         Cancel Appointment
                     </button>
                    
@@ -251,19 +251,27 @@ const Session = () => {
             const { data: { roomId, roomToken }, status } = resultAction.payload;
             const token = roomToken;
 
-            console.log("token..........", token)
-
-            console.log("status......", status);
-            console.log("room id:", roomId)
+            if (roomId && token) {
+                toast.success("Successfully joined the session");
+            }  else {
+                throw new Error("Unable to join session")
+            }
 
             if (status !== true) {
                 throw new Error(`Failed to fetch room details: ${status}`)
             }
 
-            6
             navigate(`/video-call/${roomId}`);
-        } catch (error) {
+        } catch (error:any) {
             console.error('Failed to join session:', error);
+
+            if(error.response && error.response.status === 401 ) {
+                toast.error("Unauthorized: Token expired or invalid")
+            } else if (error.response && error.response.status === 400) {
+                toast.error("Error: User ID or Booking ID is missing")
+            } else {
+                toast.error("Failed to join the video session. Please try again")
+            }
         }
     }
 
@@ -286,24 +294,82 @@ const Session = () => {
         }
     };
 
+    const ConfirmCancelToast = ({ onConfirm, closeToast}: { onConfirm: () => void; closeToast: () => void }) => (
+        <div>
+            <p>Do you really want to cancel this appointment?</p>
+            <button
+            onClick={() => {
+                onConfirm();
+                closeToast();
+            }}
+            style={{
+                width: '120px',
+                padding: '10px',
+                background: 'green',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                marginRight: '20px',
+                transition: 'background-color 0.3s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'darkgreen')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'green')}
+            >
+                Yes
+            </button>
+            <button
+            onClick={closeToast}
+            style={{
+                width: '120px',
+                padding: '10px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s ease',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background === 'darkred')}
+            onMouseLeave={(e) => (e.currentTarget.style.background === 'red')}
+            >
+                No
+            </button>
+        </div>
+    )
 
-    const handleCancelBooking = (bookingId: string, userId: string) => {
-        console.log("Dispatching cancel appointment...");
-        dispatch(cancelAppointment({bookingId, userId}))
-            .unwrap()
-            .then((response) => {
-                console.log("Cancellation response:", response);
-                toast.success("Appointment cancelled successfully", {position:'top-right', autoClose:3000})
-            })
-            .catch((error) => {
-                console.error("Error cancelling appointment:", error);
-                toast.error(`Failed to cancel appointment: ${error}`, {
-                    position: 'top-right',
-                    autoClose: 3000,
+    
+         const handleCancelBooking = (bookingId: string, userId: string) => {
+            console.log("Dispatching cancel appointment...");
+            dispatch(cancelAppointment({ bookingId, userId }))
+                .unwrap()
+                .then((response) => {
+                    console.log("Cancellation response:", response);
+                    toast.success("Appointment cancelled successfully", { position: 'top-right', autoClose: 3000 });
                 })
-            })
-    };
-   
+                .catch((error) => {
+                    console.error("Error cancelling appointment:", error);
+                    toast.error(`Failed to cancel appointment: ${error}`, {
+                        position: 'top-right',
+                        autoClose: 3000,
+                    });
+                });
+        };
+    
+        const showConfirmationToast = (bookingId: string, userId: string) => {
+            toast(
+                ({ closeToast }) => (
+                    <ConfirmCancelToast
+                        onConfirm={() => handleCancelBooking(bookingId, userId)}
+                        closeToast={closeToast}
+                    />
+                ),
+                {
+                    position: 'top-right',
+                    autoClose: false,
+                }
+            );
+        };
 
 
     return (

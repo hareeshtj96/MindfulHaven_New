@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
+import { toast } from 'react-toastify';
 
 
 
@@ -26,8 +27,9 @@ const VideoCall: React.FC = () => {
                 const APPID = Number(import.meta.env.VITE_APP_ID) || 12345;
                 const SERVER_SECRET = import.meta.env.VITE_APP_SECRET ;
 
-                if (!APPID || !SERVER_SECRET) {
+                if (!APPID || !SERVER_SECRET || !roomId || !userID || !userName) {
                     console.error('App ID or server Secret is missing');
+                    toast.error('Missing required information to join the session')
                     return 
                 }
                 const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
@@ -48,6 +50,7 @@ const VideoCall: React.FC = () => {
                 });
             } catch (error) {
                 console.error('Error generating kit token:', error);
+                toast.error('Failed to join the video session. Please try again')
             }
         }
         setupVideoCall();

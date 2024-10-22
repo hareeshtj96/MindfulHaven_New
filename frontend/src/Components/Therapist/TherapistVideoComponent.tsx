@@ -3,6 +3,7 @@ import { ZegoUIKitPrebuilt } from "@zegocloud/zego-uikit-prebuilt";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { RootState, AppDispatch } from "../../Redux/Store/store";
+import { toast } from 'react-toastify';
 
 
 
@@ -28,8 +29,9 @@ const TherapistVideoCall: React.FC = () => {
                 const APPID = Number(import.meta.env.VITE_APP_ID)
                 const SERVER_SECRET = import.meta.env.VITE_APP_SECRET;
 
-                if (!APPID || !SERVER_SECRET) {
+                if (!APPID || !SERVER_SECRET || !roomId || !therapistId || !therapistName) {
                     console.error('App ID or server secret is missing');
+                    toast.error('Missing required information to join the session')
                     return;
                 }
 
@@ -52,6 +54,7 @@ const TherapistVideoCall: React.FC = () => {
                 });
             } catch (error) {
                 console.error('Error generating kit token:', error);
+                toast.error('Failed to join the video session. Please try again');
             }
         };
         setupVideoCall()

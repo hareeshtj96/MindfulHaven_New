@@ -48,7 +48,7 @@ const BookingStatus = () => {
                         <p className="mb-2"><strong>Therapist ID:</strong> {therapist?._id || 'N/A'}</p>
                         <p className="mb-2"><strong>Name:</strong> {therapist?.name || 'N/A'}</p>
                         <p className="mb-2"><strong>Email:</strong> {therapist?.email || 'N/A'}</p>
-                        <p className="mb-2"><strong>Fees:</strong> ₹{therapist?.fees || 'N/A'}</p>
+                        <p className="mb-2"><strong>Fees:</strong> ₹{therapist?.fees + 80 || 'N/A'}</p>
                         <div className="mb-2">
                             <strong>Date:</strong> {new Date(bookingStatus?.slot).toISOString().split('T')[0] || 'N/A'}
                         </div>

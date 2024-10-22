@@ -27,9 +27,9 @@ import {
     walletDetailsUsecase
  } from "../../application/UseCases";
 
-import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase } from "../../application/adminUseCases";
+import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase } from "../../application/adminUseCases";
 
-import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase } from "../../application/therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase } from "../../application/therapistUseCases";
 
 const useCase: any={
     userRegistration: userRegistration,
@@ -68,6 +68,7 @@ const useCase: any={
     getVerifiedUsecase: getVerifiedUsecase,
     getuserBlockUsecase: getuserBlockUsecase,
     therapistDetailstUsecase: therapistDetailstUsecase,
+    adminDashboardDetailsUsecase: adminDashboardDetailsUsecase,
     
 
 
@@ -78,7 +79,8 @@ const useCase: any={
     bookingUsecase: bookingUsecase,
     updateTherapistTimingsUsecase: updateTherapistTimingsUsecase,
     therapistSessionUsecase: therapistSessionUsecase,
-    cancelAppointmentTherapistUsecase: cancelAppointmentTherapistUsecase
+    cancelAppointmentTherapistUsecase: cancelAppointmentTherapistUsecase,
+    getTherapistDetailsUsecase: getTherapistDetailsUsecase,
 }
 
 const repository:any={

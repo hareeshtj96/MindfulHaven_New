@@ -1,5 +1,27 @@
 import mongoose, { Schema, model } from "mongoose";
 
+
+
+const bookedSlotSchema = new Schema({
+    date: {
+        type: Date,
+        required: true,
+    },
+    time: {
+        type: String,
+        enum: [
+            '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', 
+            '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM', 
+            '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM', '10:00 PM'
+        ], 
+        required: true,
+    },
+    status: {
+        type: Boolean,
+        default: false, 
+    }
+});
+
 const therapistSchema = new Schema({
     name: {
         type: String,
@@ -55,7 +77,12 @@ const therapistSchema = new Schema({
         },
     }],
     availableSlots: [Date],
-    
+
+    booked: {
+        type: [bookedSlotSchema],
+        default: [],
+    },
+
     fees: {
         type: Number,
     },

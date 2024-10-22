@@ -53,22 +53,24 @@ export {
 
 
 
-import { adminLogin, getAllUsecase, getuserBlockUsecase, therapistDetailstUsecase} from "./adminUseCases";
+import { adminLogin, getAllUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase} from "./adminUseCases";
 
 export {
     adminLogin,
     getAllUsecase,
     getuserBlockUsecase,
-    therapistDetailstUsecase
+    therapistDetailstUsecase,
+    adminDashboardDetailsUsecase
 }
 
 
-import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase } from "./therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase } from "./therapistUseCases";
 
 export {
     therapistRegistration,
     getTherapistProfileUsecase,
     updateTherapistTimingsUsecase,
     therapistSessionUsecase,
-    cancelAppointmentTherapistUsecase
+    cancelAppointmentTherapistUsecase,
+    getTherapistDetailsUsecase
 }

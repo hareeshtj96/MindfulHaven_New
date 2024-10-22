@@ -103,7 +103,7 @@ function Dashboard() {
             <section className="mb-8">
 
                 <div className="space-y-4">
-                    {hasSearched && therapists.therapists.length === 0 ? (
+                    {hasSearched  &&  therapists.length === 0 ? (
                         <div className="text-center text-gray-700">
                             <p>No therapists found based on your search criteria. Please try a different term.</p>
                         </div>

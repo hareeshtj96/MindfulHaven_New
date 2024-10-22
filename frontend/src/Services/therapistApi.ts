@@ -9,3 +9,4 @@ export const GETAPPOINTMENT = `${BASE_URL}/therapist/therapist_bookings`;
 export const UPDATETIMINGS = `${BASE_URL}/therapist/therapist_updateTimings`;
 export const JOINTHERAPISTVIDEO = `${BASE_URL}/therapist/therapist_video_call`;
 export const CANCELAPPOINTMENTBYTHERAPIST = `${BASE_URL}/therapist/therapist_cancelAppointment`
+export const GETAVAILABILITY = `${BASE_URL}/therapist/therapist_availableDetails`

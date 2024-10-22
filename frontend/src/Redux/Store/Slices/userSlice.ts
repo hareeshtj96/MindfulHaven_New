@@ -143,6 +143,7 @@ interface UserState {
     availableSlots: string[];
     bookedSlots: string[];
     timings: any[] 
+    booked: any[]
     sortedTherapists: Therapist[]
     appointmentData: any
     appointmentStatus: string | null
@@ -183,6 +184,7 @@ const initialState: UserState = {
     availableSlots: [],
     bookedSlots: [],
     timings: [],
+    booked: [],
     sortedTherapists: [],
     appointmentData: null,
     appointmentStatus: null,
@@ -477,16 +479,19 @@ export const fetchChildTherapist = createAsyncThunk<Therapist[], {page: number; 
     }
 )
 
-export const fetchAvailableSlots = createAsyncThunk<{ availableSlots: string[], timings: any[] }, string, { rejectValue: string}>(
+export const fetchAvailableSlots = createAsyncThunk<{
+    booked: any[]; availableSlots: string[], timings: any[] 
+}, string, { rejectValue: string}>(
     'user/fetchAvailableSlots',
     async(therapistId, thunkAPI) => {
         try {
             const response = await axios.get(`${GETSLOTS}/${therapistId}`);
             console.log("response from fetch availble slots:", response);
-            console.log("response.data.data.availableSlots:", response.data.data.availableSlots)
+            
             return {
                 availableSlots: response.data.data.availableSlots,
-                timings: response.data.data.timings
+                timings: response.data.data.timings,
+                booked: response.data.data.booked
             }
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch available slots";
@@ -946,6 +951,9 @@ const userSlice = createSlice({
         },
         resetResult: (state) => {
             state.search_Result = null;
+        },
+        updateAvailableSlots: (state, action) => {
+            state.availableSlots = action.payload;
         }
     },
     extraReducers: (builder) => {
@@ -1058,7 +1066,10 @@ const userSlice = createSlice({
             .addCase(fetchAvailableSlots.fulfilled, (state, action) => {
                 state.loading = false;
                 state.availableSlots = action.payload.availableSlots;
+                console.log("action payl....", action.payload);
+                
                 state.timings = action.payload.timings;
+                state.booked = action.payload.booked;
                
             })
             .addCase(fetchAvailableSlots.rejected, (state, action) => {
@@ -1223,6 +1234,6 @@ const userSlice = createSlice({
     }
 })
 
-export const { logoutUser, clearError, clearAppointmentStatus, clearBookings, resetSearchResults, resetResult } = userSlice.actions;
+export const { logoutUser, clearError, clearAppointmentStatus, clearBookings, resetSearchResults, resetResult, updateAvailableSlots } = userSlice.actions;
 
 export default userSlice.reducer;

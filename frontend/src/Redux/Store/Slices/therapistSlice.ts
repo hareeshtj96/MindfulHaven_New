@@ -9,7 +9,8 @@ import { REGISTERTHERAPIST,
     GETAPPOINTMENT,
     UPDATETIMINGS,
     JOINTHERAPISTVIDEO,
-    CANCELAPPOINTMENTBYTHERAPIST
+    CANCELAPPOINTMENTBYTHERAPIST,
+    GETAVAILABILITY
   } from "../../../Services/therapistApi";
 
 
@@ -92,9 +93,17 @@ interface LoginResponse {
     therapist: Therapist;
 }
 
+interface AvailableDetails {
+    booked: any[];
+    availableSlots: string[];
+    timings: any[]
+}
+
 interface TherapistState {
     availableSlots: any;
     bookings: Booking[];
+    booked : any[];
+    timings : any[];
     therapists: Therapist[];
     currentTherapist:Therapist | null;
     token: string | null;
@@ -104,12 +113,15 @@ interface TherapistState {
     otpVerified: boolean;
     otpError: string | null;
     totalPages: number;
+    details: AvailableDetails | null;
 }
 
 //initial state
 const initialState: TherapistState = {
     therapists: [],
     bookings:[],
+    booked : [],
+    timings: [],
     currentTherapist: null,
     availableSlots:[],
     token: localStorage.getItem('therapistToken'),
@@ -118,7 +130,8 @@ const initialState: TherapistState = {
     error: null,
     otpVerified: false,
     otpError: null,
-    totalPages: 0
+    totalPages: 0,
+    details: null
 }
 
 // Thunk for therapist login
@@ -257,6 +270,27 @@ export const fetchProfile = createAsyncThunk<Therapist[], void, {rejectValue: st
         }
     }
 ) 
+
+export const fetchAvailableDetails = createAsyncThunk<AvailableDetails, string, {rejectValue: string}>(
+    "therapist/fetchAvailableDetails",
+    async(therapistId, thunkAPI) => {
+        try {
+            
+            const response = await axios.get(GETAVAILABILITY, {
+                params: { therapistId }
+            });
+            console.log("response from fetch avaialble details:", response.data.data);
+
+            const { booked, availableSlots, timings } = response.data.data;
+
+            return { booked, availableSlots, timings }
+            
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch details";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
 
 
 export const fetchBookingAppointments = createAsyncThunk<{ bookings: Booking[], totalPages: number}, FetchAppointmentsPayload, {rejectValue: string}>(
@@ -459,6 +493,18 @@ const therapistSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload || "Failed to fetch bookings";
             })
+            .addCase(fetchAvailableDetails.pending, (state) => {
+                state.loading = true;
+                state.error = null; // Reset error on new fetch
+            })
+            .addCase(fetchAvailableDetails.fulfilled, (state, action) => {
+                state.loading = false;
+                state.details = action.payload; // Store the fetched details in state
+            })
+            .addCase(fetchAvailableDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Failed to fetch therapist details"; // Store error message
+            });
     },
 }); 
 

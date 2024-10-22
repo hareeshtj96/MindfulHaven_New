@@ -5,6 +5,7 @@ import adminGetUsers from "./adminGetUsers";
 import adminTherapistVerification from "./adminTherapistVerification";
 import adminUserBlock from "./adminUserBlock";
 import getTherapistDetails from "./getTherapistDetails";
+import adminDashboardDetails from "./adminDashboardDetails";
 
 export default (dependencies: any) => {
     return {
@@ -14,6 +15,7 @@ export default (dependencies: any) => {
         adminTherapistVerification: adminTherapistVerification(dependencies),
         adminUserBlock: adminUserBlock(dependencies),
         getTherapistDetails: getTherapistDetails(dependencies),
+        adminDashboardDetails: adminDashboardDetails(dependencies),
         
     }
 }

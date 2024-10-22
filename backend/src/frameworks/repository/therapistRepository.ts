@@ -127,8 +127,34 @@ export default {
     },
 
 
-    
+    getDetails: async(therapistId: string) => {
+        try {
+            const therapistDetails = await databaseSchema.Therapist.findById(therapistId);
+            console.log("therapist details:", therapistDetails);
 
+            const availableSlots = therapistDetails?.availableSlots
+            const booked = therapistDetails?.booked
+            const timings = therapistDetails?.timings
+
+            return {
+                status: true,
+                data :{
+                    availableSlots,
+                    booked,
+                    timings
+                }
+            }
+            
+        } catch (error) {
+            console.error("Error fetching therapist details:", error);
+            return {
+                status: false,
+                message : "Failed to fetch therapist details"
+            }
+        }
+    },
+
+    
     getBookings: async(therapistId: string, page: number, limit: number) => {
         console.log("therapist id from repository:", therapistId);
 

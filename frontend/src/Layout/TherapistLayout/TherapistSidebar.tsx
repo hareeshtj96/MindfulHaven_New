@@ -52,10 +52,10 @@ function TherapistSidebar() {
                         <FaCalendar className="inline-block mr-2" />
                         {isOpen && 'Update Availability'}
                     </button>
-                    <button className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
+                    {/* <button className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
                         <FaUser className="inline-block mr-2" />
                         {isOpen && 'Patients'}
-                    </button>
+                    </button> */}
                     <button onClick={handleNavigate} className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
                         <FaHistory className="inline-block mr-2" />
                         {isOpen && 'Bookings'}
@@ -64,10 +64,10 @@ function TherapistSidebar() {
                         <FaFileAlt className="inline-block mr-2" />
                         {isOpen && 'Reports'}
                     </button>
-                    <button className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
+                    {/* <button className="w-full rounded-full bg-white text-gray-700 mb-2 py-2 px-4 hover:bg-gray-200 flex items-center justify-center">
                         <FaCog className="inline-block mr-2" />
                         {isOpen && 'Settings'}
-                    </button>
+                    </button> */}
                 </div>
             </div>
         </div>

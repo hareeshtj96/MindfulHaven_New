@@ -173,5 +173,47 @@ export default {
             console.log("Error in therapist details:", error);
             return { status: false, message: "An error occurred while fetching the therapist details", error: error.message };
         }
+    },
+
+    dashboardDetails: async () => {
+        try {
+            const totalUsers = await databaseSchema.User.countDocuments()
+
+            const totalTherapists = await databaseSchema.Therapist.countDocuments()
+
+            const totalAppointments = await databaseSchema.Appointment.countDocuments()
+
+            const totalRevenueData = await databaseSchema.Payment.aggregate([
+                {
+                    $match: {
+                        paymentStatus: "success",
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalRevenue: {
+                            $sum: "$convenienceFee"
+                        }
+                    }
+                }
+            ]);
+
+            const totalRevenue = totalRevenueData.length > 0 ? totalRevenueData[0].totalRevenue : 0
+
+            return {
+                status: true,
+                data: {
+                    totalUsers,
+                    totalTherapists,
+                    totalAppointments,
+                    totalRevenue
+                }
+                
+            }
+        } catch (error) {
+            console.error("Error fetching dashboard details:", error);
+            return { status: false, message: "Error fetching dashboard details"}
+        }
     }
 }
