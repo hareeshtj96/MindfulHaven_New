@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from "../../Redux/Store/store";
 import { fetchWalletDetails } from "../../Redux/Store/Slices/userSlice";
@@ -9,11 +9,40 @@ const UserWallet: React.FC = () => {
   const location = useLocation();
   const { user, loading, error, walletData } = useSelector((state: RootState) => state.user);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
+  const [totalPages, setTotalPages] = useState(1);
+
+
   useEffect(() => {
     if (user?.userId && location.pathname === "/user_profile/wallet") {
       dispatch(fetchWalletDetails(user.userId));
     }
   }, [user?.userId, location.pathname]);
+
+
+  useEffect(() => {
+    if (walletData?.transactionHistory) {
+      setTotalPages(Math.ceil(walletData.transactionHistory.length / itemsPerPage));
+    }
+  }, [walletData]);
+
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+        setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+        setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  
+  const paginatedTransactions = walletData?.transactionHistory
+   ? walletData.transactionHistory.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) : []
 
   if (loading) {
     return <div>Loading...</div>;
@@ -36,11 +65,11 @@ const UserWallet: React.FC = () => {
       {/* Display transaction history */}
       <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
         <h3 className="text-xl font-bold mb-4">Transaction History</h3>
-        {walletData?.transactionHistory && walletData.transactionHistory.length > 0 ? (
+        {paginatedTransactions.length > 0 ? (
           <ul>
-            {walletData.transactionHistory.map((transaction, index) => (
+            {paginatedTransactions.map((transaction, index) => (
               <li key={index} className="border-b py-2">
-                <span>{transaction.type === 'credit' ? 'Credit' : 'Debit'}:</span> ₹{transaction.amount}
+                <span>{transaction.type === 'refund' ? 'refund' : 'Debit'}:</span> ₹{transaction.amount}
                 <span className="ml-2">({transaction.status})</span>
                 <span className="ml-2">{new Date(transaction.date).toLocaleDateString()}</span>
               </li>
@@ -50,7 +79,30 @@ const UserWallet: React.FC = () => {
           <p>No transactions yet.</p>
         )}
       </div>
+
+        {/* Pagination Controls */}
+        <div className="flex justify-between items-center mt-6">
+                    <button
+                        className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                        onClick={handlePreviousPage}
+                        disabled={currentPage === 1}
+                    >
+                        Previous
+                    </button>
+                    <p>
+                        Page {currentPage} of {totalPages}
+                    </p>
+                    <button
+                        className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded"
+                        onClick={handleNextPage}
+                        disabled={currentPage === totalPages}
+                    >
+                        Next
+                    </button>
+                </div>
+
     </div>
+
   );
 }
 
