@@ -24,6 +24,7 @@ import cancelAppointmentUsecase from "./cancelAppointmentUsecase";
 import geminiAPIUsecase from "./geminiAPIUsecase";
 import changePasswordUsecase from "./changePasswordUsecase";
 import walletDetailsUsecase from "./walletDetailsUsecase";
+import submitIssueUsecase from "./submitIssueUsecase";
 
 export {
     userRegistration,
@@ -51,5 +52,6 @@ export {
     cancelAppointmentUsecase,
     geminiAPIUsecase,
     changePasswordUsecase,
-    walletDetailsUsecase
+    walletDetailsUsecase,
+    submitIssueUsecase,
 }

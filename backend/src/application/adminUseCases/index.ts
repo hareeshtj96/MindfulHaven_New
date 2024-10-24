@@ -5,6 +5,8 @@ import getVerifiedUsecase from "./getVerifiedUsecase";
 import getuserBlockUsecase from "./getuserBlockUsecase";
 import therapistDetailstUsecase from "./therapistDetailstUsecase";
 import adminDashboardDetailsUsecase from "./adminDashboardDetailsUsecase";
+import getIssuesUsecase from "./getIssuesUsecase";
+import getIssuesresolvedUsecase from "./getIssuesresolvedUsecase";
 
 export {
     adminLogin,
@@ -13,5 +15,8 @@ export {
     getVerifiedUsecase,
     getuserBlockUsecase,
     therapistDetailstUsecase,
-    adminDashboardDetailsUsecase
+    adminDashboardDetailsUsecase,
+    getIssuesUsecase,
+    getIssuesresolvedUsecase
+    
 }

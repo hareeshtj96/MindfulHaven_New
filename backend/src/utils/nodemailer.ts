@@ -90,6 +90,50 @@ const sendVerificationEmail = async (email: string, therapistName: string, isVer
         console.error(`Error sendinf email:`, error);
         return { status: false, message: 'internal Server Error'}
     }
+
 }
 
-export {SendOtp, sendVerificationEmail};
+const sendIssueNotificationEmail =  async ( therapistEmail: string, therapistName: string, issueDescription: string, userName: string) : Promise<SendEmailResponse> => {
+    try {
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASSWORD
+            }, 
+            tls: {
+                rejectUnauthorized: false,
+            },
+        });
+
+        const subject = `Issue Raised by User: ${userName}`;
+
+        const message = `
+            <p>Dear ${therapistName},</p>
+            <p>A user has raised an issue regarding your session:</p>
+            <p><strong>User Name:</strong> ${userName}</p>
+            <p><strong>Issue Description:</strong> ${issueDescription}</p>
+            <p>Please address this issue as soon as possible.</p>
+        `;
+
+        const info = await transporter.sendMail({
+            from: process.env.EMAIL,
+            to: therapistEmail,
+            subject: subject,
+            text: `A user (${userName}) has raised an issue: ${issueDescription}`,
+            html: message,
+        })
+
+        if (info.accepted.length > 0) {
+            return { status: true}
+        } else {
+            return { status: false, message: 'Failed to send Email'}
+        }
+
+    } catch (error) {
+        console.error(`Error sending email:`, error);
+        return { status: false, message: 'Internal Server Error'}
+    }
+}
+
+export {SendOtp, sendVerificationEmail, sendIssueNotificationEmail };

@@ -99,7 +99,7 @@ const UserWallet: React.FC = () => {
                     >
                         Next
                     </button>
-                </div>
+         </div>
 
     </div>
 

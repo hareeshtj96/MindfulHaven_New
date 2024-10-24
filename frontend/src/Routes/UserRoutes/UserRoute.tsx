@@ -21,6 +21,7 @@ import ProtectedRoute from "../../ProtectedRoute/ProtectedRoute";
 import VideoCall from "../../Components/User/VideoComponent";
 import ChangePassword from "../../Components/User/ChangePassword";
 import UserWallet from "../../Components/User/UserWallet";
+import IssueManagement from "../../Components/User/IssueManagement";
 
 
 function UserRoute() {
@@ -51,6 +52,7 @@ function UserRoute() {
             <Route path="/booking_status/:bookingId" element={<BookingStatusPage /> }/>
             <Route path="/payment" element={<PaymentManagementPage />}/>
             <Route path="/video-call/:roomId" element={<VideoCall /> } />
+            <Route path="/issue_management" element={<IssueManagement />} />
 
             <Route path="/*" element={<PageNotFoundPage />}/>
         </Routes>

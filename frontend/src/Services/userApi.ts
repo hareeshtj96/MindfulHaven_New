@@ -27,3 +27,4 @@ export const CANCELAPPOINTMENT = `${BASE_URL}/cancel_appointment`;
 export const GEMINIAPI = `${BASE_URL}/search`;
 export const CHANGEPASSWORD = `${BASE_URL}/changePassword`;
 export const WALLETDETAILS = `${BASE_URL}/walletDetails`;
+export const SUBMITISSUE = `${BASE_URL}/submitIssue`;

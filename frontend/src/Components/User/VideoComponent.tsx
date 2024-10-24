@@ -16,7 +16,7 @@ const VideoCall: React.FC = () => {
 
     const handleLeaveRoom = async () => {
         console.log('user left the room');
-        navigate('/sessions');
+        navigate('/issue_management');
     };
 
     useEffect(() => {

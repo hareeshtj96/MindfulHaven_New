@@ -51,7 +51,8 @@ export default (dependencies: any) =>{
        cancelAppointment,
        geminiAPIController,
        changePasswordController,
-       walletDetailsController
+       walletDetailsController,
+       submitIssueController
     } = userController(dependencies);
 
 
@@ -83,6 +84,7 @@ export default (dependencies: any) =>{
     router.post('/search', geminiAPIController);
     router.put('/changePassword', changePasswordController);
     router.get('/walletDetails', walletDetailsController);
+    router.post('/submitIssue', submitIssueController);
 
     return router;
 }

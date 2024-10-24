@@ -6,7 +6,9 @@ import { ADMINLOGIN,
     GOTVERIFIED,
     GOTBLOCKUNBLOCK,
     GETTHERAPISTDETAILS,
-    GETDASHBOARDDETAILS
+    GETDASHBOARDDETAILS,
+    FETCHISSUES,
+    RESOLVEISSUE
  } from "../../../Services/adminApi";
 
 
@@ -65,6 +67,7 @@ interface AdminState {
     totalTherapists: number,
     totalAppointments: number,
     totalRevenue: number,
+    issues: []
     }
 
 const initialState: AdminState = {
@@ -82,6 +85,7 @@ const initialState: AdminState = {
     totalTherapists: 0,
     totalAppointments: 0,
     totalRevenue: 0,
+    issues: []
 }
 
 export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, password: string }, { rejectValue: string }>(
@@ -161,6 +165,20 @@ export const fetchUsers = createAsyncThunk<User[], void, {rejectValue: string}>(
 )
 
 
+export const fetchIssues = createAsyncThunk("admin/fetchIssues",
+    async (_, thunkAPI) => {
+        try {
+            const response = await axios.get(FETCHISSUES);
+            console.log("response from fetch issues slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to fetch issues";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
 export const fetchDashboardDetails = createAsyncThunk("admin/dashboardDetails",
     async (_, thunkAPI) => {
         try {
@@ -170,6 +188,23 @@ export const fetchDashboardDetails = createAsyncThunk("admin/dashboardDetails",
             
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch dashboard details";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
+export const resolveIssue = createAsyncThunk(
+    "admin/resolveIssue",
+    async (issueId: string, thunkAPI) => {
+        try {
+            console.log("issue id in slice:", issueId);
+            const response = await axios.post(RESOLVEISSUE, { issueId});
+            console.log("Response from resolve issue slice:", response);
+
+            return response.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to resolve the issue";
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -274,9 +309,9 @@ const adminSlice = createSlice({
                 console.log("Action payload:", action.payload);
             
                 // Set the therapists data and pagination information
-                state.therapists = action.payload.therapists;  // Access therapists from the payload
-                state.totalPages = action.payload.totalPages;  // Set totalPages from the payload
-                state.currentPage = action.payload.currentPage;  // Set currentPage from the payload
+                state.therapists = action.payload.therapists; 
+                state.totalPages = action.payload.totalPages;  
+                state.currentPage = action.payload.currentPage;  
             })
             .addCase(fetchTherapists.rejected, (state, action: PayloadAction<string | undefined>) => {
                 state.loading = false;
@@ -321,6 +356,19 @@ const adminSlice = createSlice({
                 state.totalRevenue = totalRevenue;
             })
             .addCase(fetchDashboardDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(fetchIssues.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchIssues.fulfilled, (state, action) => {
+                state.loading = false;
+                state.issues = action.payload  
+                state.error = null;
+            })
+            .addCase(fetchIssues.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });
