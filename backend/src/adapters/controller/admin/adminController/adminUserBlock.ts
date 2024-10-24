@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 dotenv.config()
@@ -13,7 +14,7 @@ export default (dependencies: any) => {
             
             const userId = req.params.id;
             if(!userId) {
-                return res.status(400).json({ status: false, message: "user ID is required"})
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.USER_ID_REQUIRED })
             }
 
             console.log("user ID:", userId);
@@ -22,13 +23,13 @@ export default (dependencies: any) => {
 
             if(response && response.status) {
                 console.log("response form controller:", response)
-                return res.status(200).json({ status: true, data: response.data});
+                return res.status(HttpStatusCode.NOT_FOUND).json({ status: true, data: response.data});
             } else {
-                return res.status(404).json({ status: false, message: "Data not found"})
+                return res.status(404).json({ status: false, message: ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
             console.error("Error in block unblock user:", error);
-            return res.status(500).json({status: false, message: "Internal Server Error"});
+            return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     }
     return adminUserblockController

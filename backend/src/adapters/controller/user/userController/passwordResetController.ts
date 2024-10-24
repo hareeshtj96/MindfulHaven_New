@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 
 dotenv.config();
 
@@ -22,7 +23,7 @@ export default function resetPassword(dependencies: any) {
             const token = authHeader?.split(" ")[1];
             console.log("token from resetcontroller:", token);
             if (!token) {
-                return res.status(401).json({ status: false, message: "Token is missing" });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_MISSING });
             }
 
             // Decode the token to extract the email
@@ -32,12 +33,12 @@ export default function resetPassword(dependencies: any) {
                 console.log("Decoded token data:", decoded);
             } catch (error) {
                 console.error("Error verifying token:", error);
-                return res.status(401).json({ status: false, message: "Invalid or expired token" });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_EXPIRED });
             }
 
             const email = decoded.email;
             if (!email) {
-                return res.status(400).json({ status: false, message: "Email not found in token" });
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.EMAIL_NOT_FOUND_IN_TOKEN });
             }
 
             console.log("Email extracted from token:", email);
@@ -49,13 +50,13 @@ export default function resetPassword(dependencies: any) {
             console.log("Result from reset password controller:", result);
 
             if (result.status) {
-                res.json({ status: true, message: "Password reset successful" });
+                res.json({ status: true, message: ResponseMessages.PASSWORD_RESET_SUCCESSFULLY });
             } else {
-                res.status(400).json({ status: false, message: result.data });
+                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: result.data });
             }
         } catch (error) {
             console.error("Error in reset password controller:", error);
-            res.status(500).json({ status: false, message: "Internal Server Error" });
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };
 

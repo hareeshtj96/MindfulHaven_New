@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { SendOtp } from "../../utils";
 import dotenv from 'dotenv';
 dotenv.config();
+import { HttpStatusCode, ResponseMessages } from "../../utils/httpStatusCode";
 
 const SECRET_KEY = process.env.JWT_SECRET || 'undefined';
 
@@ -20,7 +21,7 @@ export default function therapistRegistration(dependencies: any) {
             console.log("Exists:", therapistExists);
             if (therapistExists.status) {
                 console.log("therapist already exists error triggered:");
-                return { status: false, data: "therapist already exists"};
+                return { status: false, data: ResponseMessages.THERAPIST_ALREADY_EXISTS};
             }
 
 
@@ -40,7 +41,7 @@ export default function therapistRegistration(dependencies: any) {
             }
         } catch (error) {
             console.error('Error in therapist registration use case:', error);
-            return { status: false, message: 'Internal server error' };
+            return { status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }
     return {

@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import { ResponseMessages } from "../../utils/httpStatusCode";
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET || "undefined";
@@ -18,13 +19,13 @@ export default function userLogin(dependencies: any) {
             console.log("user found:", user);
 
             if(!user.status) {
-                return {status: false, data: "Invalid email or password"};
+                return {status: false, data: ResponseMessages.INVALID_EMAIL_OR_PASSWORD };
             }
             
             //verify the password
             const isPasswordValid = await bcrypt.compare(password, user.data.password);
             if(!isPasswordValid) {
-                return { status: false, data: "Invalid email or password"}
+                return { status: false, data: ResponseMessages.INVALID_EMAIL_OR_PASSWORD }
             }
 
             const token = jwt.sign(
@@ -35,7 +36,7 @@ export default function userLogin(dependencies: any) {
             return {status: true, token};
         } catch (error) {
             console.error("Error in user login use case:", error);
-            return {status: false, data: "Internal Server Error"}
+            return {status: false, data: ResponseMessages.INTERNAL_SERVER_ERROR }
         }
     }
     return {

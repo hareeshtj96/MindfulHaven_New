@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import dependencies from "../../../../frameworks/config/dependencies";
 import { ZegoExpressEngine } from "zego-express-engine-webrtc";
 import { generateZegoToken } from "../../../../utils/generateZegoToken";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 
 dotenv.config();
 
@@ -22,14 +23,14 @@ export default (dependencies: any) => {
             console.log("authHeader:", authHeader);
 
             if (!authHeader || !authHeader.startsWith('Bearer')) {
-                return res.status(401).json({ status: false, message: "Authorization header is missing or invalid"})
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.AUTHORIZATION_HEAD_MISSING })
             }
 
             const token = authHeader.split(' ')[1];
             console.log("token:", token);
 
             if (!token) {
-                return res.status(401).json({ status: false, message: "Token is missing"});
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_MISSING });
 
             }
 
@@ -43,7 +44,7 @@ export default (dependencies: any) => {
             console.log("request body....", req.body);
 
             if (!bookingId) {
-                return res.status(400).json({ status: false, message: "Booking ID is required"})
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.BOOKING_ID_REQUIRED })
             }
 
             
@@ -52,14 +53,14 @@ export default (dependencies: any) => {
 
             if (response && response.status) {
                 console.log("response from controller:", response);
-                res.status(200).json({ status: true, data: response.data});
+                res.status(HttpStatusCode.OK).json({ status: true, data: response.data});
             } else {
-                res.status(404).json({ status: false, message: "Unable to join video session"})
+                res.status(HttpStatusCode.NOT_FOUND).json({ status: false, message: ResponseMessages.UNABLE_TO_JOIN_VIDEO })
             }
             
         } catch (error) {
             console.error("Error in join video session:", error);
-            return res.status(401).json({ status: false, message: "Token expired or invalid "})
+            return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_EXPIRED })
         }
         
     }

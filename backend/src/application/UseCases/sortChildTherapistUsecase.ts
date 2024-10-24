@@ -1,4 +1,5 @@
 import dependencies from "../../frameworks/config/dependencies";
+import { ResponseMessages } from "../../utils/httpStatusCode";
 
 export default (dependencies: any) => {
     const { userRepository } = dependencies.repository;
@@ -18,7 +19,7 @@ export default (dependencies: any) => {
             
         } catch (error) {
             console.error("Error in sorting therapist use case...", error);
-            return { status: false, message: "Error fetching sorted therapists"}
+            return { status: false, message: ResponseMessages.ERROR_FETCHING_SORTED_THERAPIST }
         }
     }
     return { executeFunction }

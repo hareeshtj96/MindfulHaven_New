@@ -1,3 +1,5 @@
+import { ResponseMessages } from "../../utils/httpStatusCode";
+
 import dependencies from "../../frameworks/config/dependencies";
 
 export default (dependencies: any) => {
@@ -14,7 +16,7 @@ export default (dependencies: any) => {
             }
         } catch (error) {
             console.log(error);
-            return { status: false, message: "Error in adminUseCase"};
+            return { status: false, message: ResponseMessages.ERROR_IN_ADMIN_USECASE };
         }
     }
     return {executeFunction}

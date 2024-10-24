@@ -1,4 +1,4 @@
-
+import { ResponseMessages } from "../../utils/httpStatusCode";
 import bcrypt from "bcryptjs";
 
 interface ForgotPasswordData {
@@ -25,7 +25,7 @@ export default function resetPassword(dependencies: any) {
 
             // Check if passwords match
             if (newPassword !== confirmPassword) {
-                return { status: false, data: "Passwords do not match" };
+                return { status: false, data: ResponseMessages.PASSWORD_DO_NOT_MATCH };
             }
 
 
@@ -37,13 +37,13 @@ export default function resetPassword(dependencies: any) {
             const updateResult = await userRepository.updateUserPassword({ email, hashedPassword });
 
             if (!updateResult.status) {
-                return { status: false, data: "Failed to reset password" };
+                return { status: false, data: ResponseMessages.FAILED_TO_RESET_PASSWORD };
             }
 
-            return { status: true, data: "Password reset successful" };
+            return { status: true, data: ResponseMessages.PASSWORD_RESET_SUCCESSFULLY };
         } catch (error) {
             console.error("Error in forgot password use case:", error);
-            return { status: false, data: "Internal Server Error" };
+            return { status: false, data: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }
 

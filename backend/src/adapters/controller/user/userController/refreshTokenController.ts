@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { HttpStatusCode, ResponseMessages } from '../../../../utils/httpStatusCode';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -23,13 +24,13 @@ export const refreshTokenController = (dependencies: any) => {
         console.log("refresh token from controller:", refreshToken);
 
         if (!refreshToken) {
-            return res.status(403).json({ message: 'Refresh token not provided' });
+            return res.status(HttpStatusCode.FORBIDDEN).json({ message: ResponseMessages.REFRESH_TOKEN_NOT_PROVIDED });
         }
 
         // Verify refresh token
         jwt.verify(refreshToken, REFRESH_SECRET_KEY, (err:any, decoded:any) => {
             if (err) {
-                return res.status(403).json({ message: 'Invalid refresh token' });
+                return res.status(HttpStatusCode.FORBIDDEN).json({ message: ResponseMessages.INVALID_REFRESH_TOKEN });
             }
 
             // Check if decoded is JwtPayload to access its properties
@@ -59,7 +60,7 @@ export const refreshTokenController = (dependencies: any) => {
                 return res.json({ accessToken: newAccessToken });
             }
 
-            return res.status(403).json({ message: 'Invalid refresh token payload' });
+            return res.status(HttpStatusCode.FORBIDDEN).json({ message: ResponseMessages.INVALID_REFRESH_TOKEN_PAYLOAD });
         });
     }
 };

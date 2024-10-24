@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import dependencies from "../../../../frameworks/config/dependencies";
 import dotenv from 'dotenv'
@@ -17,7 +18,7 @@ export default (dependencies: any) => {
         try {
             const token = req.headers.authorization?.split(' ')[1];
             if (!token) {
-                return res.status(401).json({ status: false, message: "Unauthorized"});
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.UNAUTHORIZED });
             
             }
 
@@ -33,13 +34,13 @@ export default (dependencies: any) => {
             console.log("response from controller:", response);
 
             if (response && response.status) {
-                res.status(200).json({ status: true, data: response.data })
+                res.status(HttpStatusCode.OK).json({ status: true, data: response.data })
             } else {
-                res.status(400).json({ status: false, message: response.message});
+                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message});
             }
         } catch (error) {
             console.error("Error in therapist update timings controller:", error);
-            return res.status(401).json({ status: false, message:"Token expired Error"});
+            return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_EXPIRED });
         }
         
     };

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Razorpay from 'razorpay';
+import { HttpStatusCode, ResponseMessages } from '../../../../utils/httpStatusCode';
 
 
 export default (dependencies: any) => {
@@ -22,12 +23,12 @@ export default (dependencies: any) => {
       
 
       if (!paymentData || !paymentData.status) {
-        return res.status(400).json({ status: false, message: 'payment creation failed' });
+        return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.PAYMENT_CREATION_FAILED });
       }
 
 
       // Send the order details to the frontend
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         status: true,
         razorpayOrderId: paymentData.appointmentData.razorpayOrderId,
         amount: paymentData.appointmentData.amount,
@@ -35,7 +36,7 @@ export default (dependencies: any) => {
       });
     } catch (error) {
       console.error('Error in payment management controller:', error);
-      res.status(500).json({ status: false, message: 'Internal Server Error' });
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
     }
   };
 

@@ -1,6 +1,7 @@
 import dependencies from "../../frameworks/config/dependencies";
 import generateToken, {verifyToken} from "../../utils/generateToken";
 import { JwtPayload } from "jsonwebtoken";
+import { ResponseMessages } from "../../utils/httpStatusCode";
 
 
 const REFRESH_SECRET_KEY = process.env.JWT_REFRESH_SECRET || "your-refresh-secret-key";
@@ -17,17 +18,17 @@ export default (dependencies: any) => {
             console.log("user id from use case refresh token:", userId);
 
             if(!userId) {
-                return { status: false, message: 'Invalid token payload'};
+                return { status: false, message: ResponseMessages.INVALID_TOKEN_PAYLOAD };
             }
 
             const User = await userRepository.getUserByEmail(userId.email);
 
             if(!User) {
-                return { status: false, message: "User not found"};
+                return { status: false, message: ResponseMessages.USER_NOT_FOUND };
             }
 
             if(User.isBlocked) {
-                return { status: false, message:'User is blocked'};
+                return { status: false, message: ResponseMessages.USER_IS_BLOCKED };
             }
 
             const { accessToken, refreshToken: newRefreshToken} = generateToken({ userId });
@@ -35,7 +36,7 @@ export default (dependencies: any) => {
             return { status: true, data: {accessToken, refreshToken: newRefreshToken}}
         } catch (error) {
             console.error('Error in exceuteFunction:', error);
-            return { status: false, message: 'internal Server Error'};
+            return { status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }
     return { executionFunction }

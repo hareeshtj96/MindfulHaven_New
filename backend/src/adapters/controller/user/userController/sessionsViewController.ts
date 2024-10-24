@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 
 
 dotenv.config();
@@ -27,7 +28,7 @@ export default (dependencies: any) => {
             console.log("authheader:", authHeader);
 
             if (!authHeader || !authHeader.startsWith('Bearer ')) {
-                return res.status(401).json({ status: false, message: "Authorization header is missing or invalid" });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.AUTHORIZATION_HEAD_MISSING });
             }
 
             console.log("secret key:", SECRET_KEY);
@@ -36,7 +37,7 @@ export default (dependencies: any) => {
             console.log("token:", token);
 
             if (!token) {
-                return res.status(401).json({ status: false, message: "Token is missing" });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_MISSING });
             }
 
             // Verify and decode the token
@@ -46,20 +47,20 @@ export default (dependencies: any) => {
             console.log("userId from decoded token:", userId);
 
             if (!userId) {
-                return res.status(400).json({ status: false, message: "userId not found in the token" });
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.USER_ID_NOT_IN_TOKEN });
             }
 
            
             const response = await getAllBookings(dependencies).executeFunction({ userId, page, limit });
 
             if( response && response.status) {
-                res.status(200).json({ status: true, data: response.data });
+                res.status(HttpStatusCode.OK).json({ status: true, data: response.data });
             } else {
-                res.status(400).json({ status: false, message: response.message ||"Data not found" })
+                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
             console.error("Error in  sessions view controller:", error);
-            return res.status(401).json({status: false, message: "Token expired"});
+            return res.status(HttpStatusCode.UNAUTHORIZED).json({status: false, message: ResponseMessages.TOKEN_EXPIRED });
         }
     }
     return sessionsViewController;

@@ -1,3 +1,4 @@
+import { ResponseMessages } from "../../utils/httpStatusCode";
 
 export default (dependencies: any) => {
     const { userRepository } = dependencies.repository;
@@ -17,7 +18,7 @@ export default (dependencies: any) => {
             }
         } catch (error) {
             console.log(error);
-            return { status: false, message: "Error in get cancelled booking useCase"};
+            return { status: false, message: ResponseMessages.ERROR_IN_CANCELLED_BOOKING_USECASE };
         }
     }
     return {executeFunction}

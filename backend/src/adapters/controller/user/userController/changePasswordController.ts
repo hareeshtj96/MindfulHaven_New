@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import dependencies from "../../../../frameworks/config/dependencies";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 
 
 export default (dependencies: any) => {
@@ -17,13 +18,13 @@ export default (dependencies: any) => {
             console.log("response from change password controller:", response);
 
             if (response && response.status) {
-                return res.status(200).json({ status: true, message: "Password changed successfully"})
+                return res.status(HttpStatusCode.OK).json({ status: true, message: ResponseMessages.PASSWORD_CHANGED_SUCCESSFULLY })
             } else {
-                return res.status(400).json({ status: false, message: response.message || "Failed to change password"})
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || ResponseMessages.FAILED_TO_CHANGE_PASSWORD })
             }
         } catch (error) {
             console.error("Error in change password controller:", error);
-            return res.status(500).json({ status: false, message: "internal server Error"});
+            return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
         
     }

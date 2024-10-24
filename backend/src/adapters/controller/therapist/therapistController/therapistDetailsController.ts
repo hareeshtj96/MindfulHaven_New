@@ -4,6 +4,7 @@ import { Therapist } from "../../../../frameworks/database/schema/therapistSchem
 import { RRule, RRuleSet } from "rrule";
 import { create } from "domain";
 import { Number } from "mongoose";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 
 dotenv.config();
 
@@ -62,7 +63,7 @@ export default function therapistDetailsController(dependencies: any) {
             console.log("req.body", req.body);
 
             if(!req.body.therapistData) {
-                return res.status(400).json({ message: "Therapist data is missing"});
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ message: ResponseMessages.THERAPIST_DATA_MISSING });
             }
             
             const therapistData = JSON.parse(req.body.therapistData);
@@ -133,13 +134,13 @@ export default function therapistDetailsController(dependencies: any) {
             console.log("save result data:", saveResult);
 
             if(!saveResult) {
-                return res.status(500).json({ message: "Failed to save therapist data"});
+                return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.FAILED_TO_SAVE_THERAPIST_DATA });
             }
 
-            res.status(201).json({ status: true, message: "Therapist details saved successfully", data: saveResult.data});
+            res.status(HttpStatusCode.OK).json({ status: true, message: ResponseMessages.THERAPIST_SAVED,  data: saveResult.data});
         } catch (error) {
             console.error("Error in therapistDetailsController:", error);
-            res.status(500).json({ message: "Internal Server Error"});
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error"});
         }
     };
 

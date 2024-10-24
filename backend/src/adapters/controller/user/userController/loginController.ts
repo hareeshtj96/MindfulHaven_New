@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 
 
 dotenv.config();
@@ -24,10 +25,10 @@ export default function userLogin (dependencies: any) {
             console.log('user:', user);
 
             if (!user.status) {
-                return res.status(400).json({ message: "User not found" });
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ message: ResponseMessages.USER_NOT_FOUND });
             }
             if (user.data.isBlocked) {
-                return res.status(403).json({ message: "User is blocked. Please contact support." });
+                return res.status(HttpStatusCode.FORBIDDEN).json({ message: ResponseMessages.USER_IS_BLOCKED });
             }
 
             console.log("secret key....", SECRET_KEY);
@@ -35,7 +36,7 @@ export default function userLogin (dependencies: any) {
             // Compare provided password with the stored hashed password
             const validPassword = await bcrypt.compare(password, user.data.password);
             if (!validPassword) {
-                return res.status(400).json({ message: "Invalid password" });
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ message: ResponseMessages.INVALID_PASSWORD });
             }
 
             // Generate JWT token upon successful login
@@ -66,7 +67,7 @@ export default function userLogin (dependencies: any) {
             res.json({ status: true, token });
         } catch (error) {
             console.error("Error in loginController:", error);
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };
 

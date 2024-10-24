@@ -1,4 +1,5 @@
 import dependencies from "../../frameworks/config/dependencies";
+import { ResponseMessages } from "../../utils/httpStatusCode";
 
 export default (dependencies: any) => {
     const { therapistRepository } = dependencies.repository;
@@ -16,7 +17,7 @@ export default (dependencies: any) => {
             }
         } catch (error) {
             console.log(error);
-            return { status: false, message: "Error in therapist details usecase"};
+            return { status: false, message: ResponseMessages.ERROR_IN_THERAPIST_USECASE };
         }
     }
     return {executeFunction}

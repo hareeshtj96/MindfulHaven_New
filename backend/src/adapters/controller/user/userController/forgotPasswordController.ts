@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 
 dotenv.config();
 
@@ -40,13 +41,13 @@ export default function forgotPassword(dependencies: any) {
                 )
                 console.log("token from forgotpasswordcontoller:", token);
 
-                res.json({status: true, message: "OTP sent to email", token});
+                res.json({status: true, message: ResponseMessages.OTP_SENT_TO_MAIL, token});
             } else {
-                res.status(400).json({ status: false, message: result.data});
+                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: result.data});
             }
         } catch (error) {
             console.error("Error in forgot password controller:", error);
-            res.status(500).json({ status: false, message: "internal Server Error"});
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     }
     return forgotPasswordController;

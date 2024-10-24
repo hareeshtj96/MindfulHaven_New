@@ -1,3 +1,4 @@
+import { ResponseMessages } from "../../utils/httpStatusCode";
 
 export default (dependencies: any) => {
     const { userRepository } = dependencies.repository;
@@ -10,13 +11,13 @@ export default (dependencies: any) => {
             console.log("response from use case:", response);
             
             if(response && response.status) {
-                return { status: true, message: "Password updated successfully"};
+                return { status: true, message: ResponseMessages.PASSWORD_RESET_SUCCESSFULLY };
             } else  {
-                return { status: false, message: response.message || "Failed to change password"}
+                return { status: false, message: response.message || ResponseMessages.FAILED_TO_CHANGE_PASSWORD }
             }
         } catch (error) {
             console.log(error);
-            return { status: false, message: "Error in change password useCase"};
+            return { status: false, message: ResponseMessages.ERROR_IN_CHANGE_PASSWORD_USECASE };
         }
     }
     return {executeFunction}

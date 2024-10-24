@@ -1,5 +1,5 @@
 import Razorpay from 'razorpay';
-
+import { ResponseMessages } from '../../utils/httpStatusCode';
 export default (dependencies: any) => {
   const { userRepository } = dependencies.repository;
 
@@ -68,20 +68,20 @@ export default (dependencies: any) => {
             },
           };
         } else {
-          return { status: false, message: 'Failed to save payment data.' };
+          return { status: false, message: ResponseMessages.FAILED_TO_SAVE_PAYMENT_dATA };
         }
       } else {
         // Return response indicating payment was not successful
         return {
           status: false,
-          message: 'Payment was not successful; no data saved.',
+          message: ResponseMessages.PAYMENT_NOT_SUCCESSFUL,
         };
       }
     } catch (error: any) {
       console.error("Error in savePaymentUsecase:", error);
       return {
         status: false,
-        message: error.message || "Payment creation failed.",
+        message: error.message || ResponseMessages.PAYMENT_CREATION_FAILED,
       };
     }
   };

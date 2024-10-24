@@ -1,5 +1,6 @@
 
 import Razorpay from 'razorpay';
+import { ResponseMessages } from '../../utils/httpStatusCode';
 
 export default (dependencies: any) => {
     const { userRepository } = dependencies.repository;
@@ -19,18 +20,6 @@ export default (dependencies: any) => {
       }
       console.log("therapist ID .........", therapistId);
 
-    //   // Fetch therapist fees 
-    //   const therapistDetails = await userRepository.getTherapistDetails(therapistId);
-    //   console.log("therapist details....", therapistDetails);
-      
-
-    //   if (!therapistDetails || !therapistDetails.data.fees) {
-    //     throw new Error("unable to retrieve therapist fees");
-    //   }
-
-    //   const therapistFees = therapistDetails.data.fees;
-
-
       // Create an order with Razorpay
       const razorpayOrder = await razorpay.orders.create({
         amount: totalAmount * 100, 
@@ -40,41 +29,6 @@ export default (dependencies: any) => {
       });
 
       console.log("razorpay order.....", razorpayOrder);
-
-    //   // save payment details to databse using userRepository
-    //   const paymentData = {
-    //      therapistId,
-    //      userId, 
-    //      slot, 
-    //      notes, 
-    //      totalAmount, 
-    //      razorpayOrderId: razorpayOrder.id,
-    //      amount: therapistFees,
-    //      currency: razorpayOrder.currency,
-    //      status: 'created',
-    //      paymentMethod: 'razorpay',
-    //      paymentStatus: paymentStatus
-    //   }
-
-    //   console.log("payment data from use case..............", paymentData);
-      
-      
-    //   const savePaymentResponse = await userRepository.savePayment(paymentData);
-
-    //   // Return order details
-    //   if (savePaymentResponse.status) {
-    //     return {
-    //         status: true,
-    //         appointmentData: {
-    //           razorpayOrderId: razorpayOrder.id,
-    //           amount: razorpayOrder.amount,
-    //           currency: razorpayOrder.currency,
-    //         },
-    //       };
-
-    //   } else {
-    //     return { status: false, message: 'Failed to save payment data'}
-    //   }
 
 
     return {
@@ -90,7 +44,7 @@ export default (dependencies: any) => {
       console.error("Error in getPaymentUsecase:", error);
       return {
         status: false,
-        message: error.message || "Payment creation failed.",
+        message: error.message || ResponseMessages.PAYMENT_CREATION_FAILED,
       };
     }
   };

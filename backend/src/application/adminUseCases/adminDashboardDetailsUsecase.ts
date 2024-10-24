@@ -1,6 +1,7 @@
+import { ResponseMessages } from "../../utils/httpStatusCode";
+
 export default (dependencies: any) => {
     const { adminRepository } = dependencies.repository;
-
     
     const executeFunction = async () => {
         console.log("entered use case:.....")
@@ -11,11 +12,11 @@ export default (dependencies: any) => {
             if(response.status) {
                 return { status: true, data: response.data};
             } else  {
-                return { status: false, message: response.message || "Error fetching data"}
+                return { status: false, message: response.message || ResponseMessages.ERROR_FETCHING_DATA }
             }
         } catch (error) {
             console.log(error);
-            return { status: false, message: "Error in admin dashboard details useCase"};
+            return { status: false, message: ResponseMessages.ERROR_IN_ADMIIN_DASHBOARD_USECASE };
         }
     }
     return {executeFunction}

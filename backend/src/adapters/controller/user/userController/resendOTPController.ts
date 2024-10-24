@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 import dotenv from 'dotenv';
 import { SendOtp } from "../../../../utils";
 dotenv.config();
@@ -15,13 +16,13 @@ export default (dependencies: any) => {
         try {
             const authHeader = req.headers.authorization;
             if(!authHeader) {
-                return res.status(401).json({ status: false, message: "Authorization header is missing"});
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.AUTHORIZATION_HEAD_MISSING });
             }
 
             const token = authHeader.split(" ")[1];
             console.log("token from resend otp:", token);
             if(!token) {
-                return res.status(401).json({ status: false, message: "Token is missing"});
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_MISSING });
             }
 
             const decodedToken: any = jwt.verify(token, SECRET_KEY);
@@ -31,14 +32,14 @@ export default (dependencies: any) => {
             console.log("email from decoded token:", email);
 
             if(!email) {
-                return res.status(400).json({ status: false, message: "Email not found in the token"});
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.EMAIL_NOT_FOUND_IN_TOKEN });
             }
 
            
             const response = await SendOtp(email);
             console.log("response from resend otp:", response);
             if(!response.status) {
-                return res.status(500).json({ status: false, message: "Failed to send OTP"})
+                return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.FAILED_TO_SENT_OTP })
             }
 
             const newToken = jwt.sign(
@@ -47,10 +48,10 @@ export default (dependencies: any) => {
                 { expiresIn: "10m"}
             );
             console.log("new token :", newToken);
-            res.json({ status: true, message: "OTP resent successfully", token: newToken});
+            res.json({ status: true, message: ResponseMessages.OTP_RESENT_SUCCESSFULLY, token: newToken});
         } catch (error) {
             console.error("Error in resend OTP:", error);
-            res.status(500).json({ message: "Internal Server Error"});
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     }
     return resendOtpController;

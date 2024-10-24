@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 
 
 export default (dependencies: any) => {
@@ -15,13 +16,13 @@ export default (dependencies: any) => {
 
             if( response && response.status) {
                 console.log("response from controller:", response);
-                res.status(200).json({ status: true, data: response.data });
+                res.status(HttpStatusCode.OK).json({ status: true, data: response.data });
             } else {
-                res.status(400).json({ status: false, message: response.message ||"Data not found" })
+                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
             console.error("Error in booking status controller:", error);
-            return res.status(401).json({status: false, message: "Token expired"});
+            return res.status(HttpStatusCode.UNAUTHORIZED).json({status: false, message: ResponseMessages.TOKEN_EXPIRED });
         }
     }
     return bookingStatusController;

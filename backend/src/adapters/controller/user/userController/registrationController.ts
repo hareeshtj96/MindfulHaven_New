@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 
@@ -58,11 +59,11 @@ export default (dependencies: any) => {
 
                 res.json({ status: true, token });
             } else {
-                res.status(400).json({ status: false, data: response.data });
+                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, data: response.data });
             }
         } catch (error) {
             console.error('Error in registration:', error);
-            res.status(500).json({ message: 'Internal Server Error' });
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };
 

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { HttpStatusCode, ResponseMessages } from '../../../../utils/httpStatusCode';
 import Razorpay from 'razorpay';
 
 
@@ -24,18 +25,18 @@ export default (dependencies: any) => {
       
 
       if (!paymentData || !paymentData.status) {
-        return res.status(400).json({ status: false, message: 'payment creation failed' });
+        return res.status(400).json({ status: false, message: ResponseMessages.PAYMENT_CREATION_FAILED });
       }
 
 
       // Send the order details to the frontend
-      res.status(200).json({
-        status: true, message: "Successful created payment", paymentId: paymentData.paymentId
+      res.status(HttpStatusCode.OK).json({
+        status: true, message: ResponseMessages.SUCCESSFULLY_CREATED_PAYMENT, paymentId: paymentData.paymentId
        
       });
     } catch (error) {
       console.error('Error in verify payment controller:', error);
-      res.status(500).json({ status: false, message: 'Internal Server Error' });
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
     }
   };
 

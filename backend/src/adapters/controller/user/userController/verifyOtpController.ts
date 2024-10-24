@@ -1,5 +1,6 @@
 import jwt, { VerifyErrors } from "jsonwebtoken";
 import { Request, Response } from "express";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -20,7 +21,7 @@ export default (dependencies: any) => {
             console.log("token:", token);
 
             if (!token) {
-                return res.status(401).json({ status: false, message: "Token is missing" });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_MISSING });
             }
 
             let decoded: any;
@@ -28,7 +29,7 @@ export default (dependencies: any) => {
                 decoded = jwt.verify(token, SECRET_KEY);
                 console.log("decoded token data:", decoded);
             } catch (err) {
-                return res.status(401).json({ status: false, message: "Invalid or expired token" });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_EXPIRED });
             }
 
             // Compare the OTP from the token with the OTP provided in the request body
@@ -37,23 +38,23 @@ export default (dependencies: any) => {
                 console.log("user data from otp controller", userData);
 
                 if (!userData) {
-                    return res.status(400).json({ status: false, message: "User data is missing" });
+                    return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.USER_DATA_MISSING });
                 }
 
                 try {
                     const result = await userRepository.createUser(userData);
-                    res.json({ status: true, message: "OTP is verified and user is registered successfully", data: result });
+                    res.json({ status: true, message: ResponseMessages.OTP_VERIFIED_USER_REGISTERED_SUCCESSFULLY, data: result });
                 } catch (dbError) {
                     console.error("Error saving user to the database:", dbError);
-                    res.status(500).json({ status: false, message: "Failed to save user data" });
+                    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.FAILED_TO_SAVE_USER_DATA });
                 }
             } else {
                 console.log("Incorrect OTP provided");
-                res.status(400).json({ status: false, message: "Incorrect OTP" });
+                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.INCORRECT_OTP });
             }
         } catch (error) {
             console.error("Error in OTP verification:", error);
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };
 

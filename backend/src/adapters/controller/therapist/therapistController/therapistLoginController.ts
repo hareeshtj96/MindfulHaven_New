@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
@@ -23,13 +24,13 @@ export default function therapistLogin (dependencies: any) {
             console.log('therapist:', therapist );
 
             if (!therapist.status) {
-                return res.status(400).json({ message: "Account not found" });
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ message: ResponseMessages.ACCOUNT_NOT_FOUND });
             }
 
             // Compare provided password with the stored hashed password
             const validPassword = await bcrypt.compare(password, therapist.user.password);
             if (!validPassword) {
-                return res.status(400).json({ message: "Invalid password" });
+                return res.status(HttpStatusCode.BAD_REQUEST).json({ message: ResponseMessages.INVALID_PASSWORD });
             }
 
             // Generate JWT token upon successful login
@@ -63,7 +64,7 @@ export default function therapistLogin (dependencies: any) {
             res.json({ status: true, token, therapist: therapistDetails });
         } catch (error) {
             console.error("Error in therapist loginController:", error);
-            res.status(500).json({ message: "Internal Server Error" });
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };
 

@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { SendOtp } from "../../utils";
+import { ResponseMessages } from "../../utils/httpStatusCode";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -18,7 +19,7 @@ export default function forgotPassword(dependencies: any) {
             console.log("userExists:", userExists);
             if (!userExists.status) {
                 console.log("user not found:");
-                return { status: false, data: "User not found"};
+                return { status: false, data: ResponseMessages.USER_NOT_FOUND };
             }
 
 
@@ -32,7 +33,7 @@ export default function forgotPassword(dependencies: any) {
             }
         } catch (error) {
             console.error('Error in user registration use case:', error);
-            return { status: false, message: 'Internal server error' };
+            return { status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }
     return {

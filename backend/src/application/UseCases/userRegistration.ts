@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { SendOtp } from "../../utils";
 import dotenv from 'dotenv';
+import { ResponseMessages } from "../../utils/httpStatusCode";
 dotenv.config();
 
 
@@ -20,7 +21,7 @@ export default function userRegistration(dependencies: any) {
             console.log("userExists:", userExists);
             if (userExists.status) {
                 console.log("user already exists error triggered:");
-                return { status: false, data: "User already exists"};
+                return { status: false, data: ResponseMessages.USER_ALREADY_EXISTS };
             }
 
 
@@ -40,7 +41,7 @@ export default function userRegistration(dependencies: any) {
             }
         } catch (error) {
             console.error('Error in user registration use case:', error);
-            return { status: false, message: 'Internal server error' };
+            return { status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }
     return {

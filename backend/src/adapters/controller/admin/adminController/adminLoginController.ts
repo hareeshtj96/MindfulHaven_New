@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
 import jwt from "jsonwebtoken";
 
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
@@ -32,14 +33,14 @@ export default (dependencies: any) => {
                     console.log("token created from controller:", token);
                     res.json({ status: true, token: token, admin: { id: admin._id, email: admin.email, name: admin.name } });
                 } else {
-                    res.json({ status: false, message: "Invalid credentials" });
+                    res.json({ status: false, message: ResponseMessages.INVALID_CREDENTIALS });
                 }
             } else {
                 res.json({ status: false, message: response.message });
             }
 
         } catch (error) {
-            res.status(500).json({ status: false, message: "Internal Server Error" });
+            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     }
     return adminLoginController;
