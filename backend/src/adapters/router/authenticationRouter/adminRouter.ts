@@ -13,7 +13,9 @@ export default (dependencies:any) => {
         adminTherapistVerification,
         adminUserBlock,
         getTherapistDetails,
-        adminDashboardDetails
+        adminDashboardDetails,
+        adminFetchIssues,
+        adminIssueResolve
     } = adminController(dependencies);
 
     router.post('/admin_login', adminLoginController);
@@ -23,6 +25,9 @@ export default (dependencies:any) => {
     router.patch('/user_blockUnblock/:id', adminUserBlock);
     router.get('/admin_getTherapistDetails/:id', getTherapistDetails);
     router.get('/admin_dashboard', adminDashboardDetails);
+    router.get('/admin_issues', adminFetchIssues);
+    router.post('/admin_resolveIssues', adminIssueResolve);
+
 
     
     router.use('/*', roleMiddleware(['admin']));

@@ -21,7 +21,8 @@ import { userRegistration,
     cancelAppointmentUsecase,
     geminiAPIUsecase,
     changePasswordUsecase,
-    walletDetailsUsecase
+    walletDetailsUsecase,
+    submitIssueUsecase
  } from "./UseCases";
 
 export {
@@ -48,19 +49,22 @@ export {
     cancelAppointmentUsecase,
     geminiAPIUsecase,
     changePasswordUsecase,
-    walletDetailsUsecase
+    walletDetailsUsecase,
+    submitIssueUsecase
 }
 
 
 
-import { adminLogin, getAllUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase} from "./adminUseCases";
+import { adminLogin, getAllUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase} from "./adminUseCases";
 
 export {
     adminLogin,
     getAllUsecase,
     getuserBlockUsecase,
     therapistDetailstUsecase,
-    adminDashboardDetailsUsecase
+    adminDashboardDetailsUsecase,
+    getIssuesUsecase,
+    getIssuesresolvedUsecase
 }
 
 

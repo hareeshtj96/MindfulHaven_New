@@ -603,5 +603,40 @@ export default {
 
     },
 
+    getSubmitIssue: async (
+        { userId, therapistId, bookingId, description, category, status }
+        : 
+        { userId: string, therapistId: string, bookingId: string, description: string, category: string, status: string }) => {
+        try {
+
+            const booking = await databaseSchema.Appointment.findById(bookingId)
+            console.log("booking from repository:", booking);
+
+            if (!booking) {
+                console.log("No booking found with given bookingId");
+                return { status: false, message: "Booking not found"}
+                
+            }
+
+            const newIssue = new databaseSchema.Issue({
+                userId,
+                therapistId,
+                bookingId,
+                description,
+                category,
+                status
+            });
+
+            const result = await newIssue.save();
+
+            console.log("Issue saved successfully:", result);
+            return { status: true, data: result };
+            
+        } catch (error) {
+            console.error("Error saving issue:", error);
+            return { status: false, message: "Failed to save issue"}
+        }
+    }
+
 
 }

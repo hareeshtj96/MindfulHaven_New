@@ -1,6 +1,6 @@
 
-import { Stats } from "fs";
 import { databaseSchema } from "../database";
+import { sendIssueNotificationEmail } from "../../utils/nodemailer";
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -175,6 +175,37 @@ export default {
         }
     },
 
+    getAllIssues: async () => {
+        console.log("get all issues repository...");
+        try {
+            const issues = await databaseSchema.Issue.find();
+          
+            const enrichedIssues = [];
+
+            for (const issue of issues) {
+                const issueObject = issue.toObject();
+
+
+                const user = await databaseSchema.User.findById(issue.userId).select('name');
+                const therapist = await databaseSchema.Therapist.findById(issue.therapistId).select('name');
+
+
+                const enrichedIssue = {
+                    ...issueObject,
+                    userName: user ? user.name : "unknown user",
+                    therapistName: therapist ? therapist.name : "unknown Therapist"
+                };
+
+                enrichedIssues.push(enrichedIssue);
+            }
+
+            return { status: true, data: enrichedIssues };
+        } catch (error: any) {
+            console.log("Error in get all issues:", error);
+            return { status: false, message: "Error occured while fetching issues"}
+        }
+    },
+
     dashboardDetails: async () => {
         try {
             const totalUsers = await databaseSchema.User.countDocuments()
@@ -215,5 +246,69 @@ export default {
             console.error("Error fetching dashboard details:", error);
             return { status: false, message: "Error fetching dashboard details"}
         }
-    }
+    },
+
+    
+
+    getIssueResolved: async (issueId: string) => {
+        try {
+            const issue = await databaseSchema.Issue.findById(issueId);
+            
+            if(!issue) {
+                console.log("Issue not found");
+                return { status: false, message: "Issue not found"}
+            }
+
+            console.log("Issue found:", issue);
+
+            const therapistId = issue.therapistId;
+            console.log("therapist id:", therapistId);
+
+            const userId = issue.userId;
+
+            
+
+            if (issue.category === "therapist") {
+            
+                const therapist = await databaseSchema.Therapist.findById(therapistId).select('email name')
+                const user = await databaseSchema.User.findById(userId).select('name')
+               
+                
+                if(therapist && therapist.email && user) {
+                    const therapistEmail = therapist.email;
+                    const therapistName = therapist.name;
+                    const userName = user.name
+
+                    const emailResponse = await sendIssueNotificationEmail(therapistEmail, therapistName, issue.description, userName ?? 'user');
+
+                    if(emailResponse.status) {
+                        console.log(`Email sent to therapist: ${therapistEmail}`);
+
+                        issue.status = "resolved";
+                        await issue.save();
+                        console.log("Issue status updated to resolved");
+                    } else {
+                        console.log("Failed to send email:", emailResponse.message);
+                        return { status: false, message: emailResponse.message}
+                    }
+                } else {
+                    console.log("Therapist email not found");
+                    return { status: false, message: "Therapist email not found"};
+                }
+               
+            } else {
+                issue.status = "resolved";
+                await issue.save();
+                console.log("Issue status updated to resolved");
+            }
+
+            return { status: true, message: "Issue resolved successfully"}
+        } catch (error) {
+            console.error("Error resolving the issue:", error);
+            return { status: false, message: "Failed to resolve the issue"}
+        }
+    },
+
+   
+    
 }

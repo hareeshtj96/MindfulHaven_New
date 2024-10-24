@@ -26,6 +26,7 @@ import cancelAppointment from "./cancelAppointment";
 import geminiAPIController from "./geminiAPIController";
 import changePasswordController from "./changePasswordController";
 import walletDetailsController from "./walletDetailsController";
+import submitIssueController from "./submitIssueController";
 
 
 export default (dependencies:any) => {
@@ -58,6 +59,7 @@ export default (dependencies:any) => {
         geminiAPIController: geminiAPIController(dependencies),
         changePasswordController: changePasswordController(dependencies),
         walletDetailsController: walletDetailsController(dependencies),
+        submitIssueController: submitIssueController(dependencies),
         
     }
 }

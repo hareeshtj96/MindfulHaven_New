@@ -32,15 +32,16 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ isSidebarOpen }) => {
                             </button>
                         </li>
                         <li>
-                            <button className="w-full text-left bg-green-600 text-white py-3 px-4 rounded-full hover:bg-green-700">
+                            <button className="w-full text-left bg-green-600 text-white py-3 px-4 rounded-full hover:bg-green-700"
+                            onClick={() => navigate("/admin/admin_issuesManagement")}>
                                 Issues
                             </button>
                         </li>
-                        <li>
+                        {/* <li>
                             <button className="w-full text-left bg-green-600 text-white py-3 px-4 rounded-full hover:bg-green-700">
                                 Banner Management
                             </button>
-                        </li>
+                        </li> */}
                     </ul>
                 </div>
                 {/* Add spacing between buttons and bottom */}

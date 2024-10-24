@@ -24,10 +24,11 @@ import {
     cancelAppointmentUsecase,
     geminiAPIUsecase,
     changePasswordUsecase,
-    walletDetailsUsecase
+    walletDetailsUsecase,
+    submitIssueUsecase
  } from "../../application/UseCases";
 
-import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase } from "../../application/adminUseCases";
+import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase } from "../../application/adminUseCases";
 
 import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase } from "../../application/therapistUseCases";
 
@@ -57,6 +58,7 @@ const useCase: any={
     geminiAPIUsecase: geminiAPIUsecase,
     changePasswordUsecase: changePasswordUsecase,
     walletDetailsUsecase: walletDetailsUsecase,
+    submitIssueUsecase: submitIssueUsecase,
 
 
 
@@ -69,6 +71,8 @@ const useCase: any={
     getuserBlockUsecase: getuserBlockUsecase,
     therapistDetailstUsecase: therapistDetailstUsecase,
     adminDashboardDetailsUsecase: adminDashboardDetailsUsecase,
+    getIssuesUsecase: getIssuesUsecase,
+    getIssuesresolvedUsecase: getIssuesresolvedUsecase,
     
 
 

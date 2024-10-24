@@ -7,6 +7,7 @@ import AdminUserListPage from "../../Pages/Admin/AdminUserListPage";
 import AdminTherapistDetailsPage from "../../Pages/Admin/AdminTherapistDetailsPage";
 import AdminProtectedRoute from "../../ProtectedRoute/AdminProtectedRoute";
 import PageNotFoundPage from "../../Pages/User/PageNotFoundPage";
+import AdminIssueManagementPage from "../../Pages/Admin/AdminIssueManagementPage";
 
 
 
@@ -19,6 +20,7 @@ function AdminRoute() {
             <Route path="/admin_getTherapist" element={<AdminProtectedRoute><AdminTherapistListPage /></AdminProtectedRoute>  } />
             <Route path="/admin_getUsers" element={<AdminProtectedRoute><AdminUserListPage /></AdminProtectedRoute> } />
             <Route path="/admin_getTherapistDetails/:therapistId" element={<AdminTherapistDetailsPage />}/>
+            <Route path="/admin_issuesManagement" element={<AdminIssueManagementPage />} />
 
             <Route path="/*" element={< PageNotFoundPage/>}/>
         </Routes>

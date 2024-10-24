@@ -20,7 +20,7 @@ import { USERREGISTER,
     GETSCHEDULEDBOOKINGS,
     GETCOMPLETEDBOOKINGS,
     GETCANCELLEDBOOKINGS,
-    SEARCHTHERAPIST,
+    SEARCHTHERAPIST,    
     SEARCHCHILDTHERAPIST,
     SORTCHILDTHERAPIST,
     PAYMENTMETHOD,
@@ -29,7 +29,8 @@ import { USERREGISTER,
     CANCELAPPOINTMENT,
     GEMINIAPI,
     CHANGEPASSWORD,
-    WALLETDETAILS
+    WALLETDETAILS,
+    SUBMITISSUE,
  } from "../../../Services/userApi";
 import { act } from "react";
 
@@ -119,6 +120,16 @@ interface walletData {
     transactionHistory: Transaction[]
     userId: string;
     _id: string;
+}
+
+
+interface submitIssuePayload {
+    userId: string;
+    therapistId: string;
+    bookingId: string;
+    category: string;
+    description: string;
+    status: string;
 }
 
 
@@ -902,6 +913,21 @@ export const cancelAppointment = createAsyncThunk(
     }
 )
 
+
+export const submitIssue = createAsyncThunk<string, submitIssuePayload, {rejectValue: string}> (
+    'user/submitIssue',
+    async (issueDetails, thunkAPI) => {
+        try {
+            const response = await axios.post(SUBMITISSUE, issueDetails);
+            console.log('response from submit issue slice:', response);
+
+            return response.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Failed to submit issue";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
 
 
 export const geminiAPIResponse = createAsyncThunk<string, string, { rejectValue: string }>(
