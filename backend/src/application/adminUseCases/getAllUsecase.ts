@@ -14,7 +14,6 @@ export default (dependencies: any) => {
                 return { status: false, message: response.message}
             }
         } catch (error) {
-            console.log(error);
             return { status: false, message: ResponseMessages.ERROR_IN_ADMIN_USECASE};
         }
     }

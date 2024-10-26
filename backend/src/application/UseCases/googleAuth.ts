@@ -12,18 +12,16 @@ export default function userRegistrationGoogle(dependencies: any) {
     const executionFunction = async (data: any) => {
         try {
             const {email} = data;
-            console.log("email:", email);
-
+           
             const userExists = await userRepository.getUserByEmail({email});
-            console.log("userExists:", userExists);
+           
             if (userExists.status) {
                 console.log("user already exists error triggered:");
                 return { status: false, data: ResponseMessages.USER_ALREADY_EXISTS };
             }
-
+            
             const response = await userRepository.createUser(data);
-            console.log("response from userRepository:", response);
-
+           
             if(response.status) {
                 const token = jwt.sign (
                     {userData: data},
@@ -36,7 +34,6 @@ export default function userRegistrationGoogle(dependencies: any) {
             }
             
         } catch (error) {
-            console.error('Error in user registration use case:', error);
             return { status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }

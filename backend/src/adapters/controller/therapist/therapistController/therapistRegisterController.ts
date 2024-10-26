@@ -19,20 +19,15 @@ export default (dependencies: any) => {
     const { therapistRegistration } = dependencies.useCase;
 
     const registerController = async (req: Request, res: Response) => {
-        console.log("entered register control ..............");
         try {
             const { name, email, password, role } = req.body;
-            console.log("req.body:", req.body);
-
+            
             const data = { name, email, password, role };
 
             const response = await therapistRegistration(dependencies);
 
-            console.log("response from register controller");
-
             const execute = await response.executionFunction(data);
-            console.log('execute:', execute);
-
+            
             if (execute.status) {
                 const encodedToken = execute.token as string;
 
@@ -54,7 +49,6 @@ export default (dependencies: any) => {
                 res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, data: execute.data });
             }
         } catch (error) {
-            console.error('Error in therapist registration:',  error);
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };

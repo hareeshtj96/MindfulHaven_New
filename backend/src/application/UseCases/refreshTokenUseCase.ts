@@ -15,8 +15,7 @@ export default (dependencies: any) => {
             const decoded = verifyToken(refreshToken) as JwtPayload;
 
             const userId = decoded.userId;
-            console.log("user id from use case refresh token:", userId);
-
+            
             if(!userId) {
                 return { status: false, message: ResponseMessages.INVALID_TOKEN_PAYLOAD };
             }
@@ -30,12 +29,10 @@ export default (dependencies: any) => {
             if(User.isBlocked) {
                 return { status: false, message: ResponseMessages.USER_IS_BLOCKED };
             }
-
             const { accessToken, refreshToken: newRefreshToken} = generateToken({ userId });
 
             return { status: true, data: {accessToken, refreshToken: newRefreshToken}}
         } catch (error) {
-            console.error('Error in exceuteFunction:', error);
             return { status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }

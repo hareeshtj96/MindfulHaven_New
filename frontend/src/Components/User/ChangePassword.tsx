@@ -51,14 +51,14 @@ const ChangePassword = () => {
     }
     
     return (
-        <div className="w-full max-w-md mx-auto">
-            <h2 className="text-2xl font-bold mb-6 text-center">Change Password</h2>
-            <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit}>
+        <div className="w-full max-w-md mx-auto p-4 sm:p-6 md:p-8 lg:p-10">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">Change Password</h2>
+            <form className="bg-white shadow-md rounded px-6 sm:px-8 py-6 sm:pb-8 mb-4" onSubmit={handleSubmit}>
                 {error && <div className="text-red-500 text-center mb-4">{error}</div>}
                
 
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="currentPassword">
+                    <label className="block text-gray-700 text-sm sm:text-base font-bold mb-2" htmlFor="currentPassword">
                         Current Password
                     </label>
                     <input 
@@ -73,7 +73,7 @@ const ChangePassword = () => {
                 </div>
 
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="newPassword">
+                    <label className="block text-gray-700 text-sm  sm:text-base font-bold mb-2" htmlFor="newPassword">
                         New Password
                     </label>
                     <input 
@@ -88,7 +88,7 @@ const ChangePassword = () => {
                 </div>
 
                 <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmPassword">
+                    <label className="block text-gray-700 text-sm sm:text-base font-bold mb-2" htmlFor="confirmPassword">
                         Confirm New Password
                     </label>
                     <input 

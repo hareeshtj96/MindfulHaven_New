@@ -4,16 +4,12 @@ import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCo
 export default (dependencies:any) => {
     const { submitIssueUsecase } = dependencies.useCase;
 
-    const submitIssueController = async (req: Request, res: Response) => {
-        console.log("Entered submit issue controller");
-        
+    const submitIssueController = async (req: Request, res: Response) => { 
         try {
             const  details  = req.body;
-            console.log("details:", details);
-
+         
             const response = await submitIssueUsecase(dependencies).executeFunction(details);
-            console.log("response from submit issue controller:", response);
-
+            
             if( response && response.status) {
                 res.status(HttpStatusCode.OK).json({ status: true, data: response.data})
             } else {
@@ -21,7 +17,6 @@ export default (dependencies:any) => {
             }
             
         } catch (error) {
-            console.error("Error in submit issue controller:", error);
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR })
         }
     }

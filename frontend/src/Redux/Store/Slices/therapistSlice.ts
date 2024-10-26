@@ -10,7 +10,8 @@ import { REGISTERTHERAPIST,
     UPDATETIMINGS,
     JOINTHERAPISTVIDEO,
     CANCELAPPOINTMENTBYTHERAPIST,
-    GETAVAILABILITY
+    GETAVAILABILITY,
+    CANCELAVAILABLESLOT
   } from "../../../Services/therapistApi";
 
 
@@ -388,7 +389,20 @@ export const cancelAppointmentByTherapist = createAsyncThunk(
         return rejectWithValue(error.response?.data?.message || "Failed to cancel appointment");
       }
     }
-  );
+);
+
+
+export const cancelAvailableSlot = createAsyncThunk(
+    "therapist/cancelAvailableSlot",
+    async ({slotId, therapistId}: {slotId: string, therapistId: string}, {rejectWithValue}) => {
+        try {
+            const response = await axios.put(CANCELAVAILABLESLOT, {slotId, therapistId});
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Failed to cancel available slots")
+        }
+    }
+)
   
 
 

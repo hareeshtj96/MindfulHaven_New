@@ -53,17 +53,17 @@ const UserWallet: React.FC = () => {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-sm md:max-w-md mx-auto p-4">
       <h2 className="text-2xl font-bold mb-6 text-center">Your Wallet</h2>
       
       {/* Display wallet balance */}
-      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <div className="bg-white shadow-md rounded-lg px-6 py-4 mb-6">
         <h3 className="text-xl font-bold">Balance: ₹{walletData?.balance}</h3>
         <h4 className="text-md mt-4">Currency:{walletData?.currency}</h4>
       </div>
       
       {/* Display transaction history */}
-      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+      <div className="bg-white shadow-md rounded-lg px-6 py-4 mb-6">
         <h3 className="text-xl font-bold mb-4">Transaction History</h3>
         {paginatedTransactions.length > 0 ? (
           <ul>

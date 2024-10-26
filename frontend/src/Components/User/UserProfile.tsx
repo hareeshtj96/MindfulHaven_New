@@ -30,11 +30,11 @@ const UserProfile = () => {
     const isBasicDetails = location.pathname === "/user_profile/basicDetails" || location.pathname === "/user_profile";
 
     return (
-        <div className="flex justify-center items-start min-h-screen bg-gray-100 p-8">
+        <div className="flex justify-center items-start min-h-screen bg-gray-100 p-4 md:p-8">
             {/* Content container: Centered and limited width */}
-            <div className="flex w-full max-w-5xl space-x-6">
+            <div className="flex flex-col md:flex-row w-full max-w-5xl space-x-6 md:space-y-0 md:space-x-6">
                 {/* Left side: Tab Navigation (in a separate box) */}
-                <div className="bg-white p-6 rounded-lg shadow-lg w-1/4 sticky top-8 self-start">
+                <div className="bg-white p-6 rounded-lg shadow-lg w-full md:w-1/4 sticky top-8 self-start">
                     <nav className="space-y-4">
                         <NavLink
                             to="/user_profile/basicDetails"
@@ -72,7 +72,7 @@ const UserProfile = () => {
                 </div>
 
                 {/* Right side: User details and outlet (in a separate box) */}
-                <div className="bg-white p-6 rounded-lg shadow-lg w-3/4">
+                <div className="bg-white p-6 rounded-lg shadow-lg w-full md:w-3/4">
                     <div className={`${isBasicDetails ? 'mb-6' : 'mb-0'}`}>
                         {isBasicDetails && (
                             <div className="flex flex-col items-center">

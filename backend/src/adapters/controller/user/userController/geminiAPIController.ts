@@ -28,16 +28,11 @@ export default (dependencies: any) => {
     const { geminiAPIUsecase } = dependencies.useCase;
 
     const geminiAPIController = async (req: Request, res: Response) => {
-        console.log(" entered gemini api controller.........");
-
         try {
             const { query } = req.body;
-            console.log(" request body:", req.body);
-
-
+          
             const apiResponse = await geminiAPIUsecase(dependencies).executeFunction({query });
-            console.log("api response:", apiResponse);
-
+        
             if (apiResponse && apiResponse.status) {
                 const formattedData = formatResponse(apiResponse.data);
                 res.status(HttpStatusCode.OK).json({ status: true, data: formattedData });
@@ -45,10 +40,8 @@ export default (dependencies: any) => {
             } else {
                 res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: apiResponse.message || ResponseMessages.DATA_NOT_FOUND })
             }
-            
-            
+               
         } catch (error) {
-            console.error("Error in Gemini API Controller:", error);
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
         

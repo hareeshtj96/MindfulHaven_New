@@ -77,20 +77,20 @@ function Dashboard() {
                 <p>Manage your sessions here</p>
             </section>
 
-            <div className="mb-4 flex space-x-2">
+            <div className="mb-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-2">
                 <input
                     type="text"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     placeholder="Search therapists by name or specialization..."
-                    className="p-2 border border-gray-300 rounded-lg w-96" />
+                    className="p-2 border border-gray-300 rounded-lg w-full  sm:w-96" />
 
                 <button
                     onClick={() => {
                         setHasSearched(true);
                         dispatch(fetchTherapistBySearchTerm(debouncedSearchTerm))
                     }}
-                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full sm:w-auto"
                 >
                     Search
                 </button>
@@ -113,7 +113,7 @@ function Dashboard() {
                                 <h2 className="text-2xl font-bold text-center">Therapists Available</h2>
                             )}
                             {Array.isArray(therapists) && therapists.map((therapist) => (
-                                <div key={therapist._id} className="flex bg-white rounded-lg shadow-md p-4">
+                                <div key={therapist._id} className="flex bg-white rounded-lg shadow-md p-4 space-y-4 md:space-y-0">
                                     <div className="flex flex-col items-center justify-center p-4">
                                         {therapist.photo ? (
                                             <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
@@ -159,7 +159,7 @@ function Dashboard() {
 
             <section className="mb-16">
                 <h2 className="text-2xl font-bold">Select your therapy</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="relative">
                         <img src={familyImg} alt="image1" className="w-full h-auto rounded-lg" />
                         <div className="absolute inset-0 flex items-end justify-center">
@@ -204,20 +204,20 @@ function Dashboard() {
             <section className="mb-8">
                 <h2 className="text-2xl font-bold text-center">MindfulHaven FAQs</h2>
 
-                <div className="mb-4 flex justify-center">
-                    <div className="flex items-center space-x-2">
+                <div className="mb-4 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-2">
+                    
                     <input type="text" placeholder="Search anything related to Mental Health and Wellness"
-                    className="p-4 border border-gray-300 rounded-lg w-[500px]" value={searchTerm}
+                    className="p-4 border border-gray-300 rounded-lg w-full sm:w-[500px]" value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                    <button className="bg-btncolor text-white p-4 rounded-lg hover:bg-btncolor-dark"
+                    <button className="bg-btncolor text-white p-4 rounded-lg hover:bg-btncolor-dark w-full sm:w-auto"
                     onClick={() => dispatch(geminiAPIResponse(searchTerm))}
                     >Search</button>
-                    </div>
+                   
                 </div>
 
                 {search_Result && (
-                <div className="result bg-gray-100 p-4 rounded-lg shadow-md mt-4">
+                <div className="result bg-gray-100 p-4 rounded-lg shadow-md mt-4 max-w-full sm:max-w-lg mx-auto">
                     <h3 className="text-lg font-semibold">Search Result:</h3>
                     <p className="mt-2 text-gray-700">
                         {typeof search_Result === "string" ? search_Result : JSON.stringify(search_Result)}
@@ -225,7 +225,7 @@ function Dashboard() {
                 </div>
                  )}
 
-                <ul className="list-none pl-0 mt-4 flex flex-col items-center mx-auto">
+                <ul className="list-none pl-0 mt-4 flex flex-col items-center mx-auto space-y-4 max-w-full sm:max-w-lg">
                     {[
                         {
                             question: "How many times per month can I see my therapists?",
@@ -240,8 +240,8 @@ function Dashboard() {
                             answer: "You can choose a different therapist at any time through your dashboard"
                         }
                     ].map((faq, index) => (
-                        <li key={index} className="mb-4">
-                            <button className="w-full text-left text-lg font-semibold focus:outline-none" onClick={() => toggleFAQ(index)}>{faq.question}
+                        <li key={index} className="w-full">
+                            <button className="w-full text-left text-lg font-semibold focus:outline-none p-2 bg-gray-200 rounded-lg hover:bg-gray-300" onClick={() => toggleFAQ(index)}>{faq.question}
 
                             </button>
                             {activeIndex === index && (

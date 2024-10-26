@@ -33,7 +33,8 @@ export default (dependencies: any) => {
         therapistUpdateTimingsController,
         therapistVideoController,
         cancelAppointmentTherapist,
-        getAvailableDetails
+        getAvailableDetails,
+        cancelSlotController
     } = therapistController(dependencies);
 
 
@@ -47,6 +48,7 @@ export default (dependencies: any) => {
     router.post('/therapist_video_call', therapistVideoController)
     router.patch('/therapist_cancelAppointment', cancelAppointmentTherapist);
     router.get('/therapist_availableDetails', getAvailableDetails);
+    router.put('/therapist_cancelSlot', cancelSlotController);
    
 
     router.use('/*', roleMiddleware(['therapist']));

@@ -18,7 +18,6 @@ export default (dependencies: any) => {
             return { status: true, data: sortedTherapists };
             
         } catch (error) {
-            console.error("Error in sorting therapist use case...", error);
             return { status: false, message: ResponseMessages.ERROR_FETCHING_SORTED_THERAPIST }
         }
     }

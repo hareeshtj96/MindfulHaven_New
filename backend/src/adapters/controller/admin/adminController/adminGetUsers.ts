@@ -13,13 +13,11 @@ export default (dependencies: any) => {
             const response = await getUsersUsecase(dependencies).executeFunction({page, limit});
 
             if(response && response.status) {
-                console.log("response form controller:", response)
                 return res.status(HttpStatusCode.OK).json({ status: true, data: response.data});
             } else {
                 return res.status(HttpStatusCode.NOT_FOUND).json({ status: false, message: ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
-            console.error("Error in getAll therapist:", error);
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     }

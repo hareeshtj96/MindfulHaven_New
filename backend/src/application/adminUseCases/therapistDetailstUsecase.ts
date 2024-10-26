@@ -9,9 +9,7 @@ export default (dependencies: any) => {
     }    
 
     const executeFunction = async ({ therapistId }: StatusParams) => {
-        console.log("entered use case:.....")
         try {
-            console.log(" receieved in use case:", therapistId)
             const response = await adminRepository.therapistDetails( therapistId);
         
             if(response.status) {
@@ -20,7 +18,6 @@ export default (dependencies: any) => {
                 return { status: false, message: response.message}
             }
         } catch (error) {
-            console.log(error);
             return { status: false, message: ResponseMessages.ERROR_IN_ADMIN_USECASE };
         }
     }

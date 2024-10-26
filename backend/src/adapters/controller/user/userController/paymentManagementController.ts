@@ -9,8 +9,7 @@ export default (dependencies: any) => {
   const paymentManagementController = async (req: Request, res: Response) => {
     try {
       const { therapistId, userId, slot, notes, totalAmount} = req.body; 
-      console.log("request body:", req.body);
-
+    
       // First, execute the use case (this is your existing business logic)
       const paymentData = await getPaymentUsecase(dependencies).executeFunction({
         therapistId,
@@ -19,13 +18,10 @@ export default (dependencies: any) => {
         notes,
         totalAmount,
       });
-      console.log("paymentrdata......", paymentData);
       
-
       if (!paymentData || !paymentData.status) {
         return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.PAYMENT_CREATION_FAILED });
       }
-
 
       // Send the order details to the frontend
       res.status(HttpStatusCode.OK).json({
@@ -35,7 +31,6 @@ export default (dependencies: any) => {
         currency: paymentData.appointmentData.currency
       });
     } catch (error) {
-      console.error('Error in payment management controller:', error);
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
     }
   };

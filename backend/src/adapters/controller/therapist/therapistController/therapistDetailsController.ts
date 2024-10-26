@@ -34,11 +34,7 @@ const createTherapistSlotRules = (timings: Timing[]) => {
 
         dayOfWeeks.forEach((dayOfWeek: number) => {
             const startTimeDate = timeToDate(timing.startTime, (dayOfWeek + 7 - new Date().getDay()) % 7);
-            // const endTimeDate = timeToDate(timing.endTime, dayOfWeek - new Date().getDay());
-
-
-            console.log(`Generating slots for day: ${dayOfWeek}, start: ${startTimeDate}`);
-
+            
             const rrule = new RRule({
                 freq: RRule.WEEKLY,
                 byweekday: [dayOfWeek - 1],
@@ -57,17 +53,13 @@ export default function therapistDetailsController(dependencies: any) {
     const { therapistRepository } = dependencies.repository;
 
     const submitTherapistDetails = async (req:Request, res: Response) => {
-        console.log("Entered therapist details submission controller:");
-
         try {
-            console.log("req.body", req.body);
-
             if(!req.body.therapistData) {
                 return res.status(HttpStatusCode.BAD_REQUEST).json({ message: ResponseMessages.THERAPIST_DATA_MISSING });
             }
             
             const therapistData = JSON.parse(req.body.therapistData);
-            console.log(" parsed therapist data:", therapistData);
+    
             const {
                 name,
                 phone,
@@ -86,13 +78,10 @@ export default function therapistDetailsController(dependencies: any) {
             //Generate slots using RRule
             const slotRules = createTherapistSlotRules(timings);
             const slots = slotRules.all();
-            console.log("Generated slots:", slots);
-
+            
             let photoUrl = "";
 
             let identityProofUrl = "";
-
-            console.log("req files:", req.files);
 
             if(req.files) {
                 const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -128,10 +117,7 @@ export default function therapistDetailsController(dependencies: any) {
                 availableSlots: slots
             }
 
-            console.log("hiiiiiiiii................");
-
             const saveResult = await therapistRepository.saveTherapist(newTherapist);
-            console.log("save result data:", saveResult);
 
             if(!saveResult) {
                 return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.FAILED_TO_SAVE_THERAPIST_DATA });
@@ -139,7 +125,6 @@ export default function therapistDetailsController(dependencies: any) {
 
             res.status(HttpStatusCode.OK).json({ status: true, message: ResponseMessages.THERAPIST_SAVED,  data: saveResult.data});
         } catch (error) {
-            console.error("Error in therapistDetailsController:", error);
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error"});
         }
     };

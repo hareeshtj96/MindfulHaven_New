@@ -16,7 +16,6 @@ export default (dependencies: any) => {
                 return res.status(HttpStatusCode.NOT_FOUND).json({ status: false, message: ResponseMessages.DATA_NOT_FOUND})
             }
         } catch (error) {
-            console.error("Error in admin fetch issues:", error);
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR});
         }
     }

@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import 'react-calendar/dist/Calendar.css';
 import { RootState, AppDispatch } from '../../Redux/Store/store';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
-import { updateTherapistAvailability, fetchAvailableDetails } from '../../Redux/Store/Slices/therapistSlice';
+import { updateTherapistAvailability, fetchAvailableDetails, cancelAvailableSlot } from '../../Redux/Store/Slices/therapistSlice';
 import * as Yup from 'yup'; 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -133,13 +133,51 @@ const TherapistCalendar: React.FC = () => {
           hour12: false,
         })
 
+        const handleRemoveSlot = (slotId: string, therapistId: string) => {
+          const toastId = toast(
+            <div>
+              <p>Do you want to cancel this slot?</p>
+              <div>
+                <button 
+                  onClick={() => {
+                    dispatch(cancelAvailableSlot({ slotId, therapistId }));
+                    toast.dismiss(toastId); 
+                    toast.success("Slot canceled successfully!"); 
+                  }}
+                  className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
+                >
+                  Yes
+                </button>
+                <button 
+                  onClick={() => toast.dismiss(toastId)} 
+                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 ml-2"
+                >
+                  No
+                </button>
+              </div>
+            </div>,
+            {
+              autoClose: false, 
+              closeOnClick: false, 
+              draggable: false,
+            }
+          );
+        };
+
         return (
           <div
             key={index}
-            className={`p-4 m-2 max-w-xs w-full rounded-lg shadow-md
+            className={`relative p-4 m-2 max-w-xs w-full rounded-lg shadow-md
               ${isBooked ? 'bg-gray-400 text-white' : 'bg-green-100 text-gray-800'}
               cursor-pointer hover:shadow-lg transition-shadow duration-300`}
           >
+            {/* Red Cross Button */}
+            <button onClick={() => handleRemoveSlot(slot, therapistId??"")}
+            className='absolute top-2 right-2 bg-red-500 text-white rounded p-0.5 hover:bg-red-600'
+              >
+                X
+            </button>
+
             <h3 className='text-lg font-semibold mb-2'>{formattedDate}</h3>
             <p className='text-sm mb-1'>{formattedStartTime} - {formattedEndTime}</p>
             <p className={`text-sm ${isBooked ? 'text-white' : 'text-gray-600'}`}>

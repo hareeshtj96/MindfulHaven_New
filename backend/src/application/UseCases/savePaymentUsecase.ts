@@ -20,13 +20,10 @@ export default (dependencies: any) => {
         throw new Error("Missing required payment details.");
       }
 
-      console.log("Therapist ID:", therapistId);
-      console.log("Payment status from use case:", paymentStatus);
-
+      
       // Fetch therapist fees
       const therapistDetails = await userRepository.getTherapistDetails(therapistId);
-      console.log("Therapist details:", therapistDetails);
-
+   
       if (!therapistDetails || !therapistDetails.data.fees) {
         throw new Error("Unable to retrieve therapist fees.");
       }
@@ -48,14 +45,12 @@ export default (dependencies: any) => {
         paymentStatus,
       };
 
-      console.log("Payment data to be saved:", paymentData);
 
       // Only save payment details if paymentStatus is success
       if (paymentStatus === 'success') {
         const savePaymentResponse = await userRepository.savePayment(paymentData);
 
-        console.log("save response.......", savePaymentResponse);
-
+        
         // Check if payment was saved successfully
         if (savePaymentResponse.status) {
           return {
@@ -78,7 +73,6 @@ export default (dependencies: any) => {
         };
       }
     } catch (error: any) {
-      console.error("Error in savePaymentUsecase:", error);
       return {
         status: false,
         message: error.message || ResponseMessages.PAYMENT_CREATION_FAILED,

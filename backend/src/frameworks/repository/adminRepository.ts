@@ -5,15 +5,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 
-
 export default {
     getAdminByEmail: async (email: string, password: string) => {
-        console.log("entered getAdminByEmail");
-        
         try {
             const admin = await databaseSchema.Admin.findOne({ email });
-            console.log("Admin from getAdmin:", admin);
-
+            
             if(admin) {
                 if(admin.password === password) {
                     return {status: true, user:admin};
@@ -25,7 +21,6 @@ export default {
             }
             
         } catch (error) {
-            console.error("Error in getAdminByEmail:", error);
             return {status: false};
         }
     },
@@ -34,22 +29,16 @@ export default {
         try {
             const page = data.page || 1;
             const limit = data.limit || 2;
-            console.log("limit:",limit);
             
             const skip = (page - 1)*limit;
 
             const therapists = await databaseSchema.Therapist.find().skip(skip).limit(limit)
-            // console.log("get all therapist:", therapists);
-
+           
             const totalTherapist = await databaseSchema.Therapist.countDocuments();
-            // console.log("totalTherapists ....", totalTherapist);
-
-            console.log("total number of therapisst:", totalTherapist);
-            console.log("limit per page:", limit);
-            const totalPages = Math.ceil(totalTherapist/ limit)
-            console.log("Total pages:", totalPages);
             
-
+           
+            const totalPages = Math.ceil(totalTherapist/ limit)
+           
             if(therapists && therapists.length > 0) {
                 return {
                     status: true,
@@ -65,7 +54,6 @@ export default {
                 return { status: false, message: "Therapists not found"};
             }
         } catch (error) {
-            console.log("Error in adminRepository.getAllTherapists", error);
             return { status: false, message: "Error occured during get Therapists"};
         }
     },
@@ -77,11 +65,9 @@ export default {
             const skip = (page-1)* limit;
 
             const users = await databaseSchema.User.find().skip(skip).limit(limit)
-            console.log("Get all users:", users);
-
+            
             const totalUsers = await databaseSchema.User.countDocuments();
-            console.log("total users:", totalUsers);
-
+           
             if(users && users.length > 0) {
                 return {
                     status: true,
@@ -96,7 +82,6 @@ export default {
                 return { status: false, message: "User not found"};
             }
         } catch (error) {
-            console.log("Error in adminRepository.getAllUsers", error);
             return { status: false, message: "Error occured during get Therapists"};
         }
     },
@@ -118,15 +103,12 @@ export default {
                 { new: true }
             );
 
-            console.log("updated therapist verification:", updatedTherapist);
-
             if(updatedTherapist) {
                 return { status: true, data: { therapist: updatedTherapist }};
             } else {
                 return { status: false, message: "Therapist not found or verification failed"}
             }
         } catch (error) {
-            console.log("Error in get Verified repository:", error);
             return { status: false, message: "Error occured during therapist verification"};
         }
     },
@@ -146,15 +128,13 @@ export default {
                 { isBlocked: newStatus},
                 { new: true}
             )
-            console.log("updated user :", updatedUser);
-
+           
             if(updatedUser) {
                 return { status: true, data: { user: updatedUser}}
             } else {
                 return { status: false, message: "user not found"}
             }
         } catch (error) {
-            console.log("Error in get blocked repository:", error);
             return { status: false, message: "Error occured during user block unblock"};
         }
     },
@@ -170,7 +150,6 @@ export default {
             
             return { status: true, message: "Therapist fetched successfully", therapist}
         } catch (error: any) {
-            console.log("Error in therapist details:", error);
             return { status: false, message: "An error occurred while fetching the therapist details", error: error.message };
         }
     },
@@ -201,7 +180,6 @@ export default {
 
             return { status: true, data: enrichedIssues };
         } catch (error: any) {
-            console.log("Error in get all issues:", error);
             return { status: false, message: "Error occured while fetching issues"}
         }
     },
@@ -243,7 +221,6 @@ export default {
                 
             }
         } catch (error) {
-            console.error("Error fetching dashboard details:", error);
             return { status: false, message: "Error fetching dashboard details"}
         }
     },
@@ -255,18 +232,12 @@ export default {
             const issue = await databaseSchema.Issue.findById(issueId);
             
             if(!issue) {
-                console.log("Issue not found");
                 return { status: false, message: "Issue not found"}
             }
 
-            console.log("Issue found:", issue);
-
             const therapistId = issue.therapistId;
-            console.log("therapist id:", therapistId);
-
+          
             const userId = issue.userId;
-
-            
 
             if (issue.category === "therapist") {
             
@@ -282,29 +253,23 @@ export default {
                     const emailResponse = await sendIssueNotificationEmail(therapistEmail, therapistName, issue.description, userName ?? 'user');
 
                     if(emailResponse.status) {
-                        console.log(`Email sent to therapist: ${therapistEmail}`);
-
+                        
                         issue.status = "resolved";
                         await issue.save();
-                        console.log("Issue status updated to resolved");
                     } else {
-                        console.log("Failed to send email:", emailResponse.message);
                         return { status: false, message: emailResponse.message}
                     }
                 } else {
-                    console.log("Therapist email not found");
                     return { status: false, message: "Therapist email not found"};
                 }
                
             } else {
                 issue.status = "resolved";
                 await issue.save();
-                console.log("Issue status updated to resolved");
             }
 
             return { status: true, message: "Issue resolved successfully"}
         } catch (error) {
-            console.error("Error resolving the issue:", error);
             return { status: false, message: "Failed to resolve the issue"}
         }
     },

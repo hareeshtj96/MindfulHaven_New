@@ -22,16 +22,13 @@ export default function resetPassword(dependencies: any) {
         try {
             const { email, newPassword, confirmPassword} = data;
   
-
             // Check if passwords match
             if (newPassword !== confirmPassword) {
                 return { status: false, data: ResponseMessages.PASSWORD_DO_NOT_MATCH };
             }
 
-
             // Hash the new password
             const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
-            console.log("hashed password:", hashedPassword);
 
             // Update the password in the database
             const updateResult = await userRepository.updateUserPassword({ email, hashedPassword });
@@ -42,7 +39,6 @@ export default function resetPassword(dependencies: any) {
 
             return { status: true, data: ResponseMessages.PASSWORD_RESET_SUCCESSFULLY };
         } catch (error) {
-            console.error("Error in forgot password use case:", error);
             return { status: false, data: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }

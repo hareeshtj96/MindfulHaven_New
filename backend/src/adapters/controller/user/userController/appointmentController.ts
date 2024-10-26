@@ -6,11 +6,8 @@ export default (dependencies: any) => {
     const { getAppointmentUsecase } = dependencies.useCase;
 
     const appointmentController = async (req: Request, res: Response ) => {
-
-        console.log(" entered appointment controller.........")
         try {
             const { therapistId, userId, slot, notes, paymentId } = req.body;
-            console.log(" re body appointemnt ocontroller....", req.body);
             
             const response = await getAppointmentUsecase(dependencies).executeFunction({ therapistId,
                 userId,
@@ -24,7 +21,6 @@ export default (dependencies: any) => {
                 res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
-            console.error("Error in  appointment controller:", error);
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     }

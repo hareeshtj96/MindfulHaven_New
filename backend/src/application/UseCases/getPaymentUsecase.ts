@@ -18,8 +18,7 @@ export default (dependencies: any) => {
       if (!therapistId || !userId || !totalAmount) {
         throw new Error("Missing required payment details.");
       }
-      console.log("therapist ID .........", therapistId);
-
+      
       // Create an order with Razorpay
       const razorpayOrder = await razorpay.orders.create({
         amount: totalAmount * 100, 
@@ -27,9 +26,6 @@ export default (dependencies: any) => {
         receipt: `receipt_${Date.now()}`,
         payment_capture: true,
       });
-
-      console.log("razorpay order.....", razorpayOrder);
-
 
     return {
         status: true,
@@ -41,7 +37,6 @@ export default (dependencies: any) => {
     };
       
     } catch (error:any) {
-      console.error("Error in getPaymentUsecase:", error);
       return {
         status: false,
         message: error.message || ResponseMessages.PAYMENT_CREATION_FAILED,

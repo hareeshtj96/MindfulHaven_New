@@ -18,8 +18,6 @@ export default (dependencies: any) => {
                 return res.status(400).json({ status: false, message: ResponseMessages.THERAPIST_ID_REQUIRED })
             }
 
-            console.log("Therapist ID:", therapistId);
-
             const response = await getVerifiedUsecase(dependencies).executeFunction(therapistId);
 
             if(response && response.status) {
@@ -33,7 +31,6 @@ export default (dependencies: any) => {
                     therapist.therapist.name,
                     therapist.therapist.isVerified
                 )
-                console.log("emaill response:", emailResponse);
                 if (!emailResponse.status) {
                     console.error("Failed to send email:", emailResponse.message)
                 }
@@ -43,7 +40,6 @@ export default (dependencies: any) => {
                 return res.status(HttpStatusCode.NOT_FOUND).json({ status: false, message: ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
-            console.error("Error in verify therapist:", error);
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     }

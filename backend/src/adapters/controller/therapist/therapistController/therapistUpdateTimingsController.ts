@@ -13,8 +13,6 @@ export default (dependencies: any) => {
     const { updateTherapistTimingsUsecase } = dependencies.useCase;
 
     const therapistUpdateTimingsController = async (req: Request, res: Response) => {
-        console.log("Entered therapist update timinfs controller");
-
         try {
             const token = req.headers.authorization?.split(' ')[1];
             if (!token) {
@@ -23,15 +21,12 @@ export default (dependencies: any) => {
             }
 
             const decodedToken = jwt.verify(token, SECRET_KEY ) as JwtPayload
-            console.log("decoded token....", decodedToken);
+          
             const email = decodedToken.email
-            console.log("email decoded....", email);
-
+           
             const { startTime, endTime, date } = req.body;
-            console.log("request body:", req.body);
             
             const response = await updateTherapistTimingsUsecase(dependencies).executeFunction({email, startTime, endTime, date});
-            console.log("response from controller:", response);
 
             if (response && response.status) {
                 res.status(HttpStatusCode.OK).json({ status: true, data: response.data })
@@ -39,7 +34,6 @@ export default (dependencies: any) => {
                 res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message});
             }
         } catch (error) {
-            console.error("Error in therapist update timings controller:", error);
             return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_EXPIRED });
         }
         

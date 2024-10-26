@@ -12,9 +12,7 @@ export default (dependencies: any) => {
     }    
 
     const executeFunction = async ({ therapistId, userId, slot, notes, paymentId}: AppointmentParams) => {
-        console.log("entered use case:.....")
         try {
-            console.log(" receieved in use case:", therapistId, userId, slot, notes, paymentId)
             const response = await userRepository.saveAppointment({ therapistId, userId, slot, notes, paymentId });
            
             if(response.status) {
@@ -23,7 +21,6 @@ export default (dependencies: any) => {
                 return { status: false, message: response.message}
             }
         } catch (error) {
-            console.log(error);
             return { status: false, message: ResponseMessages.ERROR_IN_SLOT_USECASE };
         }
     }

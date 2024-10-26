@@ -27,28 +27,19 @@ export default (dependencies: any) => {
 
     const registerController = async (req: Request, res: Response) => {
         try {
-            console.log('controller');
-
             const { name, email, password, mobile, role } = req.body;
-            console.log("req.body:", req.body);
-
+            
             const userData: UserData = { name, email, password, mobile, role };
 
             // Invoke the registration use case
             const registrationFunction = await userRegistration(dependencies);
             const response: RegistrationResponse = await registrationFunction.executionFunction(userData);
 
-            console.log("response in registration controller:", response);
-
             if (response.status) {
                 const encodedToken = response.token as string;
 
-                console.log("encoded token:", encodedToken);
-
                 // Verify and decode the token
                 const decodedToken = jwt.verify(encodedToken, SECRET_KEY) as jwt.JwtPayload;
-
-                console.log("Decoded token:", decodedToken);
 
                 // Generate a new token
                 const token = jwt.sign(
@@ -62,7 +53,6 @@ export default (dependencies: any) => {
                 res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, data: response.data });
             }
         } catch (error) {
-            console.error('Error in registration:', error);
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };

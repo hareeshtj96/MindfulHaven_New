@@ -11,9 +11,7 @@ export default (dependencies: any) => {
     }    
 
     const executeFunction = async ({ therapistId, page, limit }: StatusParams) => {
-        console.log("entered use case:.....")
         try {
-            console.log(" receieved in use case:", therapistId, page, limit)
             const response = await therapistRepository.getBookings( therapistId, page, limit);
            
             if(response.status) {
@@ -22,7 +20,6 @@ export default (dependencies: any) => {
                 return { status: false, message: response.message}
             }
         } catch (error) {
-            console.log(error);
             return { status: false, message: ResponseMessages.ERROR_IN_THERAPIST_USECASE };
         }
     }

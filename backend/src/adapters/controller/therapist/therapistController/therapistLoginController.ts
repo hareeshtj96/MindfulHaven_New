@@ -13,16 +13,12 @@ export default function therapistLogin (dependencies: any) {
     const { therapistRepository } = dependencies.repository;
 
     const therapistloginController = async (req: Request, res: Response) => {
-        console.log("entered therapist login controller:")
         try {
             const { email, password, role } = req.body;
-            console.log("req body:", req.body);
-
-
+           
             // Find the therapist by email
             const therapist = await therapistRepository.getTherapistByEmail( email );
-            console.log('therapist:', therapist );
-
+        
             if (!therapist.status) {
                 return res.status(HttpStatusCode.BAD_REQUEST).json({ message: ResponseMessages.ACCOUNT_NOT_FOUND });
             }
@@ -63,7 +59,6 @@ export default function therapistLogin (dependencies: any) {
             // Send response
             res.json({ status: true, token, therapist: therapistDetails });
         } catch (error) {
-            console.error("Error in therapist loginController:", error);
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };

@@ -12,12 +12,10 @@ export default (dependencies: any) => {
             const { adminLogin } = dependencies.useCase;
 
             const data = { email, password, role };
-            console.log("data from admin controller:", data);
-
+            
             const execute = await adminLogin(dependencies);
             const response = await execute.executeFunction(data);
 
-            console.log("response:", response);
 
             if (response.status) {
                 const admin = response.user;
@@ -30,7 +28,6 @@ export default (dependencies: any) => {
                         { expiresIn: "1h" }
                     );
 
-                    console.log("token created from controller:", token);
                     res.json({ status: true, token: token, admin: { id: admin._id, email: admin.email, name: admin.name } });
                 } else {
                     res.json({ status: false, message: ResponseMessages.INVALID_CREDENTIALS });

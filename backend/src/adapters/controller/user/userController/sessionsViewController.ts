@@ -8,49 +8,38 @@ import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCo
 dotenv.config();
 
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
-console.log("secret key:", SECRET_KEY);
-
 
 export default (dependencies: any) => {
     const { getAllBookings } = dependencies.useCase;
 
     const sessionsViewController = async (req: Request, res: Response ) => {
 
-        console.log(" entered sessions view controller.........")
         try {
             const page = parseInt(req.query.page as string, 10) || 1;
-            console.log("page from controller:", page)
+          
             const limit = parseInt(req.query.limit as string, 10) || 2
-            console.log("limit from controller:", limit)
-
-
+           
             const authHeader = req.headers.authorization;
-            console.log("authheader:", authHeader);
-
+        
             if (!authHeader || !authHeader.startsWith('Bearer ')) {
                 return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.AUTHORIZATION_HEAD_MISSING });
             }
 
-            console.log("secret key:", SECRET_KEY);
-
             const token = authHeader.split(' ')[1];
-            console.log("token:", token);
-
+            
             if (!token) {
                 return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_MISSING });
             }
 
             // Verify and decode the token
             const decodedToken: any = jwt.verify(token, SECRET_KEY);
-            console.log("decoded token:", decodedToken);
+            
             const userId = decodedToken.userId;
-            console.log("userId from decoded token:", userId);
-
+           
             if (!userId) {
                 return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.USER_ID_NOT_IN_TOKEN });
             }
 
-           
             const response = await getAllBookings(dependencies).executeFunction({ userId, page, limit });
 
             if( response && response.status) {
@@ -59,7 +48,6 @@ export default (dependencies: any) => {
                 res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
-            console.error("Error in  sessions view controller:", error);
             return res.status(HttpStatusCode.UNAUTHORIZED).json({status: false, message: ResponseMessages.TOKEN_EXPIRED });
         }
     }

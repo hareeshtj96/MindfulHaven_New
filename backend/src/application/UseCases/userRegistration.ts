@@ -14,21 +14,15 @@ export default function userRegistration(dependencies: any) {
     const executionFunction = async (data: any) => {
         try {
             const {email, role,password} = data;
-            console.log("email:", email);
-            console.log("password from register use case :", password)
-
+            
             const userExists = await userRepository.getUserByEmail({email});
-            console.log("userExists:", userExists);
+           
             if (userExists.status) {
-                console.log("user already exists error triggered:");
                 return { status: false, data: ResponseMessages.USER_ALREADY_EXISTS };
             }
 
-
             const response = await SendOtp(email);
-            console.log("response otp:", response);
             if(response.status) {
-
                 const token = jwt.sign(
                     {otp: response.otp, userData:data},
                     SECRET_KEY,
@@ -40,7 +34,6 @@ export default function userRegistration(dependencies: any) {
                 return {status: false, data: response.message}
             }
         } catch (error) {
-            console.error('Error in user registration use case:', error);
             return { status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR };
         }
     }

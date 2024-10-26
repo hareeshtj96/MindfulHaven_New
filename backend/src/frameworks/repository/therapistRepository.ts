@@ -7,8 +7,6 @@ dotenv.config();
 export default {
     createtherapist: async (data: any) => {
         try {
-
-            console.log("create therapist data:", data);
             const { name, email, password, role } = data;
             
             let hashedPassword = null;
@@ -31,29 +29,22 @@ export default {
                 return { status: false, message: "therapist creation failed" };
             }
         } catch (error) {
-            console.error("Error in creating therapist:", error);
             return { status: false, message: "Internal server error" };
         }
     },
 
     getTherapistByEmail: async (email: string) => {
-        console.log("entered getTherapistByEmail");
-        console.log("type of email:", typeof email);
-        
+       
         try {
             const therapist = await databaseSchema.Therapist.findOne({ email });
-            console.log("therapist from gettherapist:", therapist);
-
+           
             if(therapist) {
                 return {status: true, user:therapist};
             } else {
                 return {status: false, message: 'Therapist not found'}
             }
 
-            
-            
         } catch (error) {
-            console.error("Error in getTherapistByEmail:", error);
             return {status: false};
         }
     },
@@ -61,12 +52,8 @@ export default {
     
     saveTherapist: async (therapistData: any) => {
         try {
-            console.log("therapist data:", therapistData);
-    
-       
                 const existingTherapist = await databaseSchema.Therapist.findById(therapistData.therapistId);
-                console.log("existing therapist:", existingTherapist);
-    
+               
                 // If therapist exists, update the therapist
                 if (existingTherapist) {
                     const updatedTherapist = await databaseSchema.Therapist.findByIdAndUpdate(
@@ -93,17 +80,14 @@ export default {
                     return { status: true, data: updatedTherapist };
                 }
             
-            console.log("Creating a new therapist as no valid therapistId was provided or found.");
             delete therapistData.therapistId; 
     
             const therapist = new databaseSchema.Therapist(therapistData);
             const savedTherapist = await therapist.save();
             
-            console.log("New therapist saved successfully:", savedTherapist);
             return { status: true, data: savedTherapist };
     
         } catch (error) {
-            console.error("Error in saving Therapist:", error);
             return { status: false, message: "Internal Server Error" };
         }
     },
@@ -113,15 +97,12 @@ export default {
     getProfile: async(data: any) => {
         try {
             const therapist = await databaseSchema.Therapist.find();
-            console.log("therapist profile:", therapist);
-
             if(therapist) {
                 return { status: true, data:{therapist}}
             } else {
                 return { status: false, message: "Therapist profile not found"}
             }
         } catch (error) {
-            console.log("Error in therapist reposotry:", error);
             return { status: false, message: "Error occured during getting therapist profile"}
         }
     },
@@ -130,8 +111,7 @@ export default {
     getDetails: async(therapistId: string) => {
         try {
             const therapistDetails = await databaseSchema.Therapist.findById(therapistId);
-            console.log("therapist details:", therapistDetails);
-
+            
             const availableSlots = therapistDetails?.availableSlots
             const booked = therapistDetails?.booked
             const timings = therapistDetails?.timings
@@ -146,7 +126,6 @@ export default {
             }
             
         } catch (error) {
-            console.error("Error fetching therapist details:", error);
             return {
                 status: false,
                 message : "Failed to fetch therapist details"
@@ -156,17 +135,14 @@ export default {
 
     
     getBookings: async(therapistId: string, page: number, limit: number) => {
-        console.log("therapist id from repository:", therapistId);
-
+       
         try {
 
             const totalBookingsCount = await databaseSchema.Appointment.countDocuments({therapistId})
             const totalPages = Math.ceil(totalBookingsCount / limit);
 
             const bookings = await databaseSchema.Appointment.find( {therapistId} ).skip((page-1)*limit).limit(limit);
-            
-         
-
+        
             if(!bookings) {
                 return {
                     status: false, message: "Bookings not found"
@@ -189,7 +165,6 @@ export default {
             }
             
         } catch (error) {
-            console.error("Error fetching the bookings:", error);
             return {
                 status: false, message: "Error fetching bookings"
             }
@@ -209,12 +184,7 @@ export default {
             const startDateTime = new Date(`${date} ${startTime}`)
             const endDateTime = new Date(`${date} ${endTime}`);
 
-           
             const currentDateTime = new Date();
-
-            console.log("stat date time:", startDateTime.toISOString());
-            console.log("end date time:", endDateTime.toISOString());
-            console.log("current date time:", currentDateTime.toISOString());
 
             if (startDateTime >= endDateTime) {
                 return { status: false, message: "Start time must be before end time"};
@@ -237,7 +207,6 @@ export default {
             return { status: true, data: therapist}
             
         } catch (error) {
-            console.log("Error in updating therapist timings:", error);
             return { status: false, message:"Error occured during updatiing therapist timings"}
         }
     },
@@ -255,10 +224,28 @@ export default {
 
             return { status: true, message: "Appointment cancelled successfuly"}
         } catch (error) {
-            console.error("Error while cancelling appointment:", error);
             return { status: false, message: "Failed to cancel appointment"};
         }
     },
+
+    getCancelSlot: async ({slotId, therapistId} : {slotId: string, therapistId: string}) => {
+        try {
+            const therapist = await databaseSchema.Therapist.findById(therapistId);
+
+            if (!therapist) {
+                return { status: false, message: "Therapist not found"}
+            }
+
+            therapist.availableSlots.pull({ _id: slotId });
+
+            await therapist.save();
+
+            return { status: true, message: "Slot removed successfully"}
+
+        } catch (error) {
+            return { status: false, message: "Failed to remove slot"}
+        }
+    }
     
 }
 

@@ -13,11 +13,9 @@ export default function userLogin(dependencies: any) {
     const executionFunction = async(data: any) => {
         try {
             const {email, password} = data;
-            console.log("Login attempt with email:", email);
-
+         
             const user = await userRepository.getUserByEmail({email});
-            console.log("user found:", user);
-
+           
             if(!user.status) {
                 return {status: false, data: ResponseMessages.INVALID_EMAIL_OR_PASSWORD };
             }
@@ -35,7 +33,6 @@ export default function userLogin(dependencies: any) {
             );
             return {status: true, token};
         } catch (error) {
-            console.error("Error in user login use case:", error);
             return {status: false, data: ResponseMessages.INTERNAL_SERVER_ERROR }
         }
     }

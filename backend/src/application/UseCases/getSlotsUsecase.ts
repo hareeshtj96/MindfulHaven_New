@@ -4,7 +4,6 @@ export default (dependencies: any) => {
     const { userRepository } = dependencies.repository;
 
     const executeFunction = async (therapistId: string) => {
-        console.log("entered use case:.....")
         try {
             const response = await userRepository.getSlot(therapistId);
 
@@ -14,7 +13,6 @@ export default (dependencies: any) => {
                 return { status: false, message: response.message}
             }
         } catch (error) {
-            console.log(error);
             return { status: false, message: ResponseMessages.ERROR_IN_SLOT_USECASE };
         }
     }

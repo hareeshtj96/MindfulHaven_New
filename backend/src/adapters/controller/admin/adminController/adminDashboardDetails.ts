@@ -7,7 +7,6 @@ export default (dependencies: any) => {
 
     const adminDashboardDetails = async (req: Request, res: Response ) => {
 
-        console.log(" entered admin dashboard details controller.........")
         try {
            
             const response = await adminDashboardDetailsUsecase(dependencies).executeFunction();
@@ -19,7 +18,6 @@ export default (dependencies: any) => {
                 res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
-            console.error("Error in admin dashboard details controller:", error);
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR});
         }
     }

@@ -14,24 +14,18 @@ export default function userLogin (dependencies: any) {
     const { userRepository } = dependencies.repository;
 
     const loginController = async (req: Request, res: Response) => {
-        console.log("entered login controller:")
         try {
             const { email, password } = req.body;
-            console.log("req body:", req.body);
-
-
+            
             // Find the user by email
             const user = await userRepository.getUserByEmail({ email });
-            console.log('user:', user);
-
+         
             if (!user.status) {
                 return res.status(HttpStatusCode.BAD_REQUEST).json({ message: ResponseMessages.USER_NOT_FOUND });
             }
             if (user.data.isBlocked) {
                 return res.status(HttpStatusCode.FORBIDDEN).json({ message: ResponseMessages.USER_IS_BLOCKED });
             }
-
-            console.log("secret key....", SECRET_KEY);
 
             // Compare provided password with the stored hashed password
             const validPassword = await bcrypt.compare(password, user.data.password);
@@ -61,12 +55,9 @@ export default function userLogin (dependencies: any) {
                 maxAge: 7 * 24 * 60 * 60 * 1000,
             })
 
-            console.log("setting refresh token cookie:", refreshToken);
-
             // Send response
             res.json({ status: true, token });
         } catch (error) {
-            console.error("Error in loginController:", error);
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     };

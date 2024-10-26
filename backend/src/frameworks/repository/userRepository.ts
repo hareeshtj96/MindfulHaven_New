@@ -5,15 +5,12 @@ import bcrypt from "bcryptjs";
 export default {
     createUser: async (data: any) => {
         try {
-
-            console.log("create user data:", data);
             const { name, email, password, mobile, role } = data;
 
             let hashedPassword = null;
             if (password) {
                  hashedPassword = await bcrypt.hash(password, 10);
             } else {
-                console.error("Password is missing or invalid");
                 return { status: false, message: "Password is required"}
             }
 
@@ -27,8 +24,7 @@ export default {
             });
 
             const savedUser = await user.save()
-            console.log("New user created:", savedUser);
-
+           
             //creating wallet for user
             const newWallet = new databaseSchema.Wallet({
                 userId: savedUser._id,
@@ -37,12 +33,9 @@ export default {
                 currency: 'INR'
             });
 
-            
-
             // saving wallet
             const savedWallet = await newWallet.save();
-            console.log("new wallet created:", savedWallet);
-
+         
             // update user with the wallet reference
             savedUser.wallet = savedWallet._id;
             await savedUser.save();
@@ -51,7 +44,6 @@ export default {
 
            return { status: true, data: { user: userWithWallet, wallet: savedWallet}}
         } catch (error) {
-            console.error("Error in creating user:", error);
             return { status: false, message: "Internal server error" };
         }
     },
@@ -67,7 +59,6 @@ export default {
                 return {status: false, message: "User not found"};
             }
         } catch(error) {
-            console.error("Error in getting user by email:", error);
             throw new Error("Internal Server Error");
         }
     },
@@ -80,15 +71,12 @@ export default {
                 {password: hashedPassword },
             );
 
-            console.log('updateduser:', updatedUser);
-
             if(updatedUser) {
                 return { status: true, data: "password updated successfully"};
             } else {
                 return { status: false, message: "User not found or update failed"}
             }
         } catch (error) {
-            console.error("Error in updating user password:", error);
             throw new Error("Internal Server Error");
         }
     },   
@@ -111,8 +99,6 @@ export default {
             }
 
             if (newPassword !== confirmPassword) {
-                console.log(" passwords do not match");
-                
                 return { status: false, message: "New password and confim password do not match"}
             }
 
@@ -131,7 +117,6 @@ export default {
             }
 
         } catch (error) {
-            console.error("Error in change password:", error);
             return { status: false, message: "Error occured while changing password"}
         }
     },
@@ -139,16 +124,13 @@ export default {
     getUserProfile: async(email: string) => {
         try {
             const user = await databaseSchema.User.findOne({email});
-            console.log("foind user profile:", user);
-            console.log("user profile:", user);
-
+            
             if(user) {
                 return { status: true, data: {user}}
             } else {
                 return { status: false, message: "User profile not found"}
             }
         } catch (error) {
-            console.log("Error in user repository:", error);
             return { status: false, message: "Error occured during getting user profile"}
         }
     },
@@ -174,7 +156,6 @@ export default {
                 }
             };
         } catch (error) {
-            console.error("Error fetching child therapists:", error);
             return {
                 status: false, message: "Error fetching child therapists"
             }
@@ -182,7 +163,6 @@ export default {
     },
 
     getTherapistDetails: async(therapistId: string) => {
-        console.log("therapist id:", therapistId);
         try {
             const therapists = await databaseSchema.Therapist.findOne({
                 _id: therapistId, 
@@ -194,7 +174,6 @@ export default {
                 data: therapists
             };
         } catch (error) {
-            console.error("Error fetching therapists details:", error);
             return {
                 status: false, message: "Error fetching therapists"
             }
@@ -222,7 +201,6 @@ export default {
                 }
             }
         } catch (error) {
-            console.error("Error fetching therapist slots:", error);
             return {
                 status: false,
                 message: "Error fetching therapist slots"
@@ -232,11 +210,9 @@ export default {
 
 
     getBookedSlot: async(therapistId: string) => {
-        console.log("therapist id from user repository:", therapistId);
         try {
             const bookedSlots = await databaseSchema.Appointment.find({ therapistId });
-            console.log("booked slots:", bookedSlots);
-            
+          
             if(!bookedSlots ) {
                 return {
                     status: false,
@@ -246,7 +222,6 @@ export default {
             const slots = bookedSlots.map((appointment) => {
                 return appointment.slot
             })
-            console.log("slots.....", slots);
             
             return {
                 status: true,
@@ -254,7 +229,6 @@ export default {
                 data: slots
             }
         } catch (error) {
-            console.error("Error fetching booked slots:", error);
             return {
                 status: false,
                 message: "Error fetching booked slots"
@@ -343,7 +317,6 @@ export default {
             data: savedAppointment
           };
         } catch (error: any) {
-          console.error("Error saving appointment:", error);
           return {
             status: false,
             message: "Failed to save the appointment"
@@ -355,11 +328,8 @@ export default {
     bookingDetails : async({ bookingId} : {bookingId: string}) => {
         try {
             const response = await databaseSchema.Appointment.findById(bookingId)
-            console.log("response from bookign details:", response);
-
             return response;
         } catch (error: any) {
-            console.error("Error fetching booking details:", error);
             return {status: false, message:"Failed to find booking details"}
         }
     },
@@ -405,7 +375,6 @@ export default {
 
             return { status: true, message: "Appointment cancelled successfuly and amount refunded successfully"}
         } catch (error) {
-            console.error("Error while cancelling appointment:", error);
             return { status: false, message: "Failed to cancel appointment and refund amount"};
         }
     },
@@ -420,7 +389,6 @@ export default {
 
             const bookings = await databaseSchema.Appointment.find({ userId : userId , status: "scheduled", slot: {$gte : currentDate} }).skip(skip).limit(limit);
            
-
             // Fetch therapist details for each booking
             const bookingWithTherapists = await Promise.all(bookings.map(async (booking: any) => {
                 const therapistDetails = await databaseSchema.Therapist.findById(booking.therapistId);
@@ -430,7 +398,6 @@ export default {
                 }
             }))
            
-
             const totalBookings = await databaseSchema.Appointment.countDocuments({ userId : userId, status: "scheduled", slot: { $gte: currentDate} })
 
             return {
@@ -443,7 +410,6 @@ export default {
                 }
             }
         } catch (error: any) {
-            console.error("Error fetching all booking details:", error);
             return { status: false, message: "Failed to find all booking details"}
         }
     },
@@ -474,7 +440,6 @@ export default {
                 }
             }
         } catch (error: any) {
-            console.error("Error fetching all booking details:", error);
             return { status: false, message: "Failed to find all booking details"}
         }
     },
@@ -507,7 +472,6 @@ export default {
             }
             
         } catch (error: any) {
-            console.error("Error fetching all booking details:", error);
             return { status: false, message: "Failed to find all booking details"}
         }
     },
@@ -523,12 +487,9 @@ export default {
 
         try {
             const therapists = await databaseSchema.Therapist.find(filter);
-            console.log("result from repository....", therapists);
-
             return therapists
             
         } catch (error) {
-            console.error("Error fetching search result:", error);
             return { status: false, message: "Failed to fetch search results"}
             
         }
@@ -547,7 +508,6 @@ export default {
             return therapists;
             
         } catch (error) {
-            console.error("Error fetching child therapists:", error);
             return { status: false, message: "Failed to fetch search child therapists"}
         }
     },
@@ -564,7 +524,6 @@ export default {
             return sortedTherapists
             
         } catch (error) {
-            console.error("Error fetching sorted therapists:", error);
             return { status: false, message: "Error fetching sorted therapists"}
         }
     },
@@ -573,12 +532,10 @@ export default {
     savePayment: async (paymentData: any) => {
         try {
             const result = await databaseSchema.Payment.create(paymentData);
-            console.log("result from repository:", result);
-
+            
             return { status: true, data: result, paymentId: result._id}
             
         } catch (error) {
-            console.error("Error saving payment:", error);
             return { status: false, message: 'Failed to save payment'}
             
         }
@@ -589,15 +546,12 @@ export default {
             const result = await databaseSchema.Wallet.findOne({userId})
             
             if (!result) {
-                console.log("No wallet found for this user");
                 return { status: false, message: "Wallet not found"};
                 
             }
-            console.log("result from wallet repository:", result);
             return { status: true, data: result }
             
         } catch (error) {
-            console.error("Error retrieving wallet details:", error);
             return { status: false, message : "Failed to retrieve wallet details"}
         }
 
@@ -610,8 +564,7 @@ export default {
         try {
 
             const booking = await databaseSchema.Appointment.findById(bookingId)
-            console.log("booking from repository:", booking);
-
+            
             if (!booking) {
                 console.log("No booking found with given bookingId");
                 return { status: false, message: "Booking not found"}
@@ -628,12 +581,8 @@ export default {
             });
 
             const result = await newIssue.save();
-
-            console.log("Issue saved successfully:", result);
             return { status: true, data: result };
-            
         } catch (error) {
-            console.error("Error saving issue:", error);
             return { status: false, message: "Failed to save issue"}
         }
     }

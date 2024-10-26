@@ -9,6 +9,7 @@ import therapistUpdateTimingsController from "./therapistUpdateTimingsController
 import therapistVideoController from "./therapistVideoController"
 import cancelAppointmentTherapist from "./cancelAppointmentTherapist"
 import getAvailableDetails from "./getAvailableDetails"
+import cancelSlotController from "./cancelSlotController"
 
 
 export default (dependencies: any) => {
@@ -23,5 +24,6 @@ export default (dependencies: any) => {
         therapistVideoController: therapistVideoController(dependencies),
         cancelAppointmentTherapist: cancelAppointmentTherapist(dependencies),
         getAvailableDetails: getAvailableDetails(dependencies),
+        cancelSlotController: cancelSlotController(dependencies),
     }
 }

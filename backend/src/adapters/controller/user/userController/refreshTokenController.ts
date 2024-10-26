@@ -13,16 +13,10 @@ if (!REFRESH_SECRET_KEY) {
 }
 
 export const refreshTokenController = (dependencies: any) => {
-    console.log("entered refresh token controller............");
     
     return (req: Request, res: Response) => {
-        
-
-        console.log("cookied received:", req.cookies);
-
         const refreshToken = req.cookies['refreshToken'];
-        console.log("refresh token from controller:", refreshToken);
-
+       
         if (!refreshToken) {
             return res.status(HttpStatusCode.FORBIDDEN).json({ message: ResponseMessages.REFRESH_TOKEN_NOT_PROVIDED });
         }
@@ -43,16 +37,13 @@ export const refreshTokenController = (dependencies: any) => {
                     SECRET_KEY,
                     { expiresIn: '20m' }
                 );
-                console.log("new access token:", newAccessToken);
-
+                
                 // Generate new refresh token
                 const newRefreshToken = jwt.sign(
                     { email,  role },
                     REFRESH_SECRET_KEY,
                     { expiresIn: '7d' }
                 );
-
-                console.log("new refresh token:", newRefreshToken);
 
                 // Set the new refresh token as a cookie
                 res.cookie('refreshToken', newRefreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'strict', maxAge: 7 * 24 * 60 * 60 * 1000 });
