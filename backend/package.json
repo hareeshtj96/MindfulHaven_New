@@ -19,11 +19,12 @@
     "@types/express-session": "^1.18.0",
     "@types/jsonwebtoken": "^9.0.6",
     "@types/mongoose": "^5.11.97",
-    "@types/node": "^22.4.1",
+    "@types/node": "^22.8.6",
     "@types/nodemailer": "^6.4.15",
     "@types/ws": "^8.5.12",
+    "nodemon": "^3.1.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -37,7 +38,6 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.14",
-    "nodemon": "^3.1.4",
     "razorpay": "^2.9.4",
     "react-modal": "^3.16.1",
     "rrule": "^2.8.1",
