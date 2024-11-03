@@ -18,7 +18,7 @@ const expressConfig = (app: Express) => {
 
     app.use(
         cors({
-            origin: ["http://localhost:5173"],
+            origin: ["http://localhost:5173", "http://35.154.121.139"],
             methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
             credentials: true,
             allowedHeaders: ["Content-Type", "Authorization"],
