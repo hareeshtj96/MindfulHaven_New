@@ -1,4 +1,4 @@
-const BASE_URL = 'http://35.154.121.139';
+const BASE_URL = 'http://35.154.121.139/api';
 
 export const USERREGISTER = `${BASE_URL}/register`;
 export const GOOGLEREGISTER = `${BASE_URL}/register_google_auth`;
