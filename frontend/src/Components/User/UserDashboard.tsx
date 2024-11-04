@@ -118,7 +118,7 @@ function Dashboard() {
                                         {therapist.photo ? (
                                             <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
                                                 <img
-                                                    src={`http://localhost:8080/uploads/${therapist.photo.replace(/\\/g, "/")}`}
+                                                    src={`http://mindfulhaven.life/api/uploads/${therapist.photo.replace(/\\/g, "/")}`}
                                                     alt={therapist.name}
                                                     className="w-full h-full object-cover"
                                                 />

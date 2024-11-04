@@ -50,7 +50,7 @@ if (storedAuthInfo) {
 
 // Create Axios instance
 const axiosInstance: AxiosInstance = axios.create({
-    baseURL: 'http://localhost:8080',
+    baseURL: 'https://mindfulhaven.life/api',
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ axiosInstance.interceptors.response.use(
             try {
                 console.log("inteceptors.....")
                 const refreshResponse = await axios.post(
-                    "http://localhost:8080/refresh_token",
+                    "https://mindfulhaven.life/api/refresh_token",
                     {},
                     { withCredentials: true }
                 );

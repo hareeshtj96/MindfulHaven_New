@@ -61,7 +61,6 @@ const AdminTherapistDetails = () => {
    
     if (!therapistData || !selectedTherapist ) return <p>No therapist found.</p>;
 
-
     return (
             <div className="flex flex-col items-center min-h-screen bg-gray-100">
                 <div className="w-full max-w-4xl">
@@ -71,7 +70,7 @@ const AdminTherapistDetails = () => {
                             {selectedTherapist.photo ? (
                                 <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
                                     <img 
-                                        src={`http://localhost:8080/uploads/${selectedTherapist.photo.replace(/\\/g, "/")}`}
+                                        src={`http://mindfulhaven.life/api/uploads/${selectedTherapist.photo.replace(/\\/g, "/")}`}
                                         alt={selectedTherapist.name} 
                                         className="w-full h-full object-cover" 
                                     />
@@ -108,7 +107,7 @@ const AdminTherapistDetails = () => {
                          <strong className="pr-2">Identity Proof:</strong> 
                             {selectedTherapist.identityProof ? (
                              <a 
-                                href={`http://localhost:8080/uploads/${selectedTherapist.identityProof.replace(/\\/g, "/")}`} 
+                                href={`http://mindfulhaven.life/api/uploads/${selectedTherapist.identityProof.replace(/\\/g, "/")}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
                                 className="text-blue-600 underline"

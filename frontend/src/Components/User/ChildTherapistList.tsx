@@ -112,7 +112,7 @@ const ChildTherapistList: React.FC = () => {
                                 {therapist.photo ? (
                                     <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
                                         <img
-                                            src={`http://localhost:8080/uploads/${therapist.photo.replace(
+                                            src={`http://mindfulhaven.life/api/uploads/${therapist.photo.replace(
                                                 /\\/g,
                                                 "/"
                                             )}`}
@@ -200,7 +200,7 @@ const ChildTherapistList: React.FC = () => {
                                 {therapist.photo ? (
                                     <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
                                         <img
-                                            src={`http://localhost:8080/uploads/${therapist.photo.replace(
+                                            src={`http://mindfulhaven.life/api/uploads/${therapist.photo.replace(
                                                 /\\/g,
                                                 "/"
                                             )}`}
