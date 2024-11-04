@@ -1,4 +1,4 @@
-const BASE_URL = 'http://35.154.121.139/api';
+const BASE_URL = 'https://mindfulhaven.life/api';
 
 export const REGISTERTHERAPIST = `${BASE_URL}/therapist/therapist_register`;
 export const VERIFYOTP = `${BASE_URL}/therapist/therapist_OTP`;

@@ -1,4 +1,4 @@
-const BASE_URL = 'http://35.154.121.139/api';
+const BASE_URL = 'https://mindfulhaven.life/api';
 
 export const ADMINLOGIN = `${BASE_URL}/admin/admin_login`;
 export const GETTHERAPIST = `${BASE_URL}/admin/admin_getTherapist`

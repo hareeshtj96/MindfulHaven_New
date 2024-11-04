@@ -18,7 +18,7 @@ const expressConfig = (app: Express) => {
 
     app.use(
         cors({
-            origin: ["http://localhost:5173", "http://35.154.121.139"],
+            origin: ["http://localhost:5173", "https://mindfulhaven.life", "https://www.mindfulhaven.life"],
             methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
             credentials: true,
             allowedHeaders: ["Content-Type", "Authorization"],

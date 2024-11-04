@@ -17,7 +17,7 @@ const expressConfig = (app) => {
     app.use(express_1.default.static("public"));
     // app.use('/src/uploads', express.static('src/uploads'));
     app.use((0, cors_1.default)({
-        origin: ["http://localhost:5173", "http://35.154.121.139"],
+        origin: ["http://localhost:5173", "https://mindfulhaven.life", "https://www.mindfulhaven.life"],
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true,
         allowedHeaders: ["Content-Type", "Authorization"],
