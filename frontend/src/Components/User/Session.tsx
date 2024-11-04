@@ -204,7 +204,7 @@ const Session = () => {
 
     const createSocket = () => {
         if (!socket || socket.readyState === WebSocket.CLOSED) {
-           socket = new WebSocket(`ws://${window.location.hostname}:8080`);
+           socket = new WebSocket(`wss://${window.location.hostname}:8080`);
 
             // event handler for successful connection
             socket.onopen = () => {
