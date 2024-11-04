@@ -70,7 +70,7 @@ const AdminTherapistDetails = () => {
                             {selectedTherapist.photo ? (
                                 <div className="w-24 h-24 rounded-full overflow-hidden flex items-center justify-center bg-gray-100">
                                     <img 
-                                        src={`http://mindfulhaven.life/api/uploads/${selectedTherapist.photo.replace(/\\/g, "/")}`}
+                                        src={`https://mindfulhaven.life/api/uploads/${selectedTherapist.photo.replace(/\\/g, "/")}`}
                                         alt={selectedTherapist.name} 
                                         className="w-full h-full object-cover" 
                                     />
@@ -107,7 +107,7 @@ const AdminTherapistDetails = () => {
                          <strong className="pr-2">Identity Proof:</strong> 
                             {selectedTherapist.identityProof ? (
                              <a 
-                                href={`http://mindfulhaven.life/api/uploads/${selectedTherapist.identityProof.replace(/\\/g, "/")}`} 
+                                href={`https://mindfulhaven.life/api/uploads/${selectedTherapist.identityProof.replace(/\\/g, "/")}`} 
                                 target="_blank" 
                                 rel="noopener noreferrer" 
                                 className="text-blue-600 underline"

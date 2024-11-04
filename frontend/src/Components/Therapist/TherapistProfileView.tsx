@@ -61,7 +61,7 @@ const TherapistProfileView = () => {
             <div className="flex flex-col items-center">
                 {therapist.photo ? (
                     <img 
-                        src={`http://mindfulhaven.life/api/uploads/${therapist.photo.replace(/\\/g, "/")}`}
+                        src={`https://mindfulhaven.life/api/uploads/${therapist.photo.replace(/\\/g, "/")}`}
                         alt="Therapist" 
                         className="w-32 h-32 rounded-full mb-4" 
                     />
