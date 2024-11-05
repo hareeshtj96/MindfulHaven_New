@@ -79,6 +79,9 @@ export enum ResponseMessages {
     ERROR_IN_SUBMIT_ISSUE = "Error in submit issue",
     INVALID_EMAIL_OR_PASSWORD = "Invalid email or password",
     ERROR_WALLET_USECASE = "Error in wallet usecase",
+    PHOTO_MISSING = "Photo is missing",
+    PHOTO_UPDATED = "Photo is successfully updated",
+    FAILED_TO_UPDATE_THERAPIST_PHOTO = "Failed to update therapist photo"
     
 
 }

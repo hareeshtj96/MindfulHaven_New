@@ -68,7 +68,7 @@ export {
 }
 
 
-import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase } from "./therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase } from "./therapistUseCases";
 
 export {
     therapistRegistration,
@@ -76,5 +76,6 @@ export {
     updateTherapistTimingsUsecase,
     therapistSessionUsecase,
     cancelAppointmentTherapistUsecase,
-    getTherapistDetailsUsecase
+    getTherapistDetailsUsecase,
+    therapistPhotoUsecase
 }

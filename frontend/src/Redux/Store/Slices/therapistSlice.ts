@@ -11,7 +11,8 @@ import { REGISTERTHERAPIST,
     JOINTHERAPISTVIDEO,
     CANCELAPPOINTMENTBYTHERAPIST,
     GETAVAILABILITY,
-    CANCELAVAILABLESLOT
+    CANCELAVAILABLESLOT,
+    UPDATEPHOTO
   } from "../../../Services/therapistApi";
 
 
@@ -256,6 +257,34 @@ export const updateTherapistDetails = createAsyncThunk<Therapist, FormData, {rej
         }
     }
 );
+
+export const updatePhoto = createAsyncThunk<Therapist, FormData, {rejectValue: string}>(
+    "therapist/updatePhoto",
+    async (FormData, thunkAPI) => {
+        try {
+            const token = localStorage.getItem("therapistToken");
+            if (!token) {
+                return thunkAPI.rejectWithValue("No token found")
+            }
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data"
+
+                }
+            }
+
+            const response = await axios.put(UPDATEPHOTO, FormData, config);
+            console.log("response from updatePhoto:", response);
+            
+            return response.data.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || "Photo upload failed";
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
 
 
 export const fetchProfile = createAsyncThunk<Therapist[], void, {rejectValue: string}>(

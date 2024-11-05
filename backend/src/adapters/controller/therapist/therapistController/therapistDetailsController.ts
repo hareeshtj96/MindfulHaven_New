@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import { Therapist } from "../../../../frameworks/database/schema/therapistSchema";
 import { RRule, RRuleSet } from "rrule";
-import { create } from "domain";
-import { Number } from "mongoose";
 import { HttpStatusCode, ResponseMessages } from "../../../../utils/httpStatusCode";
+import { uploadFileToS3 } from "../../../router/authenticationRouter/therapistRouter";
 
 dotenv.config();
+
+const bucketName = process.env.BUCKET_NAME ?? ""
 
 interface Timing {
     dayOfWeek: number[];  
@@ -50,6 +50,7 @@ const createTherapistSlotRules = (timings: Timing[]) => {
 
 
 export default function therapistDetailsController(dependencies: any) {
+   
     const { therapistRepository } = dependencies.repository;
 
     const submitTherapistDetails = async (req:Request, res: Response) => {
@@ -59,7 +60,7 @@ export default function therapistDetailsController(dependencies: any) {
             }
             
             const therapistData = JSON.parse(req.body.therapistData);
-    
+          
             const {
                 name,
                 phone,
@@ -85,19 +86,17 @@ export default function therapistDetailsController(dependencies: any) {
 
             if(req.files) {
                 const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-
+             
                 if(files['photo']) {
-                    photoUrl = files['photo'][0].filename;
+                    photoUrl = await uploadFileToS3(files["photo"][0], bucketName, "therapists/photos" )
                 }
 
                 if(files['identityProof']) {
-                    identityProofUrl = files['identityProof'][0].filename;
+                    identityProofUrl = await uploadFileToS3(files["identityProof"][0], bucketName, "therapists/identityProofs")
                 }
 
                
             }
-
-            
             
             const newTherapist = {
                 name,

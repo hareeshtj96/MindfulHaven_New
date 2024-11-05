@@ -1,4 +1,6 @@
-const BASE_URL = 'https://mindfulhaven.life/api';
+// const BASE_URL = 'https://mindfulhaven.life/api';
+
+const BASE_URL = 'http://localhost:8080'
 
 export const USERREGISTER = `${BASE_URL}/register`;
 export const GOOGLEREGISTER = `${BASE_URL}/register_google_auth`;

@@ -92,6 +92,25 @@ export default {
         }
     },
 
+    uploadPhoto: async (therapistId: string, photoUrl: string) => {
+        try {
+            const existingTherapist = await databaseSchema.Therapist.findById(therapistId);
+            
+            if (existingTherapist) {
+                const updatedTherapist = await databaseSchema.Therapist.findByIdAndUpdate(
+                    therapistId,
+                    { photo: photoUrl},
+                    { new: true }
+                );
+                return { status: true, data: updatedTherapist}
+            }
+
+            return { status: false, message: "Therapist not found"}
+        } catch (error) {
+            return { status: false, message: "Internal Server Error"}
+        }
+    },
+
 
 
     getProfile: async(data: any) => {

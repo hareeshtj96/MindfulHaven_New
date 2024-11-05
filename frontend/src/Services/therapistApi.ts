@@ -1,4 +1,6 @@
-const BASE_URL = 'https://mindfulhaven.life/api';
+// const BASE_URL = 'https://mindfulhaven.life/api';
+
+const BASE_URL = 'http://localhost:8080'
 
 export const REGISTERTHERAPIST = `${BASE_URL}/therapist/therapist_register`;
 export const VERIFYOTP = `${BASE_URL}/therapist/therapist_OTP`;
@@ -11,3 +13,4 @@ export const JOINTHERAPISTVIDEO = `${BASE_URL}/therapist/therapist_video_call`;
 export const CANCELAPPOINTMENTBYTHERAPIST = `${BASE_URL}/therapist/therapist_cancelAppointment`
 export const GETAVAILABILITY = `${BASE_URL}/therapist/therapist_availableDetails`
 export const CANCELAVAILABLESLOT = `${BASE_URL}/therapist/therapist_cancelSlot`
+export const UPDATEPHOTO = `${BASE_URL}/therapist/updatePhoto`;
