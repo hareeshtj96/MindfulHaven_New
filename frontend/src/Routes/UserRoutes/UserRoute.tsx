@@ -22,37 +22,43 @@ import VideoCall from "../../Components/User/VideoComponent";
 import ChangePassword from "../../Components/User/ChangePassword";
 import UserWallet from "../../Components/User/UserWallet";
 import IssueManagement from "../../Components/User/IssueManagement";
+import FamilyTherapistListPage from "../../Pages/User/FamilyTherapistListPage";
+import IndividualTherapistListPage from "../../Pages/User/IndividualTherapistListPage";
+import CoupleTherapistListPage from "../../Pages/User/CoupleTherapistListPage";
 
 
 function UserRoute() {
     return (
         <>
         <Routes>
-            <Route path="/" element={<ProtectedRoute> <UserLanding /> </ProtectedRoute> }/>
-            <Route path="/register" element={<ProtectedRoute> <UserRegister /> </ProtectedRoute> } />
-            <Route path="/login" element={<ProtectedRoute> <UserLogin /> </ProtectedRoute>   } />
+            <Route path="/" element={<UserLanding /> }/>
+            <Route path="/register" element={<UserRegister /> } />
+            <Route path="/login" element={<UserLogin /> } />
             <Route path="/aboutus" element={<AboutUsPage />}/>
             <Route path="/location" element={<LocationPage />} />
             <Route path="/otp_Verify" element={<UserOTP />} />
-            <Route path="/dashboard" element={ <UserDashboardPage />} />
+            <Route path="/dashboard" element={<ProtectedRoute><UserDashboardPage /></ProtectedRoute> } />
             <Route path="/forgot-password" element={ <UserForgotPassword />} />
             <Route path="/forgotPasswordOtp" element={<ForgotPasswordOtpPage /> } />
             <Route path="/password_Reset" element={<PasswordResetPage /> } />
             
-            <Route path="/user_profile" element={<UserProfilePage /> } >
+            <Route path="/user_profile" element={<ProtectedRoute> <UserProfilePage /> </ProtectedRoute> } >
 
-            <Route path="changePassword" element={<ChangePassword />} />
-            <Route path="wallet" element={<UserWallet />} />
+            <Route path="changePassword" element={<ProtectedRoute> <ChangePassword /> </ProtectedRoute> } />
+            <Route path="wallet" element={<ProtectedRoute> <UserWallet /> </ProtectedRoute> } />
             <Route path="basicDetails" element={<></>} />
             </Route>
 
-            <Route path="/childTherapy" element={<ChildTherapistListPage /> } />
-            <Route path="/slot_management/:therapistId" element={<SlotManagementPage />}/>
-            <Route path="/sessions" element={<SessionsPage />}/>
-            <Route path="/booking_status/:bookingId" element={<BookingStatusPage /> }/>
-            <Route path="/payment" element={<PaymentManagementPage />}/>
-            <Route path="/video-call/:roomId" element={<VideoCall /> } />
-            <Route path="/issue_management" element={<IssueManagement />} />
+            <Route path="/childTherapy" element={<ProtectedRoute> <ChildTherapistListPage /> </ProtectedRoute>  } />
+            <Route path="/familyTherapy" element={<ProtectedRoute> <FamilyTherapistListPage /> </ProtectedRoute>} />
+            <Route path="/slot_management/:therapistId" element={<ProtectedRoute> <SlotManagementPage /> </ProtectedRoute> }/>
+            <Route path="/sessions" element={<ProtectedRoute><SessionsPage /></ProtectedRoute>}/>
+            <Route path="/booking_status/:bookingId" element={<ProtectedRoute> <BookingStatusPage /> </ProtectedRoute> }/>
+            <Route path="/payment" element={<ProtectedRoute><PaymentManagementPage /></ProtectedRoute>}/>
+            <Route path="/video-call/:roomId" element={<ProtectedRoute><VideoCall /></ProtectedRoute> } />
+            <Route path="/issue_management" element={<ProtectedRoute><IssueManagement /></ProtectedRoute>} />
+            <Route path="/individualTherapy" element={<ProtectedRoute><IndividualTherapistListPage /></ProtectedRoute>} />
+            <Route path="/coupleTherapy" element={<ProtectedRoute><CoupleTherapistListPage /></ProtectedRoute>} />
 
             <Route path="/*" element={<PageNotFoundPage />}/>
         </Routes>

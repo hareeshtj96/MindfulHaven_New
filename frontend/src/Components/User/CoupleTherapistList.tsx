@@ -3,16 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../Redux/Store/store";
 import {
-    fetchChildTherapist,
-    fetchSortedChildTherapists,
-    fetchChildTherapistBySearchTerm,
+    fetchCoupleTherapist,
+    fetchSortedCoupleTherapists,
+    // fetchCoupleTherapistBySearchTerm,
 } from "../../Redux/Store/Slices/userSlice";
 import DefaultSkeleton from "../../Components/MaterialUI/Shimmer";
 
-const ChildTherapistList: React.FC = () => {
+const CoupleTherapistList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { therapists, totalPages, currentPage, sortedTherapists, status, error, } = useSelector(
+    const { coupleTherapists, totalPages, currentPage, sortedCoupleTherapists, status, error, } = useSelector(
         (state: RootState) => state.user
     );
 
@@ -31,7 +31,7 @@ const ChildTherapistList: React.FC = () => {
 
     // Fetch all therapists on mount
     useEffect(() => {
-        dispatch(fetchChildTherapist({ page: currentPage, limit: therapistsPerPage }));
+        dispatch(fetchCoupleTherapist({ page: currentPage, limit: therapistsPerPage }));
     }, [dispatch, currentPage, therapistsPerPage]);
 
      
@@ -40,32 +40,32 @@ const ChildTherapistList: React.FC = () => {
 
     // Fetch sorted therapists based on sort option
     useEffect(() => {
-        dispatch(fetchSortedChildTherapists(sortOption));
+        dispatch(fetchSortedCoupleTherapists(sortOption));
     }, [dispatch, sortOption]);
 
     // Debounce search input
-    useEffect(() => {
-        const timerId = setTimeout(() => {
-            setDebouncedSearchTerm(searchTerm);
-        }, 300);
+    // useEffect(() => {
+    //     const timerId = setTimeout(() => {
+    //         setDebouncedSearchTerm(searchTerm);
+    //     }, 300);
 
-        return () => clearTimeout(timerId);
-    }, [searchTerm]);
+    //     return () => clearTimeout(timerId);
+    // }, [searchTerm]);
 
     // Fetch child therapists based on the search term
-    useEffect(() => {
-        if (debouncedSearchTerm) {
-            setHasSearched(true);
-            dispatch(fetchChildTherapistBySearchTerm(debouncedSearchTerm));
-        } else {
-            setHasSearched(false);
-        }
-    }, [debouncedSearchTerm, dispatch]);
+    // useEffect(() => {
+    //     if (debouncedSearchTerm) {
+    //         setHasSearched(true);
+    //         dispatch(fetchFamilyTherapistBySearchTerm(debouncedSearchTerm));
+    //     } else {
+    //         setHasSearched(false);
+    //     }
+    // }, [debouncedSearchTerm, dispatch]);
 
     // Filter therapists based on selected gender
     const filteredTherapists = genderFilter === "all"
-        ? sortedTherapists
-        : sortedTherapists.filter((therapist) => therapist.gender === genderFilter);
+        ? sortedCoupleTherapists
+        : sortedCoupleTherapists.filter((therapist) => therapist.gender === genderFilter);
 
     const handleBookAppointment = (therapistId: string) => {
         navigate(`/slot_management/${therapistId}`);
@@ -103,10 +103,10 @@ const ChildTherapistList: React.FC = () => {
             </div>
 
             {/* Display search results */}
-            {hasSearched && therapists.length > 0 && (
+            {hasSearched && coupleTherapists.length > 0 && (
                 <div className="mb-4">
                     <h2 className="text-lg font-semibold">Search Results:</h2>
-                    {therapists.map((therapist) => (
+                    {coupleTherapists.map((therapist) => (
                         <div key={therapist._id} className="flex bg-white rounded-lg shadow-md p-4 mt-2">
                             <div className="flex flex-col items-center justify-center p-4">
                                 {therapist.photo ? (
@@ -186,7 +186,7 @@ const ChildTherapistList: React.FC = () => {
 
             {/* Therapist List */}
             <div className="space-y-4">
-                {!hasSearched && (!therapists || therapists.length === 0) ? (
+                {!hasSearched && (!coupleTherapists|| coupleTherapists.length === 0) ? (
                     <div className="text-center text-gray-700">
                         <p>No therapists found based on your criteria. Please try a different term.</p>
                     </div>
@@ -248,4 +248,4 @@ const ChildTherapistList: React.FC = () => {
     );
 };
 
-export default ChildTherapistList;
+export default CoupleTherapistList;

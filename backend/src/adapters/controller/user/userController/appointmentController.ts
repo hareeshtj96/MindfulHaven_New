@@ -8,7 +8,7 @@ export default (dependencies: any) => {
     const appointmentController = async (req: Request, res: Response ) => {
         try {
             const { therapistId, userId, slot, notes, paymentId } = req.body;
-            
+           
             const response = await getAppointmentUsecase(dependencies).executeFunction({ therapistId,
                 userId,
                 slot,

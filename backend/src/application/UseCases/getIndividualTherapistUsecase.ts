@@ -1,19 +1,20 @@
 import { ResponseMessages } from "../../utils/httpStatusCode";
 
 export default (dependencies: any) => {
-    const { adminRepository } = dependencies.repository;
+    const { userRepository } = dependencies.repository;
 
-    const executeFunction = async (userId: string) => { 
+    const executeFunction = async (requestData: {page: number, limit: number}) => {
         try {
-            const response = await adminRepository.getBlock(userId);
-            
+            const {page, limit} = requestData;
+            const response = await userRepository.getIndividualTherapist(page, limit);
+
             if(response.status) {
                 return { status: true, data: response.data};
             } else  {
                 return { status: false, message: response.message}
             }
         } catch (error) {
-            return { status: false, message: ResponseMessages.ERROR_IN_ADMIN_USECASE };
+            return { status: false, message: ResponseMessages.ERROR_IN_INDIVIDUAL_THERAPIST_USECASE };
         }
     }
     return {executeFunction}

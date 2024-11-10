@@ -11,9 +11,17 @@ const BookingStatus = () => {
   
     const bookingStatus = useSelector((state: RootState) => state.user.appointmentData);
     console.log("booking status:", bookingStatus);
-    const therapist = useSelector((state: RootState) =>
-        state.user.therapists.therapists.find(t => t._id === bookingStatus?.therapistId)
-    );
+   
+    const therapist = useSelector((state: RootState) => {
+        const therapistList = [
+          ...(state.user.therapists?.therapists || []),
+          ...(state.user.familyTherapists?.therapists || []),
+          ...(state.user.coupleTherapists?.therapists || []),
+          ...(state.user.individualTherapists?.therapists || [])
+      ]; 
+    
+        return therapistList.find((t) => t._id === bookingStatus?.therapistId);
+    });
     const loading = useSelector((state: RootState) => state.user.loading);
     const error = useSelector((state: RootState) => state.user.error);
 

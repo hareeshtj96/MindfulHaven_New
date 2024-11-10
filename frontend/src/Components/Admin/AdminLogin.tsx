@@ -1,8 +1,8 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../Redux/Store/store";
-import { loginAdmin } from "../../Redux/Store/Slices/adminSlice";
+import { loginAdmin, resetLoading } from "../../Redux/Store/Slices/adminSlice";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -13,6 +13,14 @@ function AdminLogin() {
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
     const { loading, error, token } = useSelector((state: RootState) => state.admin); 
+
+    useEffect(() => {
+        return () => {
+            dispatch(resetLoading());
+        };
+    }, []);
+    
+        
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();

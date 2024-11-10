@@ -25,6 +25,14 @@ import geminiAPIUsecase from "./geminiAPIUsecase";
 import changePasswordUsecase from "./changePasswordUsecase";
 import walletDetailsUsecase from "./walletDetailsUsecase";
 import submitIssueUsecase from "./submitIssueUsecase";
+import getFamilyTherapistUsecase from "./getFamilyTherapistUsecase";
+import searchFamilyTherapistUsecase from "./searchFamilyTherapistUsecase";
+import sortFamilyTherapistUsecase from "./sortFamilyTherapistUsecase";
+import getIndividualTherapistUsecase from "./getIndividualTherapistUsecase";
+import sortIndividualTherapistUsecase from "./sortIndividualTherapistUsecase";
+import searchIndividualTherapistUsecase from "./searchIndividualTherapistUsecase";
+import getCoupleTherapistUsecase from "./getCoupleTherapistUsecase";
+import sortCoupleTherapistUsecase from "./sortCoupleTherapistUsecase";
 
 export {
     userRegistration,
@@ -54,4 +62,12 @@ export {
     changePasswordUsecase,
     walletDetailsUsecase,
     submitIssueUsecase,
+    getFamilyTherapistUsecase,
+    searchFamilyTherapistUsecase,
+    sortFamilyTherapistUsecase,
+    getIndividualTherapistUsecase,
+    sortIndividualTherapistUsecase,
+    searchIndividualTherapistUsecase,
+    getCoupleTherapistUsecase,
+    sortCoupleTherapistUsecase,
 }

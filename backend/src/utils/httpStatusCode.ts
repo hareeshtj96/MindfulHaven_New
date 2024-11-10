@@ -81,7 +81,15 @@ export enum ResponseMessages {
     ERROR_WALLET_USECASE = "Error in wallet usecase",
     PHOTO_MISSING = "Photo is missing",
     PHOTO_UPDATED = "Photo is successfully updated",
-    FAILED_TO_UPDATE_THERAPIST_PHOTO = "Failed to update therapist photo"
+    FAILED_TO_UPDATE_THERAPIST_PHOTO = "Failed to update therapist photo",
+    FAMILY_THERAPIST_NOT_FOUND = "Family therapist not found",
+    INDIVIDUAL_THERAPIST_NOT_FOUND = "Individual therapist not found",
+    ERROR_IN_FAMILY_THERAPIST_USECASE = "Error in family therapist usecase",
+    ERROR_SEARCHING_FAMILY_THERAPIST = "Error searching family therapist",
+    ERROR_IN_INDIVIDUAL_THERAPIST_USECASE = "Error in individual therapist usecase",
+    ERROR_SEARCHING_INDIVIDUAL_THERAPIST = "Error in searching individual therapist",
+    COUPLE_THERAPIST_NOT_FOUND = "Couple therapist not found",
+    ERROR_IN_COUPLE_THERAPIST_USECASE = "Error in couple therapist usecase"
     
 
 }

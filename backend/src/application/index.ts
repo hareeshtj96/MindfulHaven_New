@@ -22,7 +22,15 @@ import { userRegistration,
     geminiAPIUsecase,
     changePasswordUsecase,
     walletDetailsUsecase,
-    submitIssueUsecase
+    submitIssueUsecase,
+    getFamilyTherapistUsecase,
+    searchFamilyTherapistUsecase,
+    sortFamilyTherapistUsecase,
+    getIndividualTherapistUsecase,
+    sortIndividualTherapistUsecase,
+    searchIndividualTherapistUsecase,
+    getCoupleTherapistUsecase,
+    sortCoupleTherapistUsecase
  } from "./UseCases";
 
 export {
@@ -50,7 +58,15 @@ export {
     geminiAPIUsecase,
     changePasswordUsecase,
     walletDetailsUsecase,
-    submitIssueUsecase
+    submitIssueUsecase,
+    getFamilyTherapistUsecase,
+    searchFamilyTherapistUsecase,
+    sortFamilyTherapistUsecase,
+    getIndividualTherapistUsecase,
+    sortIndividualTherapistUsecase,
+    searchIndividualTherapistUsecase,
+    getCoupleTherapistUsecase,
+    sortCoupleTherapistUsecase
 }
 
 

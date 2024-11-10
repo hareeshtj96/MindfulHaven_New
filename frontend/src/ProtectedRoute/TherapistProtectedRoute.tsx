@@ -14,7 +14,6 @@ const TherapistProtectedRoute: React.FC<TherapistProtectedRouteProps> = ({ child
 
     useEffect(() => {
         if(!token) {
-            console.log("Therapist not authenticated, redirecting to login");
             navigate("/therapist/therapist_login", {replace: true});
             
         }

@@ -18,15 +18,24 @@ const PaymentPage = () => {
     const appointmentStatus = useSelector((state: RootState) => state.user.appointmentStatus)
     const appointmentError = useSelector((state: RootState) => state.user.appointmentError)
     const appointmentDataState = useSelector((state: RootState) => state.user.appointmentData);
+    console.log("appointment data state:", appointmentDataState);
+    
 
     const navigate = useNavigate();
     const dispatch: AppDispatch = useDispatch();
     const location = useLocation();
     const { totalAmount, userId, therapistId, slot } = location.state || { totalAmount: 0 };
 
-    const therapist = useSelector((state: RootState) =>
-        state.user.therapists.therapists.find((t) => t._id === therapistId)
-    );
+    // const therapist = useSelector((state: RootState) => {
+    //     const therapistList = [
+    //       ...(state.user.therapists?.therapists || []),
+    //       ...(state.user.familyTherapists?.therapists || []),
+    //       ...(state.user.coupleTherapists?.therapists || []),
+    //       ...(state.user.individualTherapists?.therapists || [])
+    //   ]; 
+    
+    //     return therapistList.find((t) => t._id === therapistId);
+    // });
 
     const loadRazorpayScript = () => {
         return new Promise((resolve, reject) => {
@@ -95,6 +104,9 @@ const PaymentPage = () => {
 
                     const paymentId = paymentResponse?.paymentId
 
+                    console.log("payment id:", paymentId);
+                    
+
                     const appointmentData = await dispatch(saveAppointment({ 
                         therapistId, 
                         userId, 
@@ -103,7 +115,7 @@ const PaymentPage = () => {
                         paymentId
                      })).unwrap();
 
-                    
+                    console.log("appointment data......:", appointmentData)
 
                     if (appointmentData.success) {
                         toast.success("Appointment saved successfully!");

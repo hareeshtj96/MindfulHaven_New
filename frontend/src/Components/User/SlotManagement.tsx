@@ -15,15 +15,30 @@ import "react-toastify/dist/ReactToastify.css";
 
 const SlotManagement = () => {
   const { therapistId } = useParams<{ therapistId: string }>();
+  console.log("therapist id slot:", therapistId);
+  
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [notes, setNotes] = useState<string>("");
 
-  const therapist = useSelector((state: RootState) =>
-    state.user.therapists.therapists.find((t) => t._id === therapistId)
-  );
+  const therapiststaet = useSelector((state:RootState) => state.user);
+  console.log("therapist state slot:", therapiststaet);
+  
+
+  const therapist = useSelector((state: RootState) => {
+    const therapistList = [
+      ...(state.user.therapists?.therapists || []),
+      ...(state.user.familyTherapists?.therapists || []),
+      ...(state.user.coupleTherapists?.therapists || []),
+      ...(state.user.individualTherapists?.therapists || [])
+  ]; 
+
+    return therapistList.find((t) => t._id === therapistId);
+});
+
+
 
   const user = useSelector((state: RootState) => state.user.user);
   const userIdentity = user?.userId;

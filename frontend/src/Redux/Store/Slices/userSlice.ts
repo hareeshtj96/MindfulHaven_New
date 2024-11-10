@@ -31,8 +31,15 @@ import { USERREGISTER,
     CHANGEPASSWORD,
     WALLETDETAILS,
     SUBMITISSUE,
+    GETFAMILYTHERAPIST,
+    SEARCHFAMILYTHERAPIST,
+    SORTFAMILYTHERAPIST,
+    GETINDIVIDUALTHERAPIST,
+    SORTINDIVIDUALTHERAPIST,
+    SEARCHINDIVIDUALTHERAPIST,
+    GETCOUPLETHERAPIST,
+    SORTCOUPLETHERAPIST,
  } from "../../../Services/userApi";
-import { act } from "react";
 
 
 
@@ -80,6 +87,9 @@ interface Therapist {
     
 }
 
+interface TherapistGroup {
+    therapists: Therapist[]
+}
 
 interface PasswordResetPayload {
     newPassword: string;
@@ -134,9 +144,13 @@ interface submitIssuePayload {
 
 
 interface UserState {
+    userId: any;
     user: User | null;
     search_Result: string | null;
-    therapists: Therapist[];  
+    therapists: Therapist[]; 
+    familyTherapists: Therapist[]; 
+    coupleTherapists: Therapist[]; 
+    individualTherapists: Therapist[]; 
     token: string | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
@@ -156,6 +170,9 @@ interface UserState {
     timings: any[] 
     booked: any[]
     sortedTherapists: Therapist[]
+    sortedFamilyTherapists: Therapist[]
+    sortedIndividualTherapists: Therapist[]
+    sortedCoupleTherapists: Therapist[]
     appointmentData: any
     appointmentStatus: string | null
     appointmentError: string | null
@@ -175,9 +192,13 @@ interface UserState {
 
 
 const initialState: UserState = {
+    userId: null,
     user: null,
     search_Result : null,
     therapists: [],
+    familyTherapists: [],
+    individualTherapists:[],
+    coupleTherapists: [],
     token: localStorage.getItem('token'),
     status: 'idle',
     error: null,
@@ -197,6 +218,9 @@ const initialState: UserState = {
     timings: [],
     booked: [],
     sortedTherapists: [],
+    sortedFamilyTherapists: [],
+    sortedIndividualTherapists:[],
+    sortedCoupleTherapists: [],
     appointmentData: null,
     appointmentStatus: null,
     appointmentError: null,
@@ -489,6 +513,55 @@ export const fetchChildTherapist = createAsyncThunk<Therapist[], {page: number; 
         }
     }
 )
+
+
+export const fetchFamilyTherapist = createAsyncThunk<Therapist[], {page: number; limit: number}, {rejectValue: string}>(
+    'user/fetchFamilyTherapist',
+    async({page, limit}, thunkAPI) => {
+        try {
+            const response = await axios.get(GETFAMILYTHERAPIST, { params: {page, limit}});
+            console.log("Response from fetch family therapist slice:", response);
+
+            return response.data.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Failed to fetch family therapists';
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
+export const fetchIndividualTherapist = createAsyncThunk<Therapist[], {page: number; limit: number}, {rejectValue: string}>(
+    'user/fetchIndividualTherapist',
+    async({page, limit}, thunkAPI) => {
+        try {
+            const response = await axios.get(GETINDIVIDUALTHERAPIST, { params: {page, limit}});
+            console.log("Response from fetch INDIVIDUAL therapist slice:", response);
+
+            return response.data.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Failed to fetch individual therapists';
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
+
+export const fetchCoupleTherapist = createAsyncThunk<Therapist[], {page: number; limit: number}, {rejectValue: string}>(
+    'user/fetchCoupleTherapist',
+    async({page, limit}, thunkAPI) => {
+        try {
+            const response = await axios.get(GETCOUPLETHERAPIST, { params: {page, limit}});
+            console.log("Response from fetch couple therapist slice:", response);
+
+            return response.data.data;
+        } catch (error: any) {
+            const message = error.response?.data?.message || 'Failed to fetch couple therapists';
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+)
+
 
 export const fetchAvailableSlots = createAsyncThunk<{
     booked: any[]; availableSlots: string[], timings: any[] 
@@ -845,6 +918,82 @@ export const fetchSortedChildTherapists = createAsyncThunk(
 );
 
 
+export const fetchFamilyTherapistBySearchTerm = createAsyncThunk(
+    "therapist/fetchFamilyTherapistsBySeachTerm",
+    async (searchTerm: string, { rejectWithValue}) => {
+        try {
+            const response = await axios.get(SEARCHFAMILYTHERAPIST, { params: {search: searchTerm}});
+            console.log("response from search family therapist slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch family therapist")
+        }
+    }
+);
+
+
+export const fetchIndividualTherapistBySearchTerm = createAsyncThunk(
+    "therapist/fetchIndividualTherapistsBySeachTerm",
+    async (searchTerm: string, { rejectWithValue}) => {
+        try {
+            const response = await axios.get(SEARCHINDIVIDUALTHERAPIST, { params: {search: searchTerm}});
+            console.log("response from search individual therapist slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch individual therapist")
+        }
+    }
+);
+
+
+export const fetchSortedFamilyTherapists = createAsyncThunk(
+    "therapist/fetchSortedFamilyTherapists",
+    async (sortBy: string, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(SORTFAMILYTHERAPIST, { params: { sortBy } });
+            console.log("Response from sorted FAMILY therapists slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch sorted family therapists");
+        }
+    }
+);
+
+
+export const fetchSortedIndividualTherapists = createAsyncThunk(
+    "therapist/fetchSortedIndividualTherapists",
+    async (sortBy: string, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(SORTINDIVIDUALTHERAPIST, { params: { sortBy } });
+            console.log("Response from sorted individual therapists slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch sorted individual therapists");
+        }
+    }
+);
+
+
+export const fetchSortedCoupleTherapists = createAsyncThunk(
+    "therapist/fetchSortedCoupleTherapists",
+    async (sortBy: string, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(SORTCOUPLETHERAPIST, { params: { sortBy } });
+            console.log("Response from sorted couple therapists slice:", response.data.data);
+
+            return response.data.data;
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch sorted couple therapists");
+        }
+    }
+);
+
+
+
 export const changePassword = createAsyncThunk<string, ChangePasswordPayload, { rejectValue: string }>(
     'user/changePassword',
     async (passwordDetails, thunkAPI) => {
@@ -1081,6 +1230,45 @@ const userSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.payload || "Failed to fetch therapists";
             })
+            .addCase(fetchFamilyTherapist.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(fetchFamilyTherapist.fulfilled, (state, action: PayloadAction<Therapist[]>) => {
+                state.status = 'succeeded';
+                state.familyTherapists = action.payload
+              
+            })
+            .addCase(fetchFamilyTherapist.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.status = 'failed';
+                state.error = action.payload || "Failed to fetch therapists";
+            })
+            .addCase(fetchIndividualTherapist.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(fetchIndividualTherapist.fulfilled, (state, action: PayloadAction<Therapist[]>) => {
+                state.status = 'succeeded';
+                state.individualTherapists = action.payload
+              
+            })
+            .addCase(fetchIndividualTherapist.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.status = 'failed';
+                state.error = action.payload || "Failed to fetch therapists";
+            })
+            .addCase(fetchCoupleTherapist.pending, (state) => {
+                state.status = 'loading';
+                state.error = null;
+            })
+            .addCase(fetchCoupleTherapist.fulfilled, (state, action: PayloadAction<Therapist[]>) => {
+                state.status = 'succeeded';
+                state.coupleTherapists = action.payload
+              
+            })
+            .addCase(fetchCoupleTherapist.rejected, (state, action: PayloadAction<string | undefined>) => {
+                state.status = 'failed';
+                state.error = action.payload || "Failed to fetch therapists";
+            })
             .addCase(fetchUserProfile.fulfilled, (state, action) => {
                 state.user = action.payload;
                 console.log("Updated user in Redux:", state.user);
@@ -1228,6 +1416,37 @@ const userSlice = createSlice({
                 state.status = 'failed';
                
             })
+            .addCase(fetchSortedFamilyTherapists.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchSortedFamilyTherapists.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.sortedFamilyTherapists = action.payload; 
+            })
+            .addCase(fetchSortedFamilyTherapists.rejected, (state, action) => {
+                state.status = 'failed';
+               
+            })
+            .addCase(fetchSortedIndividualTherapists.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchSortedIndividualTherapists.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.sortedIndividualTherapists = action.payload; 
+            })
+            .addCase(fetchSortedIndividualTherapists.rejected, (state, action) => {
+                state.status = 'failed';
+            })
+            .addCase(fetchSortedCoupleTherapists.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchSortedCoupleTherapists.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.sortedCoupleTherapists = action.payload; 
+            })
+            .addCase(fetchSortedCoupleTherapists.rejected, (state, action) => {
+                state.status = 'failed';
+            })
             .addCase(fetchChildTherapistBySearchTerm.fulfilled, (state, action) => {
                 state.therapists = action.payload; 
                 state.status = 'succeeded';
@@ -1238,6 +1457,28 @@ const userSlice = createSlice({
             .addCase(fetchChildTherapistBySearchTerm.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = null
+            })
+            .addCase(fetchFamilyTherapistBySearchTerm.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchFamilyTherapistBySearchTerm.fulfilled, (state, action) => {
+                state.familyTherapists = action.payload;
+                state.status = 'succeeded';
+            })
+            .addCase(fetchFamilyTherapistBySearchTerm.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = null;
+            })
+            .addCase(fetchIndividualTherapistBySearchTerm.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchIndividualTherapistBySearchTerm.fulfilled, (state, action) => {
+                state.individualTherapists = action.payload;
+                state.status = 'succeeded';
+            })
+            .addCase(fetchIndividualTherapistBySearchTerm.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = null;
             })
             .addCase(geminiAPIResponse.pending, (state) => {
                 state.loading = true;

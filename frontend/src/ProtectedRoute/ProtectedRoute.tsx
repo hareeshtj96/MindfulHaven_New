@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { UseSelector, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../Redux/Store/store";
 
@@ -8,28 +8,34 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const isAuthenticated = useSelector((state: RootState) => state.user.isAuthenticated);
-  const state = useSelector((state: RootState) => state.user)
-  console.log("state:", state);
-  console.log("is authenticated:",isAuthenticated);
-  
+  const [isLoading, setIsLoading] = useState(true);
+  const authUser = useSelector((state: RootState) => state.user.user);
+  const adminUser = useSelector((state: RootState) => state.admin.blockStatus);
   const navigate = useNavigate();
 
-  useEffect(() => {
-
-    if (isAuthenticated) {
-      console.log("....authetnictd");
-      
-      navigate('/dashboard');
+ useEffect(() => {
+  const checkAuth = () => {
+    if (!authUser) {
+      navigate('/login');
+      return;
     }
-  }, [isAuthenticated, navigate]);
 
-  if (!isAuthenticated) {
-        return children
-  }
+    const isBlocked = adminUser && authUser.userId === adminUser._id && adminUser.isBlocked;
+    console.log("is blocked:", isBlocked);
+    
 
+    if (!isBlocked) {
+      navigate('/login');
+      return 
+    }
 
+    setIsLoading(false);
+  };
 
+  checkAuth();
+ }, [authUser, adminUser, navigate]);
+
+ return <>{children}</>
 };
 
 export default ProtectedRoute;

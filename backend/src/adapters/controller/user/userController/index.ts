@@ -27,6 +27,14 @@ import geminiAPIController from "./geminiAPIController";
 import changePasswordController from "./changePasswordController";
 import walletDetailsController from "./walletDetailsController";
 import submitIssueController from "./submitIssueController";
+import familyTherapistController from "./familyTherapistController";
+import searchFamilyTherapistController from "./searchFamilyTherapistController";
+import familyTherapistSorting from "./familyTherapistSorting";
+import individualTherapistController from "./individualTherapistController";
+import individualTherapistSorting from "./individualTherapistSorting";
+import searchIndividualTherapistController from "./searchIndividualTherapistController";
+import coupleTherapistController from "./coupleTherapistController";
+import coupleTherapistSorting from "./coupleTherapistSorting";
 
 
 export default (dependencies:any) => {
@@ -60,6 +68,14 @@ export default (dependencies:any) => {
         changePasswordController: changePasswordController(dependencies),
         walletDetailsController: walletDetailsController(dependencies),
         submitIssueController: submitIssueController(dependencies),
+        familyTherapistController: familyTherapistController(dependencies),
+        searchFamilyTherapistController: searchFamilyTherapistController(dependencies),
+        familyTherapistSorting: familyTherapistSorting(dependencies),
+        individualTherapistController: individualTherapistController(dependencies),
+        individualTherapistSorting: individualTherapistSorting(dependencies),
+        searchIndividualTherapistController: searchIndividualTherapistController(dependencies),
+        coupleTherapistController: coupleTherapistController(dependencies),
+        coupleTherapistSorting: coupleTherapistSorting(dependencies),
         
     }
 }

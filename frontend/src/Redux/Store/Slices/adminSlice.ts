@@ -10,6 +10,7 @@ import { ADMINLOGIN,
     FETCHISSUES,
     RESOLVEISSUE
  } from "../../../Services/adminApi";
+import { act } from "react";
 
 
 interface Admin {
@@ -68,6 +69,7 @@ interface AdminState {
     totalAppointments: number,
     totalRevenue: number,
     issues: []
+    blockStatus: User | null
     }
 
 const initialState: AdminState = {
@@ -85,13 +87,13 @@ const initialState: AdminState = {
     totalTherapists: 0,
     totalAppointments: 0,
     totalRevenue: 0,
-    issues: []
+    issues: [],
+    blockStatus: null
 }
 
 export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, password: string }, { rejectValue: string }>(
     'admin/admin_login',
     async (adminData, thunkAPI) => {
-        console.log("entered loginAdminslice");
         try {
             const response = await axios.post( ADMINLOGIN, adminData, {
                 headers: {
@@ -104,7 +106,8 @@ export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, passwo
 
             return response.data;
         } catch (error: any) {
-            const message = error.response?.data?.data || "An error occured";
+            const message = error.response?.data?.data || error.message || "An error occured";
+            console.error("Login error:", error);
             return thunkAPI.rejectWithValue(message);
         }
     }
@@ -245,8 +248,7 @@ export const toggleUserBlockStatus = createAsyncThunk<User, { userId: string; is
     async ({ userId, isBlocked }, thunkAPI) => {
       try {
         const token = localStorage.getItem("newToken");
-        console.log("token received from block unblock user:", token);
-  
+       
         if (!token) {
           return thunkAPI.rejectWithValue("No token found");
         }
@@ -260,8 +262,10 @@ export const toggleUserBlockStatus = createAsyncThunk<User, { userId: string; is
   
         // Send isBlocked status along with the request
         const response = await axios.patch(`${GOTBLOCKUNBLOCK}/${userId}`, { isBlocked }, config);
+        console.log("response from block user slice :", response.data.data.user);
+        
   
-        return response.data.user;
+        return response.data.data.user;
       } catch (error) {
         console.error("Error in blocking/unblocking user:", error);
         return thunkAPI.rejectWithValue("Failed to toggle block status");
@@ -279,9 +283,13 @@ const adminSlice = createSlice({
         logout: (state) => {
             state.admin = null;
             state.token = null;
-            state.isAdminAuthenticated = false;
+            state.isAdminAuthenticated = false
             localStorage.removeItem('adminToken');
         },
+        resetLoading: (state) => {
+            state.loading = false;
+            state.error = null;
+          },
     },
     extraReducers: (builder) => {
         builder
@@ -371,10 +379,24 @@ const adminSlice = createSlice({
             .addCase(fetchIssues.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+            })
+            .addCase(toggleUserBlockStatus.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(toggleUserBlockStatus.fulfilled, (state, action: PayloadAction<User>) => {
+                state.loading = false; 
+                state.blockStatus = action.payload;
+                
+            })
+            .addCase(toggleUserBlockStatus.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload || "Failed to toggle block status";
             });
+            
     },
 });
 
-export const { logout } = adminSlice.actions;
+export const { logout, resetLoading } = adminSlice.actions;
 
 export default adminSlice.reducer;

@@ -25,7 +25,15 @@ import {
     geminiAPIUsecase,
     changePasswordUsecase,
     walletDetailsUsecase,
-    submitIssueUsecase
+    submitIssueUsecase,
+    getFamilyTherapistUsecase,
+    searchFamilyTherapistUsecase,
+    sortFamilyTherapistUsecase,
+    getIndividualTherapistUsecase,
+    sortIndividualTherapistUsecase,
+    searchIndividualTherapistUsecase,
+    getCoupleTherapistUsecase,
+    sortCoupleTherapistUsecase
  } from "../../application/UseCases";
 
 import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase } from "../../application/adminUseCases";
@@ -59,6 +67,14 @@ const useCase: any={
     changePasswordUsecase: changePasswordUsecase,
     walletDetailsUsecase: walletDetailsUsecase,
     submitIssueUsecase: submitIssueUsecase,
+    getFamilyTherapistUsecase: getFamilyTherapistUsecase,
+    searchFamilyTherapistUsecase: searchFamilyTherapistUsecase,
+    sortFamilyTherapistUsecase: sortFamilyTherapistUsecase,
+    getIndividualTherapistUsecase: getIndividualTherapistUsecase,
+    sortIndividualTherapistUsecase: sortIndividualTherapistUsecase,
+    searchIndividualTherapistUsecase: searchIndividualTherapistUsecase,
+    getCoupleTherapistUsecase: getCoupleTherapistUsecase,
+    sortCoupleTherapistUsecase: sortCoupleTherapistUsecase,
 
 
 

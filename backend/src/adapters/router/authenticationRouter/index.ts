@@ -52,7 +52,15 @@ export default (dependencies: any) =>{
        geminiAPIController,
        changePasswordController,
        walletDetailsController,
-       submitIssueController
+       submitIssueController,
+       familyTherapistController,
+       searchFamilyTherapistController,
+       familyTherapistSorting,
+       individualTherapistController,
+       individualTherapistSorting,
+       searchIndividualTherapistController,
+       coupleTherapistController,
+       coupleTherapistSorting
     } = userController(dependencies);
 
 
@@ -85,6 +93,15 @@ export default (dependencies: any) =>{
     router.put('/changePassword', changePasswordController);
     router.get('/walletDetails', walletDetailsController);
     router.post('/submitIssue', submitIssueController);
+    router.get('/familyTherapy', familyTherapistController);
+    router.get('/search_familyTherapist', searchFamilyTherapistController);
+    router.get('/sort_familyTherapist', familyTherapistSorting);
+    router.get('/individualTherapy', individualTherapistController);
+    router.get('/sort_individualTherapist', individualTherapistSorting);
+    router.get('/search_individualTherapist', searchIndividualTherapistController);
+    router.get('/coupleTherapy', coupleTherapistController);
+    router.get('/sort_coupleTherapist', coupleTherapistSorting);
+
 
     return router;
 }

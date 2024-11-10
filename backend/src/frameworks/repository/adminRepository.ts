@@ -113,10 +113,10 @@ export default {
         }
     },
 
-    getBlock: async ( userId: string) => {
+    getBlock: async ( userId: string) => {    
         try {
             const user = await databaseSchema.User.findById(userId);
-
+     
             if(!user) {
                 return { status: false, message: "User not found"}
             }
@@ -128,7 +128,7 @@ export default {
                 { isBlocked: newStatus},
                 { new: true}
             )
-           
+            
             if(updatedUser) {
                 return { status: true, data: { user: updatedUser}}
             } else {
