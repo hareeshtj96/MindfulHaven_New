@@ -10,7 +10,9 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const authUser = useSelector((state: RootState) => state.user.user);
+  console.log("auth user..:", authUser)
   const adminUser = useSelector((state: RootState) => state.admin.blockStatus);
+  console.log("admin user...:", adminUser);
   const navigate = useNavigate();
 
  useEffect(() => {
