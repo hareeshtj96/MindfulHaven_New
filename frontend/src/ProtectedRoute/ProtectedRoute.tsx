@@ -20,20 +20,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       return;
     }
 
-    const isBlocked =  adminUser?.isBlocked && authUser?.userId === adminUser._id;
-    console.log("is blocked:", isBlocked);
-    
-
-    if (!isBlocked) {
-      navigate('/login');
-      return 
-    }
-
     setIsLoading(false);
   };
 
   checkAuth();
- }, [authUser, adminUser, navigate]);
+ }, [authUser, navigate]);
 
  return <>{children}</>
 };
