@@ -90,6 +90,19 @@ exports.default = {
             return { status: false, message: "Internal Server Error" };
         }
     }),
+    uploadPhoto: (therapistId, photoUrl) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const existingTherapist = yield database_1.databaseSchema.Therapist.findById(therapistId);
+            if (existingTherapist) {
+                const updatedTherapist = yield database_1.databaseSchema.Therapist.findByIdAndUpdate(therapistId, { photo: photoUrl }, { new: true });
+                return { status: true, data: updatedTherapist };
+            }
+            return { status: false, message: "Therapist not found" };
+        }
+        catch (error) {
+            return { status: false, message: "Internal Server Error" };
+        }
+    }),
     getProfile: (data) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const therapist = yield database_1.databaseSchema.Therapist.find();
@@ -193,17 +206,18 @@ exports.default = {
             return { status: false, message: "Failed to cancel appointment" };
         }
     }),
-    getCancelSlot: (_a) => __awaiter(void 0, [_a], void 0, function* ({ slotId, therapistId }) {
+    getCancelSlot: (_a) => __awaiter(void 0, [_a], void 0, function* ({ slot, therapistId }) {
         try {
             const therapist = yield database_1.databaseSchema.Therapist.findById(therapistId);
             if (!therapist) {
                 return { status: false, message: "Therapist not found" };
             }
-            therapist.availableSlots.pull({ _id: slotId });
+            therapist.availableSlots.pull(slot);
             yield therapist.save();
             return { status: true, message: "Slot removed successfully" };
         }
         catch (error) {
+            console.error("Error in removing slot:", error);
             return { status: false, message: "Failed to remove slot" };
         }
     })

@@ -32,6 +32,15 @@ const geminiAPIController_1 = __importDefault(require("./geminiAPIController"));
 const changePasswordController_1 = __importDefault(require("./changePasswordController"));
 const walletDetailsController_1 = __importDefault(require("./walletDetailsController"));
 const submitIssueController_1 = __importDefault(require("./submitIssueController"));
+const familyTherapistController_1 = __importDefault(require("./familyTherapistController"));
+const searchFamilyTherapistController_1 = __importDefault(require("./searchFamilyTherapistController"));
+const familyTherapistSorting_1 = __importDefault(require("./familyTherapistSorting"));
+const individualTherapistController_1 = __importDefault(require("./individualTherapistController"));
+const individualTherapistSorting_1 = __importDefault(require("./individualTherapistSorting"));
+const searchIndividualTherapistController_1 = __importDefault(require("./searchIndividualTherapistController"));
+const coupleTherapistController_1 = __importDefault(require("./coupleTherapistController"));
+const coupleTherapistSorting_1 = __importDefault(require("./coupleTherapistSorting"));
+const checkSlotsBeforePaymentController_1 = __importDefault(require("./checkSlotsBeforePaymentController"));
 exports.default = (dependencies) => {
     return {
         registrationController: (0, registrationController_1.default)(dependencies),
@@ -63,5 +72,14 @@ exports.default = (dependencies) => {
         changePasswordController: (0, changePasswordController_1.default)(dependencies),
         walletDetailsController: (0, walletDetailsController_1.default)(dependencies),
         submitIssueController: (0, submitIssueController_1.default)(dependencies),
+        familyTherapistController: (0, familyTherapistController_1.default)(dependencies),
+        searchFamilyTherapistController: (0, searchFamilyTherapistController_1.default)(dependencies),
+        familyTherapistSorting: (0, familyTherapistSorting_1.default)(dependencies),
+        individualTherapistController: (0, individualTherapistController_1.default)(dependencies),
+        individualTherapistSorting: (0, individualTherapistSorting_1.default)(dependencies),
+        searchIndividualTherapistController: (0, searchIndividualTherapistController_1.default)(dependencies),
+        coupleTherapistController: (0, coupleTherapistController_1.default)(dependencies),
+        coupleTherapistSorting: (0, coupleTherapistSorting_1.default)(dependencies),
+        checkSlotsBeforePaymentController: (0, checkSlotsBeforePaymentController_1.default)(dependencies),
     };
 };

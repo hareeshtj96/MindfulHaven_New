@@ -37,6 +37,7 @@ const dependencies_1 = __importDefault(require("./frameworks/config/dependencies
 const db_connect_1 = __importDefault(require("./config/db.connect"));
 const config_1 = __importDefault(require("./config/config"));
 const router_1 = require("./adapters/router");
+const morgan_1 = __importDefault(require("morgan"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
@@ -54,6 +55,7 @@ app.use((req, res, next) => {
     console.log("session date:", req.session);
     next();
 });
+app.use((0, morgan_1.default)('combined'));
 app.use('/', (0, router_1.routes)(dependencies_1.default));
 // WebSocket server using the same HTTP server
 const wss = new ws_1.default.Server({ server });

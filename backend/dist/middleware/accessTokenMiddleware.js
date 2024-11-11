@@ -35,7 +35,6 @@ console.log("secret key:", SECRET_KEY);
 const verifyAccessToken = (req, res, next) => {
     var _a;
     const token = (_a = req.headers['authorization']) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
-    console.log("token from middleware:", token);
     if (!token) {
         return res.status(401).json({ message: "No access token provided" });
     }

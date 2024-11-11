@@ -12,9 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const httpStatusCode_1 = require("../../utils/httpStatusCode");
 exports.default = (dependencies) => {
     const { therapistRepository } = dependencies.repository;
-    const executeFunction = (slotId, therapistId) => __awaiter(void 0, void 0, void 0, function* () {
+    const executeFunction = (slot, therapistId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const response = yield therapistRepository.getCancelSlot({ slotId, therapistId });
+            const response = yield therapistRepository.getCancelSlot(slot, therapistId);
             if (response.status) {
                 return { status: true, data: response.data };
             }

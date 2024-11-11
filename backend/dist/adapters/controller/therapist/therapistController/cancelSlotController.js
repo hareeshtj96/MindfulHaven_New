@@ -14,8 +14,8 @@ exports.default = (dependencies) => {
     const { cancelSlotUsecase } = dependencies.useCase;
     const cancelSlotController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const { slotId, therapistId } = req.query;
-            const response = yield cancelSlotUsecase(dependencies).executeFunction({ slotId, therapistId });
+            const { slot, therapistId } = req.body;
+            const response = yield cancelSlotUsecase(dependencies).executeFunction({ slot, therapistId });
             if (response && response.status) {
                 res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, data: response.data });
             }
@@ -24,6 +24,7 @@ exports.default = (dependencies) => {
             }
         }
         catch (error) {
+            console.error("Error in contoller:", error);
             return res.status(httpStatusCode_1.HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: httpStatusCode_1.ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     });

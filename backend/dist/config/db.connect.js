@@ -21,7 +21,7 @@ const connectDB = (config) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("connected to mongodb");
     }
     catch (error) {
-        console.error("error connecting to mongodb database");
+        console.error("error connecting to mongodb database:", error);
         process.exit(1);
     }
 });

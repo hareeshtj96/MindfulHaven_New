@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTherapistDetailsUsecase = exports.cancelAppointmentTherapistUsecase = exports.therapistSessionUsecase = exports.updateTherapistTimingsUsecase = exports.bookingUsecase = exports.getTherapistProfileUsecase = exports.therapistRegistration = void 0;
+exports.cancelSlotUsecase = exports.therapistPhotoUsecase = exports.getTherapistDetailsUsecase = exports.cancelAppointmentTherapistUsecase = exports.therapistSessionUsecase = exports.updateTherapistTimingsUsecase = exports.bookingUsecase = exports.getTherapistProfileUsecase = exports.therapistRegistration = void 0;
 const therapistRegisterUseCase_1 = __importDefault(require("./therapistRegisterUseCase"));
 exports.therapistRegistration = therapistRegisterUseCase_1.default;
 const getTherapistProfileUsecase_1 = __importDefault(require("./getTherapistProfileUsecase"));
@@ -18,3 +18,7 @@ const cancelAppointmentTherapistUsecase_1 = __importDefault(require("./cancelApp
 exports.cancelAppointmentTherapistUsecase = cancelAppointmentTherapistUsecase_1.default;
 const getTherapistDetailsUsecase_1 = __importDefault(require("./getTherapistDetailsUsecase"));
 exports.getTherapistDetailsUsecase = getTherapistDetailsUsecase_1.default;
+const therapistPhotoUsecase_1 = __importDefault(require("./therapistPhotoUsecase"));
+exports.therapistPhotoUsecase = therapistPhotoUsecase_1.default;
+const cancelSlotUsecase_1 = __importDefault(require("./cancelSlotUsecase"));
+exports.cancelSlotUsecase = cancelSlotUsecase_1.default;

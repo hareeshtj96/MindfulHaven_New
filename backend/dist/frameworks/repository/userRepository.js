@@ -149,6 +149,76 @@ exports.default = {
             };
         }
     }),
+    getFamilyTherapist: (page, limit) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * limit;
+            const therapists = yield database_1.databaseSchema.Therapist.find({
+                specialization: 'Family Therapy',
+                isVerified: true
+            }).skip(skip).limit(limit);
+            const totalTherapists = yield database_1.databaseSchema.Therapist.countDocuments({ specialization: 'Family Therapy', isVerified: true });
+            return {
+                status: true,
+                data: {
+                    therapists,
+                    total: totalTherapists,
+                    currentPage: page,
+                    totalPages: Math.ceil(totalTherapists / limit)
+                }
+            };
+        }
+        catch (error) {
+            return {
+                status: false, message: "Error fetching Family therapists"
+            };
+        }
+    }),
+    getIndividualTherapist: (page, limit) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * limit;
+            const therapists = yield database_1.databaseSchema.Therapist.find({
+                specialization: 'Individual Therapy',
+                isVerified: true
+            }).skip(skip).limit(limit);
+            const totalTherapists = yield database_1.databaseSchema.Therapist.countDocuments({ specialization: 'Individual Therapy', isVerified: true });
+            return {
+                status: true,
+                data: {
+                    therapists,
+                    total: totalTherapists,
+                    currentPage: page,
+                    totalPages: Math.ceil(totalTherapists / limit)
+                }
+            };
+        }
+        catch (error) {
+            return {
+                status: false, message: "Error fetching Individual therapists"
+            };
+        }
+    }),
+    getCoupleTherapist: (page, limit) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const skip = (page - 1) * limit;
+            const therapists = yield database_1.databaseSchema.Therapist.find({
+                specialization: 'Couple Therapy',
+                isVerified: true
+            }).skip(skip).limit(limit);
+            const totalTherapists = yield database_1.databaseSchema.Therapist.countDocuments({ specialization: 'Couple Therapy', isVerified: true });
+            return {
+                status: true,
+                data: {
+                    therapists,
+                    total: totalTherapists,
+                    currentPage: page,
+                    totalPages: Math.ceil(totalTherapists / limit)
+                }
+            };
+        }
+        catch (error) {
+            return { status: false, message: "Error fetching Couple therapists" };
+        }
+    }),
     getTherapistDetails: (therapistId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const therapists = yield database_1.databaseSchema.Therapist.findOne({
@@ -217,6 +287,27 @@ exports.default = {
             };
         }
     }),
+    checkSlotBeforePayment: (therapistId, slotDate, slotTime) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const bookedSlots = yield database_1.databaseSchema.Appointment.find({ therapistId, status: "scheduled" });
+            const isSlotBooked = bookedSlots.some(appointment => {
+                const appointmentDate = appointment.slot.toISOString().split("T")[0];
+                const appointmentTime = new Date(appointment.slot).toISOString().split("T")[1].slice(0, 5);
+                return appointmentDate === slotDate && appointmentTime === slotTime;
+                ``;
+            });
+            if (isSlotBooked) {
+                return { status: false, message: "Slot is already booked" };
+            }
+            else {
+                return { status: true, message: "Slot is available" };
+            }
+        }
+        catch (error) {
+            console.error("Error checking slot availability:", error);
+            return { status: false, message: "Error fetching appointments" };
+        }
+    }),
     saveAppointment: (_a) => __awaiter(void 0, [_a], void 0, function* ({ therapistId, userId, slot, notes, paymentId }) {
         try {
             const slotDate = typeof slot === 'string' ? new Date(slot) : slot;
@@ -277,6 +368,7 @@ exports.default = {
             };
         }
         catch (error) {
+            console.error("Error saving appointment:", error);
             return {
                 status: false,
                 message: "Failed to save the appointment"
@@ -429,6 +521,36 @@ exports.default = {
             return { status: false, message: "Failed to fetch search child therapists" };
         }
     }),
+    getFamilyTherapistSearchResult: (searchTerm) => __awaiter(void 0, void 0, void 0, function* () {
+        const filter = {
+            $or: [
+                { name: { $regex: searchTerm, $options: 'i' } },
+                { specialization: { $regex: searchTerm, $options: 'i' } }
+            ],
+        };
+        try {
+            const therapists = yield database_1.databaseSchema.Therapist.find(filter);
+            return therapists;
+        }
+        catch (error) {
+            return { status: false, message: "Failed to fetch search family therapists" };
+        }
+    }),
+    getIndividualTherapistSearchResult: (searchTerm) => __awaiter(void 0, void 0, void 0, function* () {
+        const filter = {
+            $or: [
+                { name: { $regex: searchTerm, $options: 'i' } },
+                { specialization: { $regex: searchTerm, $options: 'i' } }
+            ],
+        };
+        try {
+            const therapists = yield database_1.databaseSchema.Therapist.find(filter);
+            return therapists;
+        }
+        catch (error) {
+            return { status: false, message: "Failed to fetch search individual therapists" };
+        }
+    }),
     getSortedTherapists: (sortCriteria) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const sortedTherapists = yield database_1.databaseSchema.Therapist.find({
@@ -439,6 +561,42 @@ exports.default = {
         }
         catch (error) {
             return { status: false, message: "Error fetching sorted therapists" };
+        }
+    }),
+    getSortedFamilyTherapists: (sortCriteria) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const sortedTherapists = yield database_1.databaseSchema.Therapist.find({
+                specialization: 'Family Therapy',
+                isVerified: true
+            }).sort(sortCriteria);
+            return sortedTherapists;
+        }
+        catch (error) {
+            return { status: false, message: "Error fetching sorted family therapists" };
+        }
+    }),
+    getSortedIndividualTherapists: (sortCriteria) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const sortedTherapists = yield database_1.databaseSchema.Therapist.find({
+                specialization: 'Individual Therapy',
+                isVerified: true
+            }).sort(sortCriteria);
+            return sortedTherapists;
+        }
+        catch (error) {
+            return { status: false, message: "Error fetching sorted individual therapists" };
+        }
+    }),
+    getSortedCoupleTherapists: (sortCriteria) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const sortedTherapists = yield database_1.databaseSchema.Therapist.find({
+                specialization: 'Couple Therapy',
+                isVerified: true
+            }).sort(sortCriteria);
+            return sortedTherapists;
+        }
+        catch (error) {
+            return { status: false, message: "Error fetching sorted couple therapists" };
         }
     }),
     savePayment: (paymentData) => __awaiter(void 0, void 0, void 0, function* () {

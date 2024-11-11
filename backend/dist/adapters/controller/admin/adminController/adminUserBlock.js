@@ -26,10 +26,10 @@ exports.default = (dependencies) => {
             }
             const response = yield getuserBlockUsecase(dependencies).executeFunction(userId);
             if (response && response.status) {
-                return res.status(httpStatusCode_1.HttpStatusCode.NOT_FOUND).json({ status: true, data: response.data });
+                return res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, data: response.data });
             }
             else {
-                return res.status(404).json({ status: false, message: httpStatusCode_1.ResponseMessages.DATA_NOT_FOUND });
+                return res.status(httpStatusCode_1.HttpStatusCode.NOT_FOUND).json({ status: false, message: httpStatusCode_1.ResponseMessages.DATA_NOT_FOUND });
             }
         }
         catch (error) {

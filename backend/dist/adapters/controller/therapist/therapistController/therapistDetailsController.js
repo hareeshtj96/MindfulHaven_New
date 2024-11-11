@@ -11,12 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = therapistDetailsController;
 const dotenv_1 = __importDefault(require("dotenv"));
 const rrule_1 = require("rrule");
 const httpStatusCode_1 = require("../../../../utils/httpStatusCode");
+const therapistRouter_1 = require("../../../router/authenticationRouter/therapistRouter");
 dotenv_1.default.config();
+const bucketName = (_a = process.env.BUCKET_NAME) !== null && _a !== void 0 ? _a : "";
 //Existing function to convert "HH:mm" to Date object
 const timeToDate = (time, dayOffset) => {
     const [hours, minutes] = time.split(':').map(Number);
@@ -61,10 +64,10 @@ function therapistDetailsController(dependencies) {
             if (req.files) {
                 const files = req.files;
                 if (files['photo']) {
-                    photoUrl = files['photo'][0].filename;
+                    photoUrl = yield (0, therapistRouter_1.uploadFileToS3)(files["photo"][0], bucketName, "therapists/photos");
                 }
                 if (files['identityProof']) {
-                    identityProofUrl = files['identityProof'][0].filename;
+                    identityProofUrl = yield (0, therapistRouter_1.uploadFileToS3)(files["identityProof"][0], bucketName, "therapists/identityProofs");
                 }
             }
             const newTherapist = {
