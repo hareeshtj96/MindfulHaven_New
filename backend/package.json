@@ -28,7 +28,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.685.0",
+    "@aws-sdk/client-s3": "^3.688.0",
     "@google/generative-ai": "^0.21.0",
     "@material-tailwind/react": "^2.1.10",
     "@types/multer": "^1.4.12",
