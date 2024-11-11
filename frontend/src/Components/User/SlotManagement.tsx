@@ -7,8 +7,7 @@ import {
   fetchAvailableSlots,
   saveAppointment,
   fetchBookedSlots,
-  clearAppointmentStatus,
-  updateAvailableSlots,
+  checkSlotBeforePayment
 } from "../../Redux/Store/Slices/userSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -96,9 +95,19 @@ const SlotManagement = () => {
         slot,
         totalAmount,
       };
+      const slotDate = slot.toISOString().split("T")[0];
+      const slotTime = slot.toISOString().split("T")[1].substring(0,5);
 
       try {
-        navigate(`/payment`, { state: appointmentData });
+        const response = await dispatch(checkSlotBeforePayment({therapistId, slotDate, slotTime})).unwrap();
+        console.log("response from handle submit:......", response);
+        
+        if (response.status) {
+          navigate(`/payment`, { state: appointmentData });
+        } else {
+          toast.error("Selected slot is already booked. Please choose another slot.")
+        }
+        
       } catch (error) {
         console.error("Appointment booking failed:", error);
       }

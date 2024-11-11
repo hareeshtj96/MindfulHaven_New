@@ -318,6 +318,30 @@ export default {
         }
     },
 
+    checkSlotBeforePayment: async(therapistId: string, slotDate: string, slotTime: string) => {
+        try {
+            const bookedSlots = await databaseSchema.Appointment.find({therapistId, status: "scheduled"})
+        
+            const isSlotBooked = bookedSlots.some(appointment => {
+                const appointmentDate = appointment.slot.toISOString().split("T")[0];
+                const appointmentTime = new Date(appointment.slot).toISOString().split("T")[1].slice(0,5);
+
+                return appointmentDate === slotDate && appointmentTime === slotTime;
+``         })
+            
+            if (isSlotBooked) {
+                return { status: false, message: "Slot is already booked"}
+            } else {
+                return { status: true, message: "Slot is available"}
+            }
+
+            
+        } catch (error) {
+            console.error("Error checking slot availability:", error);
+            return { status: false, message:"Error fetching appointments"};
+        }
+    },
+
     saveAppointment: async ({
         therapistId,
         userId,

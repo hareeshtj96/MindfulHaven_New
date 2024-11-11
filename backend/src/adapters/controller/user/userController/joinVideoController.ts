@@ -37,6 +37,7 @@ export default (dependencies: any) => {
 
            
             const { bookingId} = req.body;
+              
             
             if (!bookingId) {
                 return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.BOOKING_ID_REQUIRED })

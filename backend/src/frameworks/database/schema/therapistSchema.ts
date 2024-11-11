@@ -14,7 +14,16 @@ const bookedSlotSchema = new Schema({
     status: {
         type: Boolean,
         default: false, 
-    }
+    },
+    reservedBy: {
+        type: Schema.Types.ObjectId,
+        ref: 'User', 
+        default: null,
+    },
+    reservedUntil: {
+        type: Date, 
+        default: null,
+    },
 });
 
 const therapistSchema = new Schema({
@@ -77,6 +86,8 @@ const therapistSchema = new Schema({
         type: [bookedSlotSchema],
         default: [],
     },
+    
+    updatedAvailableSlots: [Date],
 
     fees: {
         type: Number,

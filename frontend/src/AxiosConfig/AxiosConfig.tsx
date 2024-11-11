@@ -1,5 +1,7 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 // Define types
 interface AuthInfo {
     accessToken: string | null;
@@ -50,7 +52,7 @@ if (storedAuthInfo) {
 
 // Create Axios instance
 const axiosInstance: AxiosInstance = axios.create({
-    baseURL: 'http//localhost:8080',
+    baseURL: import.meta.env.VITE_BASE_URL,
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json',
@@ -113,7 +115,7 @@ axiosInstance.interceptors.response.use(
             try {
                 console.log("inteceptors.....")
                 const refreshResponse = await axios.post(
-                    "http://localhost:8080/refresh_token",
+                    `${BASE_URL}/refresh_token`,
                     {},
                     { withCredentials: true }
                 );

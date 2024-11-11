@@ -95,7 +95,7 @@ export default {
     uploadPhoto: async (therapistId: string, photoUrl: string) => {
         try {
             const existingTherapist = await databaseSchema.Therapist.findById(therapistId);
-            
+
             if (existingTherapist) {
                 const updatedTherapist = await databaseSchema.Therapist.findByIdAndUpdate(
                     therapistId,
@@ -247,7 +247,7 @@ export default {
         }
     },
 
-    getCancelSlot: async ({slotId, therapistId} : {slotId: string, therapistId: string}) => {
+    getCancelSlot: async ({slot, therapistId} : {slot: string, therapistId: string}) => {
         try {
             const therapist = await databaseSchema.Therapist.findById(therapistId);
 
@@ -255,13 +255,14 @@ export default {
                 return { status: false, message: "Therapist not found"}
             }
 
-            therapist.availableSlots.pull({ _id: slotId });
+            therapist.availableSlots.pull(slot);
 
             await therapist.save();
 
             return { status: true, message: "Slot removed successfully"}
 
         } catch (error) {
+            console.error("Error in removing slot:", error);
             return { status: false, message: "Failed to remove slot"}
         }
     }

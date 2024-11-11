@@ -5,6 +5,7 @@ interface ImportMetaEnv {
     readonly VITE_APP_SERVER_URL: string;
     readonly VITE_APP_BUCKET_NAME: string;
     readonly VITE_APP_BUCKET_REGION: string;
+    readonly VITE_BASE_URL: string;
 }
 
 interface ImportMeta {

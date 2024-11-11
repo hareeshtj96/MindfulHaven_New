@@ -11,9 +11,7 @@ export default (dependencies: any) => {
             const { sortBy } = req.query;
            
             const response = await sortIndividualTherapistUsecase(dependencies).executeFunction(sortBy);
-            console.log("response from controller:", response);
-            
-         
+          
             if (response && response.status) {
                 res.status(HttpStatusCode.OK).json({ status: true, data: response.data})
             } else {

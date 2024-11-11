@@ -7,9 +7,9 @@ export default (dependencies: any) => {
 
     const cancelSlotController = async (req: Request, res: Response ) => {
         try {
-            const { slotId, therapistId } = req.query;
+            const { slot, therapistId } = req.body;
 
-            const response = await cancelSlotUsecase(dependencies).executeFunction({slotId, therapistId});
+            const response = await cancelSlotUsecase(dependencies).executeFunction({slot, therapistId});
             
             if( response && response.status) {
                 res.status(HttpStatusCode.OK).json({ status: true, data: response.data });
@@ -17,6 +17,7 @@ export default (dependencies: any) => {
                 res.status(HttpStatusCode.NOT_FOUND).json({ status: false, message: ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
+            console.error("Error in contoller:", error);
             return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });
         }
     }

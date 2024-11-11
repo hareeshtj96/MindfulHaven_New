@@ -33,12 +33,13 @@ import {
     sortIndividualTherapistUsecase,
     searchIndividualTherapistUsecase,
     getCoupleTherapistUsecase,
-    sortCoupleTherapistUsecase
+    sortCoupleTherapistUsecase,
+    checkSlotBeforePaymentUsecase
  } from "../../application/UseCases";
 
 import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase } from "../../application/adminUseCases";
 
-import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase } from "../../application/therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase, cancelSlotUsecase } from "../../application/therapistUseCases";
 
 const useCase: any={
     userRegistration: userRegistration,
@@ -75,6 +76,7 @@ const useCase: any={
     searchIndividualTherapistUsecase: searchIndividualTherapistUsecase,
     getCoupleTherapistUsecase: getCoupleTherapistUsecase,
     sortCoupleTherapistUsecase: sortCoupleTherapistUsecase,
+    checkSlotBeforePaymentUsecase: checkSlotBeforePaymentUsecase,
 
 
 
@@ -101,7 +103,8 @@ const useCase: any={
     therapistSessionUsecase: therapistSessionUsecase,
     cancelAppointmentTherapistUsecase: cancelAppointmentTherapistUsecase,
     getTherapistDetailsUsecase: getTherapistDetailsUsecase,
-    therapistPhotoUsecase: therapistPhotoUsecase
+    therapistPhotoUsecase: therapistPhotoUsecase,
+    cancelSlotUsecase: cancelSlotUsecase,
 }
 
 const repository:any={

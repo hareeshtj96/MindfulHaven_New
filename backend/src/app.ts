@@ -9,6 +9,7 @@ import dependencies from './frameworks/config/dependencies';
 import connectDB from './config/db.connect';
 import config from './config/config';
 import { routes } from './adapters/router';
+import morgan from 'morgan';
 
 dotenv.config()
 
@@ -29,6 +30,8 @@ app.use((req, res, next) => {
     console.log("session date:", req.session)
     next();
 })
+
+app.use(morgan('combined')); 
 
 app.use('/', routes(dependencies))
 

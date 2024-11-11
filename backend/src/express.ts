@@ -2,7 +2,10 @@ import express, {Express} from "express";
 import cors from "cors";
 import http from "http";
 import path from 'path'
+import dotenv from 'dotenv';
+dotenv.config();
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
 const cookieParser = require("cookie-parser");
 
@@ -19,7 +22,7 @@ const expressConfig = (app: Express) => {
 
     app.use(
         cors({
-            origin: ["http://localhost:5173", "https://mindfulhaven.life", "https://www.mindfulhaven.life"],
+            origin: allowedOrigins,
             methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
             credentials: true,
             allowedHeaders: ["Content-Type", "Authorization"],

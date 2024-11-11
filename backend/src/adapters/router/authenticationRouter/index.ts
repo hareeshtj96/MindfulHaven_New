@@ -60,7 +60,8 @@ export default (dependencies: any) =>{
        individualTherapistSorting,
        searchIndividualTherapistController,
        coupleTherapistController,
-       coupleTherapistSorting
+       coupleTherapistSorting,
+       checkSlotsBeforePaymentController
     } = userController(dependencies);
 
 
@@ -101,6 +102,7 @@ export default (dependencies: any) =>{
     router.get('/search_individualTherapist', searchIndividualTherapistController);
     router.get('/coupleTherapy', coupleTherapistController);
     router.get('/sort_coupleTherapist', coupleTherapistSorting);
+    router.get('/checkSlotBeforePayment/:id', checkSlotsBeforePaymentController);
 
 
     return router;

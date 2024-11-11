@@ -41,13 +41,19 @@ const Session = () => {
     const { scheduledBookings, cancelledBookings, completedBookings, error, status, totalPages, currentPage, completedCurrentPage, completedTotalPages, cancelledCurrentPage, cancelledTotalPages } = useSelector((state: RootState) => state.user);
 
     const user = useSelector((state: RootState) => state.user.user)
+    const [refreshToggle, setRefreshToggle] = useState(false);
     console.log("states....", user);
 
     const userId = user?.userId;
     const name =user?.name;
     
     const [activeTab, setActiveTab] = useState<'upcoming' | 'completed' | 'cancelled'>('upcoming');
-    const limit = 6;
+    const limit = 10;
+
+
+    useEffect(() => {
+        dispatch(fetchScheduledBookingDetails({ page: currentPage, limit}))
+    }, [dispatch, refreshToggle])
 
     useEffect(() => {
         dispatch(clearBookings());
@@ -330,8 +336,8 @@ const Session = () => {
                 cursor: 'pointer',
                 transition: 'background-color 0.3s ease',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background === 'darkred')}
-            onMouseLeave={(e) => (e.currentTarget.style.background === 'red')}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'darkred')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'red')}
             >
                 No
             </button>
@@ -346,6 +352,8 @@ const Session = () => {
                 .then((response) => {
                     console.log("Cancellation response:", response);
                     toast.success("Appointment cancelled successfully", { position: 'top-right', autoClose: 3000 });
+
+                    setRefreshToggle((prev) => !prev);
                 })
                 .catch((error) => {
                     console.error("Error cancelling appointment:", error);

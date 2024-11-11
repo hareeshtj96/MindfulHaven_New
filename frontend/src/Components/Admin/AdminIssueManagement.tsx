@@ -27,6 +27,9 @@ const AdminIssuesManagement: React.FC = () => {
     (state: RootState) => state.admin as { issues: Issue[]; loading: boolean; error: string | null }
   );
 
+  console.log("issues:", issues);
+  
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
@@ -86,6 +89,9 @@ const AdminIssuesManagement: React.FC = () => {
         .unwrap()
         .then(() => {
             toast.success("Issue resolved successfully")
+            setTimeout(() => {
+              dispatch(fetchIssues());
+          }, 500);
         })
         .catch(() => {
             toast.error("Failed to resolve issue")

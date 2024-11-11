@@ -6,6 +6,7 @@ import therapistSessionUsecase from "./therapistSessionUsecase";
 import cancelAppointmentTherapistUsecase from "./cancelAppointmentTherapistUsecase";
 import getTherapistDetailsUsecase from "./getTherapistDetailsUsecase";
 import therapistPhotoUsecase from "./therapistPhotoUsecase";
+import cancelSlotUsecase from "./cancelSlotUsecase";
 
 
 export {
@@ -16,5 +17,6 @@ export {
     therapistSessionUsecase,
     cancelAppointmentTherapistUsecase,
     getTherapistDetailsUsecase,
-    therapistPhotoUsecase
+    therapistPhotoUsecase,
+    cancelSlotUsecase
 }

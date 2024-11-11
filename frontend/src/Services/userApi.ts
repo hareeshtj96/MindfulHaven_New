@@ -1,6 +1,5 @@
-// const BASE_URL = 'https://mindfulhaven.life/api';
 
-const BASE_URL = 'http://localhost:8080'
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 export const USERREGISTER = `${BASE_URL}/register`;
 export const GOOGLEREGISTER = `${BASE_URL}/register_google_auth`;
@@ -38,3 +37,4 @@ export const SORTINDIVIDUALTHERAPIST = `${BASE_URL}/sort_individualTherapist`;
 export const SEARCHINDIVIDUALTHERAPIST = `${BASE_URL}/search_individualTherapist`;
 export const GETCOUPLETHERAPIST = `${BASE_URL}/coupleTherapy`;
 export const SORTCOUPLETHERAPIST = `${BASE_URL}/sort_coupleTherapist`;
+export const CHECKSLOTBEFOREPAYMENT = `${BASE_URL}/checkSlotBeforePayment`;

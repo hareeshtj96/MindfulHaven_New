@@ -29,8 +29,8 @@ const TherapistCalendar: React.FC = () => {
   };
 
   const generateTimeSlotsForDate = (date: Date) => {
-    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' }); // Get the day of the week
-    const dayTiming = timings.find(timing => timing.dayOfWeek.includes(dayOfWeek)); // Find the matching day
+    const dayOfWeek = date.toLocaleString('en-US', { weekday: 'long' }); 
+    const dayTiming = timings.find(timing => timing.dayOfWeek.includes(dayOfWeek));
     
     if (dayTiming) {
       const { startTime, endTime } = dayTiming;
@@ -53,7 +53,7 @@ const TherapistCalendar: React.FC = () => {
       minute: '2-digit',
       hour12: false,
     }));
-    start.setHours(start.getHours() + 1); // Increment time by 1 hour
+    start.setHours(start.getHours() + 1); 
   }
   
     return slots;
@@ -133,16 +133,17 @@ const TherapistCalendar: React.FC = () => {
           hour12: false,
         })
 
-        const handleRemoveSlot = (slotId: string, therapistId: string) => {
+        const handleRemoveSlot = (slot: string, therapistId: string) => {
           const toastId = toast(
             <div>
               <p>Do you want to cancel this slot?</p>
               <div>
                 <button 
                   onClick={() => {
-                    dispatch(cancelAvailableSlot({ slotId, therapistId }));
+                    dispatch(cancelAvailableSlot({ slot, therapistId }));
                     toast.dismiss(toastId); 
                     toast.success("Slot canceled successfully!"); 
+                    setAvailableTimeSlots(prevSlots => prevSlots.filter(existingSlot => existingSlot !== slot));
                   }}
                   className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
                 >

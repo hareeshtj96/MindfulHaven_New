@@ -423,9 +423,11 @@ export const cancelAppointmentByTherapist = createAsyncThunk(
 
 export const cancelAvailableSlot = createAsyncThunk(
     "therapist/cancelAvailableSlot",
-    async ({slotId, therapistId}: {slotId: string, therapistId: string}, {rejectWithValue}) => {
+    async ({slot, therapistId}: {slot: string, therapistId: string}, {rejectWithValue}) => {
         try {
-            const response = await axios.put(CANCELAVAILABLESLOT, {slotId, therapistId});
+            console.log("slot in slice:", slot);
+            console.log("therapist id:", therapistId);
+            const response = await axios.put(CANCELAVAILABLESLOT, {slot, therapistId});
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Failed to cancel available slots")

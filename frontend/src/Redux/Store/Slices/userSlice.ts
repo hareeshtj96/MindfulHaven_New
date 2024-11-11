@@ -39,6 +39,7 @@ import { USERREGISTER,
     SEARCHINDIVIDUALTHERAPIST,
     GETCOUPLETHERAPIST,
     SORTCOUPLETHERAPIST,
+    CHECKSLOTBEFOREPAYMENT
  } from "../../../Services/userApi";
 
 
@@ -602,6 +603,36 @@ export const fetchBookedSlots = createAsyncThunk<{ bookedSlots: string[] }, stri
         }
     }
 )
+
+
+export const checkSlotBeforePayment = createAsyncThunk<
+  { available: boolean },
+  { therapistId: string; slotDate: string; slotTime: string }, 
+  { rejectValue: string } 
+>(
+  "user/checkSlotBeforePayment",
+  async ({ therapistId, slotDate, slotTime }, thunkAPI) => {
+    try {
+      
+        const response = await axios.get(`${CHECKSLOTBEFOREPAYMENT}/${therapistId}`, 
+            {
+              params: {
+                slotDate,
+                slotTime
+              }
+            }
+          );
+
+      console.log("response from check slot before payment:", response);
+      
+      return response.data; 
+
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Failed to fetch available slots";
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 
 
 

@@ -33,6 +33,8 @@ function BookingsList() {
     const [itemsPerPage] = useState<number>(6);
     const [activeTab, setActiveTab] = useState<TabType>('upcoming');
 
+    
+
     useEffect(() => {
         if (therapistId) {
             dispatch(fetchBookingAppointments({ therapistId, page: currentPage, limit: 20 }))
@@ -43,6 +45,16 @@ function BookingsList() {
                 .catch((err) => console.log(err));
         }
     }, [therapistId, dispatch, currentPage, activeTab]);
+
+
+
+    useEffect(() => {
+        if (bookings) {
+            filterBookings(bookings);
+        }
+    }, [bookings, activeTab]);
+
+   
 
     const filterBookings = (allBookings: Booking[]) => {
         const today = new Date();
@@ -138,8 +150,9 @@ function BookingsList() {
                     <ConfirmCancelToast 
                         onConfirm={async () => {
                             try {
-                                // Perform cancellation
-                                await dispatch(cancelAppointmentByTherapist({ bookingId }));
+                                const result = await dispatch(cancelAppointmentByTherapist({ bookingId }));
+                            
+                            if (result) {  
                                 toast.success("Appointment cancelled successfully!", {
                                     position: "top-right",
                                     autoClose: 5000,
@@ -148,10 +161,18 @@ function BookingsList() {
                                     pauseOnHover: true,
                                     draggable: true,
                                 });
+                                
+                                if (therapistId)
+                                dispatch(fetchBookingAppointments({ 
+                                    therapistId, 
+                                    page: currentPage,
+                                    limit: 20 
+                                  }));
+                            }
                             } catch (error) {
                                 toast.error("Failed to cancel the appointment.", {
                                     position: "top-right",
-                                    autoClose: 5000,
+                                    autoClose: 2000,
                                     hideProgressBar: false,
                                     closeOnClick: true,
                                     pauseOnHover: true,
@@ -165,7 +186,7 @@ function BookingsList() {
                 ),
                 {
                     position: "top-right",
-                    autoClose: false, // Set to false to keep the confirmation toast on screen until dismissed
+                    autoClose: false,
                     closeOnClick: false,
                     draggable: false,
                     hideProgressBar: true,
