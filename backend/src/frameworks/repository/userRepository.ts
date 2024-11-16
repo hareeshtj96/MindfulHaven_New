@@ -321,13 +321,24 @@ export default {
     checkSlotBeforePayment: async(therapistId: string, slotDate: string, slotTime: string) => {
         try {
             const bookedSlots = await databaseSchema.Appointment.find({therapistId, status: "scheduled"})
+
+            const validAppointments = bookedSlots.filter(appointment => {
+                if (appointment.payment?.paymentStatus === 'success') {
+                  return true; 
+                } else {
+                   appointment.status = 'cancelled';
+                   appointment.save();
+                  return false; 
+                }
+              });
+
         
-            const isSlotBooked = bookedSlots.some(appointment => {
+            const isSlotBooked = validAppointments.some(appointment => {
                 const appointmentDate = appointment.slot.toISOString().split("T")[0];
                 const appointmentTime = new Date(appointment.slot).toISOString().split("T")[1].slice(0,5);
 
                 return appointmentDate === slotDate && appointmentTime === slotTime;
-``         })
+``         });
             
             if (isSlotBooked) {
                 return { status: false, message: "Slot is already booked"}
@@ -342,50 +353,157 @@ export default {
         }
     },
 
+    
+
+    // saveAppointment: async ({
+    //     therapistId,
+    //     userId,
+    //     slot,
+    //     notes,
+    //     paymentId
+    //   }: {
+    //     therapistId: string;
+    //     userId: string;
+    //     slot: Date | string;
+    //     notes?: string;
+    //     paymentId?: string;
+    //   }) => {
+    //     try {
+
+    //       const slotDate = typeof slot === 'string' ? new Date(slot) : slot as Date;
+
+    //       const existingAppointment = await databaseSchema.Appointment.findOne({
+    //         therapistId,
+    //         slot: slotDate,
+    //         status: { $ne: 'cancelled'}
+    //       });
+      
+    //       if (existingAppointment) {
+    //         return {
+    //           status: false,
+    //           message: "The slot is already booked. Please choose a different slot"
+    //         };
+    //       }
+
+    //       const paymentDetails = await databaseSchema.Payment.findById(paymentId);
+      
+    //       if (!paymentDetails) {
+    //         return {
+    //           status: false,
+    //           message: "Payment details not found."
+    //         };
+    //       }
+      
+    //       const newAppointment = new databaseSchema.Appointment({
+    //         therapistId,
+    //         userId,
+    //         slot: slotDate,
+    //         notes,
+    //         payment: {
+    //           userId: paymentDetails.userId,
+    //           therapistId: paymentDetails.therapistId,
+    //           amount: paymentDetails.amount,
+    //           convenienceFee: paymentDetails.convenienceFee,
+    //           totalAmount: paymentDetails.totalAmount,
+    //           paymentMethod: paymentDetails.paymentMethod,
+    //           paymentStatus: paymentDetails.paymentStatus,
+    //           paymentDate: paymentDetails.paymentDate,
+    //           refundRequest: paymentDetails.refundRequest,
+    //           refundReason: paymentDetails.refundReason,
+    //           refundProcessedAt: paymentDetails.refundProcessedAt
+    //         }
+    //       });
+
+    //       // Save the appointment
+    //       const savedAppointment = await newAppointment.save();
+
+    //       // Update the therapist's booked slots
+    //       const therapist = await databaseSchema.Therapist.findById(therapistId);
+    //       if (therapist) {
+    //         // Add the booked slot to the therapist's `booked` array
+    //         const bookedSlot = {
+    //           date: slotDate.toISOString().split('T')[0],
+    //           time: `${slotDate.getUTCHours() % 12 || 12}:00 ${slotDate.getUTCHours() >= 12 ? 'PM' : 'AM'}`,
+    //           status: true
+    //         };
+    //         therapist.booked.push(bookedSlot);
+      
+    //         // Save the updated therapist document
+    //         await therapist.save();
+    //       }
+      
+    //       return {
+    //         status: true,
+    //         data: savedAppointment
+    //       };
+    //     } catch (error: any) {
+    //         console.error("Error saving appointment:", error);
+    //       return {
+    //         status: false,
+    //         message: "Failed to save the appointment"
+    //       };
+    //     }
+    //   },
+
     saveAppointment: async ({
         therapistId,
         userId,
         slot,
         notes,
-        paymentId
+        paymentId,
       }: {
         therapistId: string;
         userId: string;
         slot: Date | string;
         notes?: string;
-        paymentId: string;
+        paymentId?: string; 
       }) => {
         try {
-
+            console.log("payment id in save appointment repo:", paymentId)
           const slotDate = typeof slot === 'string' ? new Date(slot) : slot as Date;
-
+      
+          // Check if the slot is already booked
           const existingAppointment = await databaseSchema.Appointment.findOne({
             therapistId,
-            slot: slotDate
+            slot: slotDate,
+            status: { $ne: 'cancelled' },
           });
-      
-          if (existingAppointment) {
-            return {
-              status: false,
-              message: "The slot is already booked. Please choose a different slot"
-            };
-          }
 
-          const paymentDetails = await databaseSchema.Payment.findById(paymentId);
+          console.log("exisitng appoitnment:......", existingAppointment)
       
-          if (!paymentDetails) {
+          if (existingAppointment && typeof paymentId === 'undefined') {
             return {
               status: false,
-              message: "Payment details not found."
+              message: 'The slot is already booked. Please choose a different slot',
             };
           }
       
-          const newAppointment = new databaseSchema.Appointment({
+          let paymentDetails;
+          if (paymentId) {
+            // Fetch payment details if paymentId is provided
+            paymentDetails = await databaseSchema.Payment.findById(paymentId);
+            console.log("payment details:", paymentDetails)
+      
+            if (!paymentDetails) {
+              return {
+                status: false,
+                message: 'Payment details not found.',
+              };
+            }
+          }
+      
+          // Create the appointment object
+          const appointmentData: any = {
             therapistId,
             userId,
             slot: slotDate,
             notes,
-            payment: {
+          };
+      
+          // Add payment details only if available
+          if (paymentDetails) {
+            console.log('Payment details found:', paymentDetails);
+            appointmentData.payment = {
               userId: paymentDetails.userId,
               therapistId: paymentDetails.therapistId,
               amount: paymentDetails.amount,
@@ -396,40 +514,44 @@ export default {
               paymentDate: paymentDetails.paymentDate,
               refundRequest: paymentDetails.refundRequest,
               refundReason: paymentDetails.refundReason,
-              refundProcessedAt: paymentDetails.refundProcessedAt
-            }
-          });
-
+              refundProcessedAt: paymentDetails.refundProcessedAt,
+            };
+          }
+      
           // Save the appointment
-          const savedAppointment = await newAppointment.save();
+          const newAppointment = new databaseSchema.Appointment(appointmentData);
 
+          const savedAppointment = await newAppointment.save();
+      
           // Update the therapist's booked slots
           const therapist = await databaseSchema.Therapist.findById(therapistId);
           if (therapist) {
-            // Add the booked slot to the therapist's `booked` array
             const bookedSlot = {
               date: slotDate.toISOString().split('T')[0],
-              time: `${slotDate.getUTCHours() % 12 || 12}:00 ${slotDate.getUTCHours() >= 12 ? 'PM' : 'AM'}`,
-              status: true
+              time: `${slotDate.getUTCHours() % 12 || 12}:00 ${
+                slotDate.getUTCHours() >= 12 ? 'PM' : 'AM'
+              }`,
+              status: true,
             };
             therapist.booked.push(bookedSlot);
-      
-            // Save the updated therapist document
             await therapist.save();
           }
       
           return {
             status: true,
-            data: savedAppointment
+            data: savedAppointment,
           };
         } catch (error: any) {
-            console.error("Error saving appointment:", error);
+          console.error('Error saving appointment:', error);
           return {
             status: false,
-            message: "Failed to save the appointment"
+            message: 'Failed to save the appointment',
           };
         }
       },
+
+      
+      
       
 
     bookingDetails : async({ bookingId} : {bookingId: string}) => {
@@ -616,6 +738,21 @@ export default {
             
         } catch (error) {
             return { status: false, message: "Failed to fetch search child therapists"}
+        }
+    },
+
+    getCoupleTherapistSearchResult: async (searchTerm: string) => {
+        const filter = {
+            $or:[
+                {name: {$regex: searchTerm, $options:'i'}},
+                { specialization: {$regex: searchTerm, $options: 'i'}}
+            ],
+        };
+        try {
+            const therapists = await databaseSchema.Therapist.find(filter)
+            return therapists;
+        } catch (error) {
+            return { status: false, message:"Failed to fetch search couple therapists"}
         }
     },
     

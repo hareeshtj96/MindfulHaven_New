@@ -13,6 +13,7 @@ export default (dependencies: any) => {
             } else  {
                 return { status: false, message: response.message}
             }
+            
         } catch (error) {
             return { status: false, message: ResponseMessages.ERROR_IN_BOOKED_SLOT_USECASE };
         }

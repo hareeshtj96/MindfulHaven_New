@@ -48,6 +48,7 @@ function TherapistLogin () {
                     navigate("/therapist/therapist_dashboard");
                 },2000);
                 
+                window.history.pushState(null, '', '/therapist/therapist_dashboard');
             }
         } else {
             setErrors({general: resultAction.error.message});

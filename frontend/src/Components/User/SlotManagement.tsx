@@ -12,6 +12,12 @@ import {
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+interface CheckSlotResponse {
+  available: boolean;
+  status: boolean;
+  message: string;
+}
+
 const SlotManagement = () => {
   const { therapistId } = useParams<{ therapistId: string }>();
   console.log("therapist id slot:", therapistId);
@@ -99,13 +105,12 @@ const SlotManagement = () => {
       const slotTime = slot.toISOString().split("T")[1].substring(0,5);
 
       try {
-        const response = await dispatch(checkSlotBeforePayment({therapistId, slotDate, slotTime})).unwrap();
-        console.log("response from handle submit:......", response);
-        
+        const response : CheckSlotResponse =  await dispatch(checkSlotBeforePayment({therapistId, slotDate, slotTime})).unwrap();
+       
         if (response.status) {
           navigate(`/payment`, { state: appointmentData });
         } else {
-          toast.error("Selected slot is already booked. Please choose another slot.")
+          toast.error(response.message);
         }
         
       } catch (error) {

@@ -39,7 +39,8 @@ import { USERREGISTER,
     SEARCHINDIVIDUALTHERAPIST,
     GETCOUPLETHERAPIST,
     SORTCOUPLETHERAPIST,
-    CHECKSLOTBEFOREPAYMENT
+    CHECKSLOTBEFOREPAYMENT,
+    SEARCHCOUPLETHERAPIST
  } from "../../../Services/userApi";
 
 
@@ -88,9 +89,7 @@ interface Therapist {
     
 }
 
-interface TherapistGroup {
-    therapists: Therapist[]
-}
+
 
 interface PasswordResetPayload {
     newPassword: string;
@@ -152,6 +151,10 @@ interface UserState {
     familyTherapists: Therapist[]; 
     coupleTherapists: Therapist[]; 
     individualTherapists: Therapist[]; 
+    familyTherapistsSearch: Therapist[];
+    individualTherapistsSearch: Therapist[];
+    childTherapistsSearch: Therapist[];
+    coupleTherapistsSearch: Therapist[],
     token: string | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
@@ -200,6 +203,10 @@ const initialState: UserState = {
     familyTherapists: [],
     individualTherapists:[],
     coupleTherapists: [],
+    familyTherapistsSearch: [],
+    individualTherapistsSearch: [],
+    childTherapistsSearch: [],
+    coupleTherapistsSearch: [],
     token: localStorage.getItem('token'),
     status: 'idle',
     error: null,
@@ -978,6 +985,20 @@ export const fetchIndividualTherapistBySearchTerm = createAsyncThunk(
     }
 );
 
+export const fetchCoupleTherapistBySearchTerm = createAsyncThunk(
+    "therapist/fetchCoupleTherapistBySearchTerm",
+    async (searchTerm: string, {rejectWithValue}) => {
+        try {
+            const response = await axios.get(SEARCHCOUPLETHERAPIST, { params: {search: searchTerm}});
+            console.log("response from seach couple therapists slice:", response.data.data);
+            return response.data.data;
+
+        } catch (error: any) {
+            return rejectWithValue(error.response.data.message || "Failed to fetch couple therapists");
+        }
+    }
+);
+
 
 export const fetchSortedFamilyTherapists = createAsyncThunk(
     "therapist/fetchSortedFamilyTherapists",
@@ -1127,6 +1148,10 @@ export const geminiAPIResponse = createAsyncThunk<string, string, { rejectValue:
   );
 
 
+
+  
+
+
 const userSlice = createSlice({
     name: 'user',
     initialState,
@@ -1160,7 +1185,32 @@ const userSlice = createSlice({
         },
         updateAvailableSlots: (state, action) => {
             state.availableSlots = action.payload;
+        },
+        clearSearchResults: (state) => {
+            state.therapists = [];
+            state.status = 'idle';
+        },
+        clearGeminiResults: (state) => {
+            state.search_Result = "";
+            state.status = 'idle';
+        },
+        clearChildTherapistSearchResults: (state) => {
+            state.childTherapistsSearch = [];
+            state.status = 'idle';
+        },
+        clearFamilyTherapistSearchResults: (state) => {
+            state.familyTherapistsSearch = [];
+            state.status = 'idle';
+        },
+        clearIndividualTherapistSearchResults: (state) => {
+            state.individualTherapistsSearch = [];
+            state.status = 'idle';
+        },
+        clearCoupleTherapistSearchResults: (state) => {
+            state.coupleTherapistsSearch = [];
+            state.status = 'idle';
         }
+        
     },
     extraReducers: (builder) => {
         builder
@@ -1310,9 +1360,7 @@ const userSlice = createSlice({
             })
             .addCase(fetchAvailableSlots.fulfilled, (state, action) => {
                 state.loading = false;
-                state.availableSlots = action.payload.availableSlots;
-                console.log("action payl....", action.payload);
-                
+                state.availableSlots = action.payload.availableSlots;   
                 state.timings = action.payload.timings;
                 state.booked = action.payload.booked;
                
@@ -1479,7 +1527,7 @@ const userSlice = createSlice({
                 state.status = 'failed';
             })
             .addCase(fetchChildTherapistBySearchTerm.fulfilled, (state, action) => {
-                state.therapists = action.payload; 
+                state.childTherapistsSearch = action.payload; 
                 state.status = 'succeeded';
             })
             .addCase(fetchChildTherapistBySearchTerm.pending, (state) => {
@@ -1493,7 +1541,7 @@ const userSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(fetchFamilyTherapistBySearchTerm.fulfilled, (state, action) => {
-                state.familyTherapists = action.payload;
+                state.familyTherapistsSearch = action.payload;
                 state.status = 'succeeded';
             })
             .addCase(fetchFamilyTherapistBySearchTerm.rejected, (state, action) => {
@@ -1504,11 +1552,22 @@ const userSlice = createSlice({
                 state.status = 'loading';
             })
             .addCase(fetchIndividualTherapistBySearchTerm.fulfilled, (state, action) => {
-                state.individualTherapists = action.payload;
+                state.individualTherapistsSearch = action.payload;
                 state.status = 'succeeded';
             })
             .addCase(fetchIndividualTherapistBySearchTerm.rejected, (state, action) => {
                 state.status = "failed";
+                state.error = null;
+            })
+            .addCase(fetchCoupleTherapistBySearchTerm.pending, (state) => {
+                state.status = 'loading';
+            })
+            .addCase(fetchCoupleTherapistBySearchTerm.fulfilled, (state, action) => {
+                state.coupleTherapistsSearch = action.payload;
+                state.status = 'succeeded';
+            })
+            .addCase(fetchCoupleTherapistBySearchTerm.rejected, (state) => {
+                state.status = 'failed';
                 state.error = null;
             })
             .addCase(geminiAPIResponse.pending, (state) => {
@@ -1532,6 +1591,18 @@ const userSlice = createSlice({
     }
 })
 
-export const { logoutUser, clearError, clearAppointmentStatus, clearBookings, resetSearchResults, resetResult, updateAvailableSlots } = userSlice.actions;
+export const { logoutUser, 
+    clearError, 
+    clearAppointmentStatus, 
+    clearBookings, 
+    resetSearchResults, 
+    resetResult, 
+    updateAvailableSlots, 
+    clearSearchResults,
+    clearGeminiResults,
+    clearChildTherapistSearchResults,
+    clearFamilyTherapistSearchResults,
+    clearIndividualTherapistSearchResults,
+    clearCoupleTherapistSearchResults } = userSlice.actions;
 
 export default userSlice.reducer;

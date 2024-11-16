@@ -35,7 +35,8 @@ function AdminLogin() {
                 setTimeout(() => {
                     navigate("/admin/admin_dashboard");
                 },2000);
-                
+
+                window.history.pushState(null, '', '/admin/admin_dashboard');
             } else {
                 toast.error(message || "Login failed. Please check your credentials.",  { position: 'top-right'})
                 console.error("Login failed:", message);

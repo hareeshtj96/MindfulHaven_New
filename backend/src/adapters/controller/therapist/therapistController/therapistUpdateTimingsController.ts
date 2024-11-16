@@ -15,6 +15,7 @@ export default (dependencies: any) => {
     const therapistUpdateTimingsController = async (req: Request, res: Response) => {
         try {
             const token = req.headers.authorization?.split(' ')[1];
+            
             if (!token) {
                 return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.UNAUTHORIZED });
             
@@ -27,11 +28,11 @@ export default (dependencies: any) => {
             const { startTime, endTime, date } = req.body;
             
             const response = await updateTherapistTimingsUsecase(dependencies).executeFunction({email, startTime, endTime, date});
-
+        
             if (response && response.status) {
-                res.status(HttpStatusCode.OK).json({ status: true, data: response.data })
+                res.status(HttpStatusCode.OK).json({ status: true, message: response.message });
             } else {
-                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message});
+                res.status(HttpStatusCode.OK).json({ status: false, message: response.message});
             }
         } catch (error) {
             return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.TOKEN_EXPIRED });

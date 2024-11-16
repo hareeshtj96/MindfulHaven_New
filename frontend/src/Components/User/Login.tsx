@@ -43,6 +43,7 @@ function Login() {
             const timer = setTimeout(() => {
                 console.log("navigating to dashboard");
                 navigate("/dashboard");
+                window.history.pushState(null, '', '/dashboard');
                 
             }, 2000);
             return () => clearTimeout(timer);

@@ -11,6 +11,8 @@ import {
   resetSearchResults,
   geminiAPIResponse,
   resetResult,
+  clearSearchResults,
+  clearGeminiResults
 } from "../../Redux/Store/Slices/userSlice";
 
 function Dashboard() {
@@ -109,9 +111,19 @@ function Dashboard() {
             setHasSearched(true);
             dispatch(fetchTherapistBySearchTerm(debouncedSearchTerm));
           }}
-          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 w-full sm:w-auto"
+          className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 w-full sm:w-auto"
         >
           Search
+        </button>
+
+        <button onClick={() => {
+            setSearchTerm("");
+            setHasSearched(false);
+            dispatch(clearSearchResults());
+        }}
+        className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full sm:w-auto"
+        >
+            Clear
         </button>
       </div>
 
@@ -268,11 +280,22 @@ function Dashboard() {
             onChange={(e) => setSearchTermGemini(e.target.value)}
           />
           <button
-            className="bg-btncolor text-white p-4 rounded-lg hover:bg-btncolor-dark w-full sm:w-auto"
+            className="bg-green-500 text-white px-4 py-4 rounded-lg hover:bg-green-600 w-full sm:w-auto"
             onClick={() => dispatch(geminiAPIResponse(searchTermGemini))}
           >
             Search
           </button>
+
+          <button onClick={() => {
+            setSearchTermGemini("");
+            setHasSearched(false);
+            dispatch(clearGeminiResults());
+        }}
+        className="bg-red-500 text-white px-6 py-4 rounded-lg hover:bg-red-600 w-full sm:w-auto"
+        >
+            Clear
+        </button>
+
         </div>
 
         {search_Result && (

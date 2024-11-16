@@ -199,9 +199,16 @@ export default {
                 return { status: false, message: "Therapist not found"}
             }
            
+            const reformattedDate = date.split("/").reverse().join("-");
+            const [startHour, startMinute] = startTime.split(":").map(Number);
+            const [endHour, endMinute] = endTime.split(":").map(Number);
          
-            const startDateTime = new Date(`${date} ${startTime}`)
-            const endDateTime = new Date(`${date} ${endTime}`);
+            const startDateTime = new Date(reformattedDate);
+            startDateTime.setHours(startHour, startMinute, 0);
+           
+            
+            const endDateTime = new Date(reformattedDate);
+            endDateTime.setHours(endHour, endMinute, 0);
 
             const currentDateTime = new Date();
 
@@ -213,17 +220,28 @@ export default {
                 return { status: false, message: "Start time must be in the future"};
             }
 
-            const newTiming = {
-                date: new Date(date),
-                startTime: startDateTime,
-                endTime: endDateTime
+             // Check if this timing already exists in updatedTimings
+            const existingTiming = therapist.updatedTimings.some(timing =>
+                timing.date.toISOString().split("T")[0] === reformattedDate &&
+                timing.startTime === startTime &&
+                timing.endTime === endTime
+            );
+
+            if (existingTiming) {
+            return { status: false, message: "This timing already exists" };
             }
 
+            const newTiming = {
+                date: reformattedDate,
+                startTime: startTime,
+                endTime: endTime
+            }
+           
             therapist.updatedTimings.push(newTiming);
 
             await therapist.save();
 
-            return { status: true, data: therapist}
+            return { status: true, message:"Timings updated successfully"}
             
         } catch (error) {
             return { status: false, message:"Error occured during updatiing therapist timings"}

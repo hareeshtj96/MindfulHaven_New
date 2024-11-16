@@ -55,6 +55,7 @@ const PaymentPage = () => {
         setIsLoading(true);
 
         try {
+
             const scriptLoaded = await loadRazorpayScript();
 
             if (!scriptLoaded) {
@@ -66,10 +67,17 @@ const PaymentPage = () => {
             const initialPaymentStatus = "pending"
 
             const data = await dispatch(paymentMethod({ therapistId, userId, notes, totalAmount, slot, paymentStatus:initialPaymentStatus })).unwrap();
-            const { razorpayOrderId, amount } = data.appointmentData || {};
+            console.log("data from payment management:",data);
+            const { razorpayOrderId, amount, reserveAppointment } = data.appointmentData || {};
 
             if (!razorpayOrderId) {
                 toast.error("Error creating Razorpay order. Please try again.");
+                setIsLoading(false);
+                return;
+            }
+
+            if (!reserveAppointment.status) {
+                toast.error("Slot is already booked")
                 setIsLoading(false);
                 return;
             }
@@ -82,12 +90,13 @@ const PaymentPage = () => {
                 image: "/your_logo.png",
                 order_id: razorpayOrderId,
                 handler: async function (response: any) {
-                    // Handle successful payment here
-                    toast.success("Payment successful!");
+                    try {
+                        
+                        toast.success("Payment successful!");
 
-                    const paymentStatus = "success";
-                    const paymentResponse =  await savePaymentToBackend(
-                        {
+                        const paymentStatus = "success";
+                        const paymentResponse =  await savePaymentToBackend(
+                            {
                             razorpayOrderId: response.razorpay_order_id,
                             paymentDetails: response,
                         },
@@ -99,13 +108,7 @@ const PaymentPage = () => {
                         notes,
                     );
 
-                    console.log("paymentresponse............", paymentResponse);
-                    
-
                     const paymentId = paymentResponse?.paymentId
-
-                    console.log("payment id:", paymentId);
-                    
 
                     const appointmentData = await dispatch(saveAppointment({ 
                         therapistId, 
@@ -115,14 +118,17 @@ const PaymentPage = () => {
                         paymentId
                      })).unwrap();
 
-                    console.log("appointment data......:", appointmentData)
-
                     if (appointmentData.success) {
                         toast.success("Appointment saved successfully!");
                         navigate(`/booking_status/${appointmentDataState._id}`, { state: { paymentDetails: response } });
                     } else {
                         toast.error("Failed to save appointment. Please try again.");
                     }
+                    } catch (error) {
+                        
+                    }
+                    
+        
                 },
                 notes: {
                     address: "Therapy booking",
@@ -155,7 +161,7 @@ const PaymentPage = () => {
             const razorpay = new window.Razorpay(options);
             razorpay.open();
 
-            setIsLoading(false); // Stop loading after the modal opens
+            setIsLoading(false); 
         } catch (error) {
             console.error("Payment failed:", error);
             toast.error("Payment failed. Please try again.");

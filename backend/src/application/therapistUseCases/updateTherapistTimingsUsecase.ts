@@ -16,9 +16,10 @@ export default (dependencies: any) => {
         try {
           
             const response = await therapistRepository.updateTimings(email, startTime, endTime, date);
+            console.log("response from usecase:", response);
 
             if (response.status) {
-                return { status: true, data: response.data}
+                return { status: true, message: response.mesage};
             } else {
                 return { status: false, message: response.message};
             }

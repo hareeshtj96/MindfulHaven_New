@@ -89,14 +89,17 @@ const TherapistCalendar: React.FC = () => {
   const handleSubmit = async (values: { date: string; startTime: string; endTime: string }, resetForm: () => void) => {
     const updatedValues = { ...values, date: formatSelectedDate() };
     try {
-      const response = await dispatch(updateTherapistAvailability(updatedValues)).unwrap();
-      if (response) {
+      const response = await dispatch(updateTherapistAvailability(updatedValues))
+      console.log("response from handle submit:", response);
+      if (response.payload && response.payload.status) {
         toast.success("Timings updated successfully!");
         resetForm();
         setSelectedDate(null);
         setAvailableTimeSlots([]);
+      } else if (response.payload && !response.payload.status){
+        toast.error(response.payload.message);
       } else {
-        toast.error("Failed to update timings.");
+        toast.error("Failed to update timings")
       }
     } catch (error) {
       toast.error("Failed to update timings.");

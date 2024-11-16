@@ -34,7 +34,8 @@ import {
     searchIndividualTherapistUsecase,
     getCoupleTherapistUsecase,
     sortCoupleTherapistUsecase,
-    checkSlotBeforePaymentUsecase
+    checkSlotBeforePaymentUsecase,
+    searchCoupleTherapistUsecase,
  } from "../../application/UseCases";
 
 import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase } from "../../application/adminUseCases";
@@ -77,6 +78,7 @@ const useCase: any={
     getCoupleTherapistUsecase: getCoupleTherapistUsecase,
     sortCoupleTherapistUsecase: sortCoupleTherapistUsecase,
     checkSlotBeforePaymentUsecase: checkSlotBeforePaymentUsecase,
+    searchCoupleTherapistUsecase: searchCoupleTherapistUsecase,
 
 
 

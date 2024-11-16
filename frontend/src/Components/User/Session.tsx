@@ -94,7 +94,7 @@ const Session = () => {
         return (
             <div key={booking._id} className="bg-white p-4 rounded-lg shadow-md border border-gray-200">
                 <h4 className="text-lg font-semibold mb-2">Therapist: {booking.therapist.name}</h4>
-                <p className="text-gray-600">Booking Id: {booking._id}</p>
+                <p className="text-gray-600">Booking Id: {`#${booking._id.slice(-6).toUpperCase()}`}</p>
                 <p className="text-gray-600">Date: {date}</p>
                 <p className="text-gray-600">Time: {time}</p>
                 <p className={`mt-2 text-sm ${

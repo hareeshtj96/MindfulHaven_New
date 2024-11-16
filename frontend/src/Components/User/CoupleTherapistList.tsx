@@ -5,14 +5,16 @@ import { AppDispatch, RootState } from "../../Redux/Store/store";
 import {
     fetchCoupleTherapist,
     fetchSortedCoupleTherapists,
-    // fetchCoupleTherapistBySearchTerm,
+    fetchCoupleTherapistBySearchTerm,
+    clearCoupleTherapistSearchResults
+
 } from "../../Redux/Store/Slices/userSlice";
 import DefaultSkeleton from "../../Components/MaterialUI/Shimmer";
 
 const CoupleTherapistList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { coupleTherapists, totalPages, currentPage, sortedCoupleTherapists, status, error, } = useSelector(
+    const { coupleTherapists, coupleTherapistsSearch, totalPages, currentPage, sortedCoupleTherapists, status, error, } = useSelector(
         (state: RootState) => state.user
     );
 
@@ -44,23 +46,23 @@ const CoupleTherapistList: React.FC = () => {
     }, [dispatch, sortOption]);
 
     // Debounce search input
-    // useEffect(() => {
-    //     const timerId = setTimeout(() => {
-    //         setDebouncedSearchTerm(searchTerm);
-    //     }, 300);
+    useEffect(() => {
+        const timerId = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 300);
 
-    //     return () => clearTimeout(timerId);
-    // }, [searchTerm]);
+        return () => clearTimeout(timerId);
+    }, [searchTerm]);
 
     // Fetch child therapists based on the search term
-    // useEffect(() => {
-    //     if (debouncedSearchTerm) {
-    //         setHasSearched(true);
-    //         dispatch(fetchFamilyTherapistBySearchTerm(debouncedSearchTerm));
-    //     } else {
-    //         setHasSearched(false);
-    //     }
-    // }, [debouncedSearchTerm, dispatch]);
+    useEffect(() => {
+        if (debouncedSearchTerm) {
+            setHasSearched(true);
+            dispatch(fetchCoupleTherapistBySearchTerm(debouncedSearchTerm));
+        } else {
+            setHasSearched(false);
+        }
+    }, [debouncedSearchTerm, dispatch]);
 
     // Filter therapists based on selected gender
     const filteredTherapists = genderFilter === "all"
@@ -100,13 +102,23 @@ const CoupleTherapistList: React.FC = () => {
                 <button className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 ml-auto">
                     Search
                 </button>
+
+                <button onClick={() => {
+                setSearchTerm("");
+                setHasSearched(false);
+                dispatch(clearCoupleTherapistSearchResults());
+                }}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full sm:w-auto"
+                >
+                Clear
+                </button>
             </div>
 
             {/* Display search results */}
-            {hasSearched && coupleTherapists.length > 0 && (
+            {hasSearched && coupleTherapistsSearch.length > 0 && (
                 <div className="mb-4">
                     <h2 className="text-lg font-semibold">Search Results:</h2>
-                    {coupleTherapists.map((therapist) => (
+                    {coupleTherapistsSearch.map((therapist) => (
                         <div key={therapist._id} className="flex bg-white rounded-lg shadow-md p-4 mt-2">
                             <div className="flex flex-col items-center justify-center p-4">
                                 {therapist.photo ? (

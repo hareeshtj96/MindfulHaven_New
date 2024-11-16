@@ -364,9 +364,9 @@ AvailabilityForm,
             }
 
             const response = await axios.put(UPDATETIMINGS, formData, config);
-            console.log("response from update timing slice:", response);
+            console.log("response from update timing slice:", response.data);
 
-            return response.data.data;
+            return response.data;
 
         } catch (error: any) {
             const message = error.response?.data?.message || 'Update failed';

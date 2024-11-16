@@ -36,6 +36,7 @@ import searchIndividualTherapistController from "./searchIndividualTherapistCont
 import coupleTherapistController from "./coupleTherapistController";
 import coupleTherapistSorting from "./coupleTherapistSorting";
 import checkSlotsBeforePaymentController from "./checkSlotsBeforePaymentController";
+import searchCoupleTherapistController from "./searchCoupleTherapistController";
 
 
 
@@ -79,6 +80,7 @@ export default (dependencies:any) => {
         coupleTherapistController: coupleTherapistController(dependencies),
         coupleTherapistSorting: coupleTherapistSorting(dependencies),
         checkSlotsBeforePaymentController: checkSlotsBeforePaymentController(dependencies),
+        searchCoupleTherapistController: searchCoupleTherapistController(dependencies),
         
     }
 }

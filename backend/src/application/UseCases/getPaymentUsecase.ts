@@ -19,6 +19,17 @@ export default (dependencies: any) => {
         throw new Error("Missing required payment details.");
       }
       
+
+      // Reserve the slot to booked in the database
+      const reserveAppointment = await userRepository.saveAppointment({therapistId, userId, slot})
+
+      if (!reserveAppointment) {
+        return {
+          status: false,
+          message: 'The slot is already booked.',
+        };
+      }
+      
       // Create an order with Razorpay
       const razorpayOrder = await razorpay.orders.create({
         amount: totalAmount * 100, 
@@ -34,6 +45,7 @@ export default (dependencies: any) => {
             amount: razorpayOrder.amount,
             currency: razorpayOrder.currency,
         },
+        reserveAppointment,
     };
       
     } catch (error:any) {

@@ -18,17 +18,22 @@ export default (dependencies: any) => {
         notes,
         totalAmount,
       });
+
       
       if (!paymentData || !paymentData.status) {
-        return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.PAYMENT_CREATION_FAILED });
+        return res.status(HttpStatusCode.OK).json({ status: false, message: ResponseMessages.PAYMENT_CREATION_FAILED });
       }
+
+      
 
       // Send the order details to the frontend
       res.status(HttpStatusCode.OK).json({
         status: true,
         razorpayOrderId: paymentData.appointmentData.razorpayOrderId,
         amount: paymentData.appointmentData.amount,
-        currency: paymentData.appointmentData.currency
+        currency: paymentData.appointmentData.currency,
+
+        reserveAppointment: paymentData.reserveAppointment,
       });
     } catch (error) {
       res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ status: false, message: ResponseMessages.INTERNAL_SERVER_ERROR });

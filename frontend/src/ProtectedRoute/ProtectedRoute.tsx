@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { RootState } from "../Redux/Store/store";
 
 interface ProtectedRouteProps {
@@ -10,23 +10,18 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const authUser = useSelector((state: RootState) => state.user.user);
-  const adminUser = useSelector((state: RootState) => state.admin.blockStatus);
   const navigate = useNavigate();
+  const location = useLocation();
 
  useEffect(() => {
-  const checkAuth = () => {
-    if (!authUser) {
-      navigate('/login');
-      return;
-    }
+  if (!authUser) {
+    sessionStorage.setItem('intendedRoute', location.pathname);
+    navigate('/login', {replace: true})
+  }
+ }, [authUser, navigate, location]);
 
-    setIsLoading(false);
-  };
 
-  checkAuth();
- }, [authUser, navigate]);
-
- return <>{children}</>
+return authUser ? <>{children}</> : null;
 };
 
 export default ProtectedRoute;

@@ -13,6 +13,7 @@ export default (dependencies: any) => {
 
     const executeFunction = async ({ therapistId, userId, slot, notes, paymentId}: AppointmentParams) => {
         try {
+            console.log("payment id in usecasse:", paymentId);
             const response = await userRepository.saveAppointment({ therapistId, userId, slot, notes, paymentId });
            
             if(response.status) {
