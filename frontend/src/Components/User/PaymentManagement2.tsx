@@ -149,7 +149,7 @@ const PaymentPage = () => {
 
                     if (appointmentData.success) {
                         toast.success("Payment successful! Appointment booked.");
-                        navigate(`/booking_status/${appointmentDataState._id}`, { state: { paymentDetails: response } });
+                        navigate(`/booking_status/${appointmentDataState?._id}`, { state: { paymentDetails: response } });
                     } else {
                         toast.error("Failed to save appointment. Please try again.");
                     }

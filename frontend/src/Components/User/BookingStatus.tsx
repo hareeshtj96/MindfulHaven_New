@@ -13,12 +13,28 @@ const BookingStatus = () => {
   );
   console.log("booking status:", bookingStatus);
 
+  // const therapist = useSelector((state: RootState) => {
+  //   const therapistList = [
+  //     ...(state.user.therapists?.therapists || []),
+  //     ...(state.user.familyTherapists?.therapists || []),
+  //     ...(state.user.coupleTherapists?.therapists || []),
+  //     ...(state.user.individualTherapists?.therapists || []),
+  //   ];
+
+  //   return therapistList.find(
+  //     (t) =>
+  //       t._id === bookingStatus?.therapistId ||
+  //       t._id === bookingStatus?.data?.therapistId
+  //   );
+  // });
+
+
   const therapist = useSelector((state: RootState) => {
     const therapistList = [
-      ...(state.user.therapists?.therapists || []),
-      ...(state.user.familyTherapists?.therapists || []),
-      ...(state.user.coupleTherapists?.therapists || []),
-      ...(state.user.individualTherapists?.therapists || []),
+      ...(state.user.therapists|| []),
+      ...(state.user.familyTherapists || []),
+      ...(state.user.coupleTherapists || []),
+      ...(state.user.individualTherapists || []),
     ];
 
     return therapistList.find(
@@ -27,6 +43,8 @@ const BookingStatus = () => {
         t._id === bookingStatus?.data?.therapistId
     );
   });
+
+  
   const loading = useSelector((state: RootState) => state.user.loading);
   const error = useSelector((state: RootState) => state.user.error);
 
@@ -73,7 +91,7 @@ const BookingStatus = () => {
               <strong>Email:</strong> {therapist?.email || "N/A"}
             </p>
             <p className="mb-2">
-              <strong>Fees:</strong> ₹{therapist?.fees + 80 || "N/A"}
+              <strong>Fees:</strong> ₹{(therapist?.fees ?? 0) + 80 || "N/A"}
             </p>
             <div className="mb-2">
               <strong>Date:</strong>{" "}
