@@ -13,28 +13,12 @@ const BookingStatus = () => {
   );
   console.log("booking status:", bookingStatus);
 
-  // const therapist = useSelector((state: RootState) => {
-  //   const therapistList = [
-  //     ...(state.user.therapists?.therapists || []),
-  //     ...(state.user.familyTherapists?.therapists || []),
-  //     ...(state.user.coupleTherapists?.therapists || []),
-  //     ...(state.user.individualTherapists?.therapists || []),
-  //   ];
-
-  //   return therapistList.find(
-  //     (t) =>
-  //       t._id === bookingStatus?.therapistId ||
-  //       t._id === bookingStatus?.data?.therapistId
-  //   );
-  // });
-
-
   const therapist = useSelector((state: RootState) => {
     const therapistList = [
-      ...(state.user.therapists|| []),
-      ...(state.user.familyTherapists || []),
-      ...(state.user.coupleTherapists || []),
-      ...(state.user.individualTherapists || []),
+      ...(state.user.therapists?.therapists || []),
+      ...(state.user.familyTherapists?.therapists || []),
+      ...(state.user.coupleTherapists?.therapists || []),
+      ...(state.user.individualTherapists?.therapists || []),
     ];
 
     return therapistList.find(
@@ -43,6 +27,22 @@ const BookingStatus = () => {
         t._id === bookingStatus?.data?.therapistId
     );
   });
+
+
+  // const therapist = useSelector((state: RootState) => {
+  //   const therapistList = [
+  //     ...(state.user.therapists|| []),
+  //     ...(state.user.familyTherapists || []),
+  //     ...(state.user.coupleTherapists || []),
+  //     ...(state.user.individualTherapists || []),
+  //   ];
+
+  //   return therapistList.find(
+  //     (t) =>
+  //       t._id === bookingStatus?.therapistId ||
+  //       t._id === bookingStatus?.data?.therapistId
+  //   );
+  // });
 
   
   const loading = useSelector((state: RootState) => state.user.loading);
