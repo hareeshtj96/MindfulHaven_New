@@ -48,12 +48,14 @@ const issueSchema = new mongoose_1.Schema({
     category: {
         type: String,
         enum: ['general', 'payment', 'therapist', 'technical'],
-        required: true
     },
     status: {
         type: String,
         enum: ['pending', 'in progress', 'resolved'],
         default: 'pending',
+    },
+    rating: {
+        type: Number
     },
     raisedAt: {
         type: Date,

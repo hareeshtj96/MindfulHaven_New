@@ -13,3 +13,4 @@ export const CANCELAPPOINTMENTBYTHERAPIST = `${BASE_URL}/therapist/therapist_can
 export const GETAVAILABILITY = `${BASE_URL}/therapist/therapist_availableDetails`
 export const CANCELAVAILABLESLOT = `${BASE_URL}/therapist/therapist_cancelSlot`
 export const UPDATEPHOTO = `${BASE_URL}/therapist/updatePhoto`;
+export const FETCHPROFIT = `${BASE_URL}/therapist/fetchProfit`;

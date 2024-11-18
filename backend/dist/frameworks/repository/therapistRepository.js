@@ -170,8 +170,13 @@ exports.default = {
             if (!therapist) {
                 return { status: false, message: "Therapist not found" };
             }
-            const startDateTime = new Date(`${date} ${startTime}`);
-            const endDateTime = new Date(`${date} ${endTime}`);
+            const reformattedDate = date.split("/").reverse().join("-");
+            const [startHour, startMinute] = startTime.split(":").map(Number);
+            const [endHour, endMinute] = endTime.split(":").map(Number);
+            const startDateTime = new Date(reformattedDate);
+            startDateTime.setHours(startHour, startMinute, 0);
+            const endDateTime = new Date(reformattedDate);
+            endDateTime.setHours(endHour, endMinute, 0);
             const currentDateTime = new Date();
             if (startDateTime >= endDateTime) {
                 return { status: false, message: "Start time must be before end time" };
@@ -179,14 +184,21 @@ exports.default = {
             if (startDateTime <= currentDateTime) {
                 return { status: false, message: "Start time must be in the future" };
             }
+            // Check if this timing already exists in updatedTimings
+            const existingTiming = therapist.updatedTimings.some(timing => timing.date.toISOString().split("T")[0] === reformattedDate &&
+                timing.startTime === startTime &&
+                timing.endTime === endTime);
+            if (existingTiming) {
+                return { status: false, message: "This timing already exists" };
+            }
             const newTiming = {
-                date: new Date(date),
-                startTime: startDateTime,
-                endTime: endDateTime
+                date: reformattedDate,
+                startTime: startTime,
+                endTime: endTime
             };
             therapist.updatedTimings.push(newTiming);
             yield therapist.save();
-            return { status: true, data: therapist };
+            return { status: true, message: "Timings updated successfully" };
         }
         catch (error) {
             return { status: false, message: "Error occured during updatiing therapist timings" };
@@ -219,6 +231,45 @@ exports.default = {
         catch (error) {
             console.error("Error in removing slot:", error);
             return { status: false, message: "Failed to remove slot" };
+        }
+    }),
+    getTherapistProfit: (_a) => __awaiter(void 0, [_a], void 0, function* ({ therapistId }) {
+        try {
+            console.log("therapist id in repo:", therapistId);
+            const appointments = yield database_1.databaseSchema.Appointment.find({
+                therapistId,
+                status: 'scheduled',
+            });
+            const totalProfit = appointments.reduce((sum, appointment) => {
+                var _a;
+                return sum + (((_a = appointment.payment) === null || _a === void 0 ? void 0 : _a.amount) || 0);
+            }, 0);
+            console.log('total Profit', totalProfit);
+            const timeSlotCounts = {};
+            appointments.forEach((appointment) => {
+                const hour = new Date(appointment.slot).getUTCHours(); // Extract the hour
+                timeSlotCounts[hour] = (timeSlotCounts[hour] || 0) + 1;
+            });
+            const mostBookedHour = Object.entries(timeSlotCounts).reduce((max, [hour, count]) => (count > max.count ? { hour, count } : max), { hour: null, count: 0 }).hour;
+            // Calculate user with the highest bookings
+            const userBookingCounts = {};
+            appointments.forEach((appointment) => {
+                const userId = appointment.userId.toString();
+                userBookingCounts[userId] = (userBookingCounts[userId] || 0) + 1;
+            });
+            const mostFrequentUser = Object.entries(userBookingCounts).reduce((max, [userId, count]) => (count > max.count ? { userId, count } : max), { userId: null, count: 0 }).userId;
+            const user = yield database_1.databaseSchema.User.findById(mostFrequentUser);
+            const userName = user === null || user === void 0 ? void 0 : user.name;
+            return {
+                status: true,
+                totalProfit,
+                mostBookedHour,
+                userName,
+            };
+        }
+        catch (error) {
+            console.error("Error in get therapist profit:", error);
+            return { status: false, message: "Failed to fetch profit" };
         }
     })
 };

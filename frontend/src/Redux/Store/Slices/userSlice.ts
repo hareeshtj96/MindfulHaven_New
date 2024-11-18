@@ -137,7 +137,6 @@ interface walletData {
 
 interface submitIssuePayload {
     userId: string;
-    therapistId: string;
     bookingId: string;
     category: string;
     description: string;
@@ -269,8 +268,6 @@ export const registerUser = createAsyncThunk<RegisterResponse, {name: string, em
 
             const response = await axiosInstance.post( USERREGISTER, userData);
 
-            console.log("response:", response);
-
             localStorage.setItem('otpToken', response.data.token);
             return response.data;
         } catch (error: any) {
@@ -290,8 +287,7 @@ export const googleRegister = createAsyncThunk<{token: string; user: User}, any,
 
 
             const { token } = response.data;
-            console.log("Token received from RegisterUser slice:", token);
-
+   
             // Decode the payload from the JWT token manually
             const base64Url = token.split('.')[1];
 
@@ -302,7 +298,6 @@ export const googleRegister = createAsyncThunk<{token: string; user: User}, any,
             }).join(''));
 
             const decoded = JSON.parse(jsonPayload);
-            console.log("Decoded token:", decoded);
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(decoded));
@@ -372,11 +367,9 @@ export const loginUser = createAsyncThunk<LoginResponse, {email: string, passwor
     async (userData, thunkAPI) => {
         try {
             const response = await axios.post(USERLOGIN, userData, { withCredentials: true });
-            console.log("login response from slice:", response);
 
             const { token } = response.data;
-            console.log("Token received from loginUser slice:", token);
-
+     
             // Decode the payload from the JWT token manually
             const base64Url = token.split('.')[1];
 
@@ -387,14 +380,12 @@ export const loginUser = createAsyncThunk<LoginResponse, {email: string, passwor
             }).join(''));
 
             const decoded = JSON.parse(jsonPayload);
-            console.log("Decoded token:", decoded);
 
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(decoded));
 
             const refreshToken = response.data.refreshToken;
-            console.log("refresh token from slice:", refreshToken);
-            
+          
             setAuthInfo(token, decoded.role,'');
 
             return { token, user: decoded };
@@ -414,7 +405,6 @@ export const forgotPassword = createAsyncThunk<ForgotPasswordResponse, string, {
             const response = await axios.post(FORGOTPASSWORD, {email});
             const token = response.data.token;
 
-            console.log("token recieved and saved:", token);
             localStorage.setItem('newToken', token);
            
             return response.data;
@@ -431,7 +421,6 @@ export const verifyForgotPasswordOTP = createAsyncThunk<{status: boolean}, strin
     async (otp, thunkAPI) => {
         try {
             const token = localStorage.getItem('newToken');
-            console.log("Token retrieved for verification:", token);
             if(!token) {
                 return thunkAPI.rejectWithValue('Token is missing or invalid');
             }
@@ -441,7 +430,7 @@ export const verifyForgotPasswordOTP = createAsyncThunk<{status: boolean}, strin
                 },
             };
             const response = await axios.post(FORGOTPASSWORDOTP, { otp }, config);
-            console.log("response from verifyforgotot slice:", response);
+
 
             if (response.data.status) {
                 return response.data;
@@ -462,7 +451,6 @@ export const PasswordResetSlice = createAsyncThunk<ForgotPasswordResponse, Passw
         console.log("password data:", passwordData);
         try {
             const token = localStorage.getItem("token");
-            console.log("Token retrieved for password reset:", token);
             if(!token) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
             }
@@ -473,7 +461,6 @@ export const PasswordResetSlice = createAsyncThunk<ForgotPasswordResponse, Passw
                 },
             }
             const response = await axios.post(PASSWORDRESET, passwordData, config);
-            console.log("response from user slice:", response);
             return response.data;
         } catch (error:any) {
             const message = error.response?.data?.message || "An error occurred";
@@ -488,7 +475,6 @@ export const fetchUserProfile = createAsyncThunk<User, void, {rejectValue: strin
     async(_, thunkAPI) => {
         try {
             const authInfoString = localStorage.getItem("authInfo");
-            console.log("auth info string....", authInfoString);
 
             if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
@@ -496,7 +482,6 @@ export const fetchUserProfile = createAsyncThunk<User, void, {rejectValue: strin
 
             const authInfo = JSON.parse(authInfoString);
             const accessToken = authInfo.accessToken;
-            console.log("access token... in slice...", accessToken);
 
             if (!accessToken) {
                 return thunkAPI.rejectWithValue("Access token is missing or invalid");
@@ -512,8 +497,6 @@ export const fetchUserProfile = createAsyncThunk<User, void, {rejectValue: strin
 
             const response = await axiosInstance.get(GETUSERPROFILE, config);
           
-            console.log("response from user slice:", response);
-            console.log("response data data user", response.data.data.user);
             return response.data.data.user;
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch profile";
@@ -528,7 +511,6 @@ export const fetchChildTherapist = createAsyncThunk<{therapists: Therapist[], cu
     async({page, limit}, thunkAPI) => {
         try {
             const response = await axios.get(GETCHILDTHERAPIST, { params: {page, limit}});
-            console.log("Response from fetch child therapist slice:", response);
 
             const {therapists, currentPage, totalPages} =  response.data.data;
             return { therapists, currentPage, totalPages };
@@ -545,7 +527,6 @@ export const fetchFamilyTherapist = createAsyncThunk<{familyTherapist:Therapist[
     async({page, limit}, thunkAPI) => {
         try {
             const response = await axios.get(GETFAMILYTHERAPIST, { params: {page, limit}});
-            console.log("Response from fetch family therapist slice:", response);
 
             const {familyTherapist, currentPagesFamily, totalPagesFamily} =  response.data.data;
             return { familyTherapist, currentPagesFamily, totalPagesFamily };
@@ -562,7 +543,6 @@ export const fetchIndividualTherapist = createAsyncThunk<{individualTherapists:T
     async({page, limit}, thunkAPI) => {
         try {
             const response = await axios.get(GETINDIVIDUALTHERAPIST, { params: {page, limit}});
-            console.log("Response from fetch INDIVIDUAL therapist slice:", response);
 
             const {individualTherapists, currentPagesIndividual, totalPagesIndividual} =  response.data.data;
             return { individualTherapists, currentPagesIndividual, totalPagesIndividual };
@@ -579,7 +559,6 @@ export const fetchCoupleTherapist = createAsyncThunk<{coupleTherapists: Therapis
     async({page, limit}, thunkAPI) => {
         try {
             const response = await axios.get(GETCOUPLETHERAPIST, { params: {page, limit}});
-            console.log("Response from fetch couple therapist slice:", response);
 
             const {coupleTherapists, currentPagesCouple, totalPagesCouple} =  response.data.data;
             return { coupleTherapists, currentPagesCouple, totalPagesCouple };
@@ -598,8 +577,7 @@ export const fetchAvailableSlots = createAsyncThunk<{
     async(therapistId, thunkAPI) => {
         try {
             const response = await axios.get(`${GETSLOTS}/${therapistId}`);
-            console.log("response from fetch availble slots:", response);
-            
+          
             return {
                 availableSlots: response.data.data.availableSlots,
                 timings: response.data.data.timings,
@@ -618,7 +596,6 @@ export const fetchBookedSlots = createAsyncThunk<{ bookedSlots: string[] }, stri
     async(therapistId, thunkAPI) => {
         try {
             const response = await axios.get(`${BOOKEDSLOTS}/${therapistId}`);
-            console.log("response from fetch booked slots:", response);
 
             return {
                 bookedSlots: response.data.data
@@ -651,7 +628,6 @@ export const checkSlotBeforePayment = createAsyncThunk<
             }
           );
 
-      console.log("response from check slot before payment:", response);
       
       return response.data; 
 
@@ -673,8 +649,6 @@ export const saveAppointment = createAsyncThunk<
     async ({ therapistId, userId, slot, notes, paymentId }, thunkAPI) => {
         try {
             const response = await axios.post(SAVEAPPOINTMENT, { therapistId, userId, slot, notes, paymentId });
-
-            console.log("response from save appointment:", response);
 
             // Returning the appointment data upon success
             return {
@@ -698,7 +672,6 @@ export const paymentMethod = createAsyncThunk<
     async ({ therapistId, userId, slot, notes, totalAmount, paymentStatus }, thunkAPI) => {
         try {
             const response = await axios.post(PAYMENTMETHOD, { therapistId, userId, slot, notes, totalAmount, paymentStatus });
-            console.log("response from payment method:", response.data);
 
             return {
                 success: true,
@@ -730,9 +703,6 @@ export const sendPaymentStatus = createAsyncThunk<
         notes,
         totalAmount
       });
-
-      // Log the response from the backend
-      console.log("Payment status response:", response);
 
       return {
         success: true,
@@ -775,8 +745,7 @@ export const getBookingDetails = createAsyncThunk<{success: boolean, bookingData
     async ({ bookingId}, thunkAPI) => {
         try {
             const response = await axios.get(`${GETBOOKINGDETAILS}/${bookingId}`);
-            console.log("response from booking details slice....:", response);
-            
+             
             return {
                 success: true,
                 bookingData: response.data
@@ -805,7 +774,6 @@ export const fetchScheduledBookingDetails = createAsyncThunk<{
         try {
             
             const authInfoString = localStorage.getItem("authInfo");
-            console.log("auth info string....", authInfoString);
 
             if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
@@ -813,7 +781,6 @@ export const fetchScheduledBookingDetails = createAsyncThunk<{
 
             const authInfo = JSON.parse(authInfoString);
             const accessToken = authInfo.accessToken;
-            console.log("access token... in slice...", accessToken);
 
             if (!accessToken) {
                 return thunkAPI.rejectWithValue("Access token is missing or invalid");
@@ -825,10 +792,8 @@ export const fetchScheduledBookingDetails = createAsyncThunk<{
                     Authorization: `Bearer ${accessToken}`,
                 }
             }
-            console.log("sending authorization header:", config.headers.Authorization);
 
             const response = await axiosInstance.get(`${GETSCHEDULEDBOOKINGS}?page=${page}&limit=${limit}`, config);
-            console.log("response data.data...", response.data.data);
 
             return {
                 bookings: response.data.data.data.bookings,
@@ -854,15 +819,13 @@ export const fetchCompletedBookingDetails = createAsyncThunk<{
         console.log("fetching page:", page,  "with limit:", limit);
         try {
             const authInfoString = localStorage.getItem("authInfo");
-            console.log("auth info string....", authInfoString);
-
+       
             if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
             }
 
             const authInfo = JSON.parse(authInfoString);
             const accessToken = authInfo.accessToken;
-            console.log("access token... in slice...", accessToken);
 
             if (!accessToken) {
                 return thunkAPI.rejectWithValue("Access token is missing or invalid");
@@ -875,7 +838,6 @@ export const fetchCompletedBookingDetails = createAsyncThunk<{
                 }
             }
             const response = await axiosInstance.get(`${GETCOMPLETEDBOOKINGS}?page=${page}&limit=${limit}`, config);
-            console.log("response data.data...", response.data.data);
 
             return {
                 bookings: response.data.data.data.bookings,
@@ -899,10 +861,8 @@ export const fetchCancelledBookingDetails = createAsyncThunk<{
     {rejectValue: string}>(
     "user/fetchCancelledBookingDetails",
     async({ page, limit }, thunkAPI) => {
-        console.log("fetching page:", page,  "with limit:", limit);
         try {
             const authInfoString = localStorage.getItem("authInfo");
-            console.log("auth info string....", authInfoString);
 
             if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
@@ -910,7 +870,6 @@ export const fetchCancelledBookingDetails = createAsyncThunk<{
 
             const authInfo = JSON.parse(authInfoString);
             const accessToken = authInfo.accessToken;
-            console.log("access token... in slice...", accessToken);
 
             if (!accessToken) {
                 return thunkAPI.rejectWithValue("Access token is missing or invalid");
@@ -923,7 +882,6 @@ export const fetchCancelledBookingDetails = createAsyncThunk<{
                 }
             }
             const response = await axiosInstance.get(`${GETCANCELLEDBOOKINGS}?page=${page}&limit=${limit}`, config);
-            console.log("response data.data...", response.data.data);
 
             return {
                 bookings: response.data.data.data.bookings,
@@ -943,8 +901,7 @@ export const fetchTherapistBySearchTerm = createAsyncThunk(
     async (searchTerm: string, { rejectWithValue}) => {
         try {
             const response = await axios.get(SEARCHTHERAPIST, { params: {search: searchTerm}});
-            console.log("response from search therapist slice:", response.data.data);
-
+ 
             return response.data.data;
         } catch (error: any) {
             return rejectWithValue(error.response.data.message || "Failed to fetch therapist")
@@ -959,7 +916,6 @@ export const fetchWalletDetails = createAsyncThunk(
             const response = await axios.get(WALLETDETAILS, {
                 params: { userId },  
             });
-            console.log("response from wallet slice:", response.data.data);
             
             return response.data.data
         } catch (error: any) {
@@ -975,7 +931,6 @@ export const fetchChildTherapistBySearchTerm = createAsyncThunk(
     async (searchTerm: string, { rejectWithValue}) => {
         try {
             const response = await axios.get(SEARCHCHILDTHERAPIST, { params: {search: searchTerm}});
-            console.log("response from search child therapist slice:", response.data.data);
 
             return response.data.data;
         } catch (error: any) {
@@ -996,7 +951,6 @@ export const fetchSortedChildTherapists = createAsyncThunk<
             const response = await axios.get(SORTCHILDTHERAPIST, {
                 params: { sortBy: sortOption, page, limit },
             });
-            console.log("Response from sorted child therapists slice:", response.data.data);
 
             // Return the necessary data
             const { sortedTherapists, currentPage, totalPages } = response.data.data.data;
@@ -1016,7 +970,6 @@ export const fetchFamilyTherapistBySearchTerm = createAsyncThunk(
     async (searchTerm: string, { rejectWithValue}) => {
         try {
             const response = await axios.get(SEARCHFAMILYTHERAPIST, { params: {search: searchTerm}});
-            console.log("response from search family therapist slice:", response.data.data);
 
             return response.data.data;
         } catch (error: any) {
@@ -1031,7 +984,6 @@ export const fetchIndividualTherapistBySearchTerm = createAsyncThunk(
     async (searchTerm: string, { rejectWithValue}) => {
         try {
             const response = await axios.get(SEARCHINDIVIDUALTHERAPIST, { params: {search: searchTerm}});
-            console.log("response from search individual therapist slice:", response.data.data);
 
             return response.data.data;
         } catch (error: any) {
@@ -1045,7 +997,6 @@ export const fetchCoupleTherapistBySearchTerm = createAsyncThunk(
     async (searchTerm: string, {rejectWithValue}) => {
         try {
             const response = await axios.get(SEARCHCOUPLETHERAPIST, { params: {search: searchTerm}});
-            console.log("response from seach couple therapists slice:", response.data.data);
             return response.data.data;
 
         } catch (error: any) {
@@ -1064,7 +1015,6 @@ export const fetchSortedFamilyTherapists = createAsyncThunk<
     async ({sortOption, page, limit}, { rejectWithValue }) => {
         try {
             const response = await axios.get(SORTFAMILYTHERAPIST, { params: {sortBy: sortOption, page, limit } });
-            console.log("Response from sorted FAMILY therapists slice:", response.data.data);
 
             const { sortedFamilyTherapists, currentPageFamily, totalPagesFamily } = response.data.data.data;
             return { sortedFamilyTherapists, currentPageFamily, totalPagesFamily };
@@ -1084,7 +1034,6 @@ export const fetchSortedIndividualTherapists = createAsyncThunk<
     async ({sortOption, page, limit}, { rejectWithValue }) => {
         try {
             const response = await axios.get(SORTINDIVIDUALTHERAPIST, { params: { sortBy: sortOption, page, limit } });
-            console.log("Response from sorted individual therapists slice:", response.data.data);
 
             const { sortedIndividualTherapists, currentPagesIndividual, totalPagesIndividual } = response.data.data.data;
             return { sortedIndividualTherapists, currentPagesIndividual, totalPagesIndividual };
@@ -1104,7 +1053,6 @@ export const fetchSortedCoupleTherapists = createAsyncThunk<
     async ({sortOption, page, limit}, { rejectWithValue }) => {
         try {
             const response = await axios.get(SORTCOUPLETHERAPIST, { params: { sortBy: sortOption, page, limit } });
-            console.log("Response from sorted couple therapists slice:", response.data.data);
 
             const { sortedCoupleTherapists, currentPagesCouple, totalPagesCouple } = response.data.data.data;
             return { sortedCoupleTherapists, currentPagesCouple, totalPagesCouple };
@@ -1121,7 +1069,6 @@ export const changePassword = createAsyncThunk<string, ChangePasswordPayload, { 
     async (passwordDetails, thunkAPI) => {
         try {
             const response = await axios.put(CHANGEPASSWORD, passwordDetails);
-            console.log("Response from change password slice:", response);
 
             return response.data;
         } catch (error: any) {
@@ -1137,7 +1084,6 @@ export const joinSession = createAsyncThunk(
     async ({ bookingId, role, userId}: { bookingId: string; role: string, userId: string}, thunkAPI ) => {
         try {
             const authInfoString = localStorage.getItem("authInfo");
-            console.log("auth info string....", authInfoString);
 
             if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
@@ -1145,7 +1091,6 @@ export const joinSession = createAsyncThunk(
 
             const authInfo = JSON.parse(authInfoString);
             const accessToken = authInfo.accessToken;
-            console.log("access token... in slice...", accessToken);
 
             if (!accessToken) {
                 return thunkAPI.rejectWithValue("Access token is missing or invalid");
@@ -1160,7 +1105,6 @@ export const joinSession = createAsyncThunk(
 
             const response = await axios.post(JOINSESSION, { bookingId, role, userId }, config);
 
-            console.log("response from join session slice:", response);
 
             return response.data;
         } catch (error: any) {
@@ -1175,7 +1119,7 @@ export const cancelAppointment = createAsyncThunk(
     async ({ bookingId, userId }: { bookingId: string; userId: string }, { rejectWithValue }) => {
         try {
             const response = await axios.patch(CANCELAPPOINTMENT, { bookingId, userId})
-            console.log("reponse from slice:",response);
+
             return response;
             
         } catch (error:any) {
@@ -1190,7 +1134,6 @@ export const submitIssue = createAsyncThunk<string, submitIssuePayload, {rejectV
     async (issueDetails, thunkAPI) => {
         try {
             const response = await axios.post(SUBMITISSUE, issueDetails);
-            console.log('response from submit issue slice:', response);
 
             return response.data;
         } catch (error: any) {
@@ -1207,7 +1150,6 @@ export const geminiAPIResponse = createAsyncThunk<string, string, { rejectValue:
       try {
        
         const response = await axios.post(GEMINIAPI, { query: searchText });
-        console.log("Response from slice:", response);
   
         return response.data.data; 
       } catch (error: any) {
@@ -1499,7 +1441,6 @@ const userSlice = createSlice({
                 state.totalPages = totalPages; 
                 state.currentPage = currentPage;
             
-                console.log("updated scheduledBookings state:", state.scheduledBookings);
             })
             .addCase(fetchCompletedBookingDetails.fulfilled, (state, action: PayloadAction<{
                 bookings: Booking[];
@@ -1522,7 +1463,6 @@ const userSlice = createSlice({
                 state.completedTotalPages = totalPages; 
                 state.completedCurrentPage = currentPage;
             
-                console.log("updated completed Bookings state:", state.completedBookings);
             })
             .addCase(fetchCancelledBookingDetails.fulfilled, (state, action: PayloadAction<{
                 bookings: Booking[];
@@ -1544,8 +1484,7 @@ const userSlice = createSlice({
                 // Set pagination details
                 state.cancelledTotalPages = totalPages; 
                 state.cancelledCurrentPage = currentPage;
-            
-                console.log("updated cancelled Bookings state:", state.cancelledBookings);
+
             })
             .addCase(fetchScheduledBookingDetails.pending, (state) => {
                 state.scheduledBookings = []; 
@@ -1613,7 +1552,7 @@ const userSlice = createSlice({
                 state.status = 'succeeded';
                 state.sortedCoupleTherapists = action.payload.sortedCoupleTherapists; 
                 state.totalPagesCouple = action.payload.totalPagesCouple;
-                state.currentPagesCouple = action.payload.currentPagesCouple;
+                state.currentPagesCouple = action.payload.currentPagesCouple
             })
             .addCase(fetchSortedCoupleTherapists.rejected, (state, action) => {
                 state.status = 'failed';

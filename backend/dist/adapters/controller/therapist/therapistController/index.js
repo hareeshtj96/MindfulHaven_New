@@ -15,6 +15,7 @@ const cancelAppointmentTherapist_1 = __importDefault(require("./cancelAppointmen
 const getAvailableDetails_1 = __importDefault(require("./getAvailableDetails"));
 const cancelSlotController_1 = __importDefault(require("./cancelSlotController"));
 const updatePhotoController_1 = __importDefault(require("./updatePhotoController"));
+const fetchProfitTherapist_1 = __importDefault(require("./fetchProfitTherapist"));
 exports.default = (dependencies) => {
     return {
         therapistRegisterController: (0, therapistRegisterController_1.default)(dependencies),
@@ -29,5 +30,6 @@ exports.default = (dependencies) => {
         getAvailableDetails: (0, getAvailableDetails_1.default)(dependencies),
         cancelSlotController: (0, cancelSlotController_1.default)(dependencies),
         updatePhotoController: (0, updatePhotoController_1.default)(dependencies),
+        fetchProfitTherapist: (0, fetchProfitTherapist_1.default)(dependencies),
     };
 };

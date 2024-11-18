@@ -270,6 +270,8 @@ const Session = () => {
         try {
             const APP_ID = Number(import.meta.env.VITE_APP_ID) || 12345;
             console.log("App id:", APP_ID);
+            console.log("user id:", userId)
+            console.log("booking id:", bookingId);
 
             const SECRET_URL = import.meta.env.VITE_APP_SERVER_URL || 'wss://webrtc.example.com'
             console.log("app secret:", SECRET_URL);

@@ -15,8 +15,9 @@ exports.default = (dependencies) => {
     const executeFunction = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email, startTime, endTime, date }) {
         try {
             const response = yield therapistRepository.updateTimings(email, startTime, endTime, date);
+            console.log("response from usecase:", response);
             if (response.status) {
-                return { status: true, data: response.data };
+                return { status: true, message: response.mesage };
             }
             else {
                 return { status: false, message: response.message };

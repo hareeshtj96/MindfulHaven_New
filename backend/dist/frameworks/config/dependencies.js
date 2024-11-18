@@ -40,6 +40,8 @@ const useCase = {
     getCoupleTherapistUsecase: UseCases_1.getCoupleTherapistUsecase,
     sortCoupleTherapistUsecase: UseCases_1.sortCoupleTherapistUsecase,
     checkSlotBeforePaymentUsecase: UseCases_1.checkSlotBeforePaymentUsecase,
+    searchCoupleTherapistUsecase: UseCases_1.searchCoupleTherapistUsecase,
+    walletPaymentUsecase: UseCases_1.walletPaymentUsecase,
     adminLogin: adminUseCases_1.adminLogin,
     getAllUsecase: adminUseCases_1.getAllUsecase,
     getUsersUsecase: adminUseCases_1.getUsersUsecase,
@@ -58,6 +60,7 @@ const useCase = {
     getTherapistDetailsUsecase: therapistUseCases_1.getTherapistDetailsUsecase,
     therapistPhotoUsecase: therapistUseCases_1.therapistPhotoUsecase,
     cancelSlotUsecase: therapistUseCases_1.cancelSlotUsecase,
+    fetchTherapistUsecase: therapistUseCases_1.fetchTherapistUsecase,
 };
 const repository = {
     userRepository: repository_1.userRepository,

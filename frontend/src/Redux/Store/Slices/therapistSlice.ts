@@ -12,7 +12,8 @@ import { REGISTERTHERAPIST,
     CANCELAPPOINTMENTBYTHERAPIST,
     GETAVAILABILITY,
     CANCELAVAILABLESLOT,
-    UPDATEPHOTO
+    UPDATEPHOTO,
+    FETCHPROFIT
   } from "../../../Services/therapistApi";
 
 
@@ -116,6 +117,9 @@ interface TherapistState {
     otpError: string | null;
     totalPages: number;
     details: AvailableDetails | null;
+    totalProfit: number | null;
+    mostBookedHour: string | null;
+    userName : string | null;
 }
 
 //initial state
@@ -133,22 +137,23 @@ const initialState: TherapistState = {
     otpVerified: false,
     otpError: null,
     totalPages: 0,
-    details: null
+    details: null,
+    totalProfit: null,
+    mostBookedHour: null,
+    userName: null
 }
 
 // Thunk for therapist login
 export const registerTherapist = createAsyncThunk<RegisterResponse, {name: string, email: string, password: string}, { rejectValue: string}>(
     'therapist/therapist_register',
     async (therapistData, thunkAPI) => {
-        console.log("entered registerTherapist slice");
         try {
             const response = await axios.post(REGISTERTHERAPIST, therapistData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
-            console.log("response from registerTherapist slice:", response);
-
+  
             // Save the token to local storage
             localStorage.setItem('therapistToken', response.data.token);
 
@@ -165,20 +170,17 @@ export const registerTherapist = createAsyncThunk<RegisterResponse, {name: strin
 export const verifyOtp = createAsyncThunk<{status: boolean}, string, {rejectValue: string}>(
     'therapist/therapist_OTP',
     async (otp, thunkAPI) => {
-        console.log("entered verify otp in therapist slice:")
         try {
             const token = localStorage.getItem('therapistToken');
             if (!token) {
                 return thunkAPI.rejectWithValue('No token found');
             }
-            console.log('token from slice:', token);
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             };
             const response = await axios.post(VERIFYOTP, { otp }, config);
-            console.log("response from slice:", response);
 
             if (response.data.status) {
                 localStorage.removeItem('therapistToken');
@@ -201,7 +203,6 @@ export const logintherapist = createAsyncThunk<LoginResponse, { email: string, p
             const response = await axios.post(LOGINTHERAPIST, therapistData);
 
             const { token, therapist } = response.data;
-            console.log("Token received from logintherapist slice:", token, therapist);
 
             // Decode the payload from the JWT token manually
             const base64Url = token.split('.')[1];
@@ -213,7 +214,6 @@ export const logintherapist = createAsyncThunk<LoginResponse, { email: string, p
             }).join(''));
 
             const decoded = JSON.parse(jsonPayload);
-            console.log("Decoded token:", decoded);
 
             localStorage.setItem('therapistToken', token);
             localStorage.setItem('therapist', JSON.stringify(decoded));
@@ -233,7 +233,6 @@ export const updateTherapistDetails = createAsyncThunk<Therapist, FormData, {rej
     async (formData, thunkAPI) => {
         try {
             const token = localStorage.getItem("therapistToken");
-            console.log("token from updateTherapist:", token);
             if(!token) {
                 return thunkAPI.rejectWithValue("No token found");
             }
@@ -245,11 +244,7 @@ export const updateTherapistDetails = createAsyncThunk<Therapist, FormData, {rej
                 }
             }
             const response = await axios.put(UPDATETHERAPIST, formData, config);
-            console.log("response from therapist slice:", response);
-
-            console.log("Response from updateTherapistDetails thunk:", response.data);
-
-            console.log("response from therapisr slice data:", response.data.data);
+         
             return response.data.data;
         } catch (error:any) {
             const message = error.response?.data?.message || "update failed";
@@ -276,8 +271,7 @@ export const updatePhoto = createAsyncThunk<Therapist, FormData, {rejectValue: s
             }
 
             const response = await axios.put(UPDATEPHOTO, FormData, config);
-            console.log("response from updatePhoto:", response);
-            
+           
             return response.data.data;
         } catch (error: any) {
             const message = error.response?.data?.message || "Photo upload failed";
@@ -292,7 +286,6 @@ export const fetchProfile = createAsyncThunk<Therapist[], void, {rejectValue: st
     async(_, thunkAPI) => {
         try {
             const response = await axios.get(GETPROFILE);
-            console.log("response from  fetch profile slice:", response);
             return response.data.data.therapist || [];
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch profile";
@@ -309,7 +302,6 @@ export const fetchAvailableDetails = createAsyncThunk<AvailableDetails, string, 
             const response = await axios.get(GETAVAILABILITY, {
                 params: { therapistId }
             });
-            console.log("response from fetch avaialble details:", response.data.data);
 
             const { booked, availableSlots, timings } = response.data.data;
 
@@ -328,7 +320,6 @@ export const fetchBookingAppointments = createAsyncThunk<{ bookings: Booking[], 
     async({therapistId, page, limit}, thunkAPI) => {
         try {
             const response = await axios.get(`${GETAPPOINTMENT}/${therapistId}`, {params: { page, limit}});
-            console.log("response from fetch booking:", response);
             // return response.data.data as Booking[];
             return {
                 bookings: response.data.data,
@@ -364,7 +355,6 @@ AvailabilityForm,
             }
 
             const response = await axios.put(UPDATETIMINGS, formData, config);
-            console.log("response from update timing slice:", response.data);
 
             return response.data;
 
@@ -395,8 +385,6 @@ export const joinTherapistVideo = createAsyncThunk(
 
             const response = await axios.post(JOINTHERAPISTVIDEO, { bookingId, role: "therapist", therapistId}, config);
 
-            console.log("Response from join thrapist slice:", response);
-
             return response.data;
             
         } catch (error: any) {
@@ -425,8 +413,6 @@ export const cancelAvailableSlot = createAsyncThunk(
     "therapist/cancelAvailableSlot",
     async ({slot, therapistId}: {slot: string, therapistId: string}, {rejectWithValue}) => {
         try {
-            console.log("slot in slice:", slot);
-            console.log("therapist id:", therapistId);
             const response = await axios.put(CANCELAVAILABLESLOT, {slot, therapistId});
             return response.data;
         } catch (error: any) {
@@ -434,7 +420,23 @@ export const cancelAvailableSlot = createAsyncThunk(
         }
     }
 )
-  
+
+export const fetchTherapistProfit = createAsyncThunk(
+    "therapist/fetchTherapistProfit",
+    async ({ therapistId }: { therapistId: string }, { rejectWithValue }) => {
+        try {
+            // Pass therapistId as a query parameter
+            const response = await axios.get(`${FETCHPROFIT}?therapistId=${therapistId}`);
+
+            const { totalProfit, mostBookedHour, userName} = response.data;
+
+            return { totalProfit, mostBookedHour, userName };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Failed to fetch therapist profit");
+        }
+    }
+);
+
 
 
 
@@ -549,6 +551,20 @@ const therapistSlice = createSlice({
             .addCase(fetchAvailableDetails.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Failed to fetch therapist details"; // Store error message
+            })
+            .addCase(fetchTherapistProfit.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchTherapistProfit.fulfilled, (state, action) => {
+                state.loading = false;
+                state.totalProfit = action.payload.totalProfit;
+                state.mostBookedHour = action.payload.mostBookedHour;
+                state.userName = action.payload.userName;
+            })
+            .addCase(fetchTherapistProfit.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
             });
     },
 }); 

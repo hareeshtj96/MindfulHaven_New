@@ -12,14 +12,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const httpStatusCode_1 = require("../../utils/httpStatusCode");
 exports.default = (dependencies) => {
     const { userRepository } = dependencies.repository;
-    const executeFunction = (sortBy) => __awaiter(void 0, void 0, void 0, function* () {
+    const executeFunction = (_a) => __awaiter(void 0, [_a], void 0, function* ({ sortBy, page, limit }) {
         try {
             let sortCriteria = {};
             if (sortBy === "experience") {
                 sortCriteria = { professionalExperience: -1 };
             }
-            const sortedTherapists = yield userRepository.getSortedCoupleTherapists(sortCriteria);
-            console.log("sorted therapists:", sortedTherapists);
+            const sortedTherapists = yield userRepository.getSortedCoupleTherapists({ sortCriteria, page, limit });
             return { status: true, data: sortedTherapists };
         }
         catch (error) {

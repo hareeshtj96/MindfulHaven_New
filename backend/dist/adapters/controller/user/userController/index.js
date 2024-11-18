@@ -41,6 +41,8 @@ const searchIndividualTherapistController_1 = __importDefault(require("./searchI
 const coupleTherapistController_1 = __importDefault(require("./coupleTherapistController"));
 const coupleTherapistSorting_1 = __importDefault(require("./coupleTherapistSorting"));
 const checkSlotsBeforePaymentController_1 = __importDefault(require("./checkSlotsBeforePaymentController"));
+const searchCoupleTherapistController_1 = __importDefault(require("./searchCoupleTherapistController"));
+const walletPaymentController_1 = __importDefault(require("./walletPaymentController"));
 exports.default = (dependencies) => {
     return {
         registrationController: (0, registrationController_1.default)(dependencies),
@@ -81,5 +83,7 @@ exports.default = (dependencies) => {
         coupleTherapistController: (0, coupleTherapistController_1.default)(dependencies),
         coupleTherapistSorting: (0, coupleTherapistSorting_1.default)(dependencies),
         checkSlotsBeforePaymentController: (0, checkSlotsBeforePaymentController_1.default)(dependencies),
+        searchCoupleTherapistController: (0, searchCoupleTherapistController_1.default)(dependencies),
+        walletPaymentController: (0, walletPaymentController_1.default)(dependencies),
     };
 };

@@ -27,7 +27,7 @@ const paymentSchema = new mongoose_1.Schema({
     },
     paymentMethod: {
         type: String,
-        enum: ['creditCard', 'debitCard', 'razorpay', 'upi', 'netBanking'],
+        enum: ['creditCard', 'debitCard', 'razorpay', 'upi', 'netBanking', 'wallet'],
         required: true
     },
     paymentStatus: {

@@ -15,6 +15,7 @@ exports.default = (dependencies) => {
     const submitIssueController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const details = req.body;
+            console.log("details recieved in controller:", details);
             const response = yield submitIssueUsecase(dependencies).executeFunction(details);
             if (response && response.status) {
                 res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, data: response.data });

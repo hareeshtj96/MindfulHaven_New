@@ -41,7 +41,7 @@ import {
 
 import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase } from "../../application/adminUseCases";
 
-import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase, cancelSlotUsecase } from "../../application/therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase, cancelSlotUsecase, fetchTherapistUsecase } from "../../application/therapistUseCases";
 
 const useCase: any={
     userRegistration: userRegistration,
@@ -109,6 +109,7 @@ const useCase: any={
     getTherapistDetailsUsecase: getTherapistDetailsUsecase,
     therapistPhotoUsecase: therapistPhotoUsecase,
     cancelSlotUsecase: cancelSlotUsecase,
+    fetchTherapistUsecase: fetchTherapistUsecase,
 }
 
 const repository:any={

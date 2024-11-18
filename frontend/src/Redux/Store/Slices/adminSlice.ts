@@ -100,8 +100,7 @@ export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, passwo
                     'Content-Type': 'application/json',
                 },
             });
-            console.log("response from loginadminslice:", response);
-
+          
             localStorage.setItem('adminToken', response.data.token);
 
             return response.data;
@@ -121,7 +120,6 @@ export const fetchTherapists = createAsyncThunk<
     "admin/fetchTherapists",
     async ({ page, limit }, thunkAPI) => {
         try {
-            console.log("Page:", page, "Limit:", limit);
             const response = await axios.get(`${GETTHERAPIST}?page=${page}&limit=${limit}`);
             return {
                 therapists: response.data.data.therapists,
@@ -141,10 +139,7 @@ export const fetchTherapistDetails = createAsyncThunk(
     async (therapistId: string, thunkAPI) => {
        try {
         const response = await axios.get(`${GETTHERAPISTDETAILS}/${therapistId}`);
-        console.log("response from fetch therapist details:", response);
-
-        console.log("response data data:", response.data.data)
-
+    
         return response.data.data
        } catch (error:any) {
          const message = error.response?.data?.message || "Failed to fetch details";
@@ -172,8 +167,7 @@ export const fetchIssues = createAsyncThunk("admin/fetchIssues",
     async (_, thunkAPI) => {
         try {
             const response = await axios.get(FETCHISSUES);
-            console.log("response from fetch issues slice:", response.data.data);
-
+  
             return response.data.data;
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch issues";
@@ -186,7 +180,6 @@ export const fetchDashboardDetails = createAsyncThunk("admin/dashboardDetails",
     async (_, thunkAPI) => {
         try {
             const response = await axios.get(GETDASHBOARDDETAILS);
-            console.log("response from fetch dashboard slice:", response);
             return response.data
             
         } catch (error: any) {
@@ -201,9 +194,7 @@ export const resolveIssue = createAsyncThunk(
     "admin/resolveIssue",
     async (issueId: string, thunkAPI) => {
         try {
-            console.log("issue id in slice:", issueId);
             const response = await axios.post(RESOLVEISSUE, { issueId});
-            console.log("Response from resolve issue slice:", response);
 
             return response.data;
         } catch (error: any) {
@@ -221,7 +212,7 @@ export const getTherapistVerified = createAsyncThunk<Therapist[], string, {rejec
     async(therapistId, thunkAPI) => {
         try {
             const token = localStorage.getItem("adminToken");
-            console.log("token recieved from verifed therapist:", token);
+
             if(!token) {
                 return thunkAPI.rejectWithValue("No token found");
             }
@@ -262,9 +253,7 @@ export const toggleUserBlockStatus = createAsyncThunk<User, { userId: string; is
   
         // Send isBlocked status along with the request
         const response = await axios.patch(`${GOTBLOCKUNBLOCK}/${userId}`, { isBlocked }, config);
-        console.log("response from block user slice :", response.data.data.user);
-        
-  
+
         return response.data.data.user;
       } catch (error) {
         console.error("Error in blocking/unblocking user:", error);

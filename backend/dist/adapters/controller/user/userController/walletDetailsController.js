@@ -20,7 +20,7 @@ exports.default = (dependencies) => {
                 res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, data: response.data });
             }
             else {
-                res.status(httpStatusCode_1.HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || httpStatusCode_1.ResponseMessages.DATA_NOT_FOUND });
+                res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: false, message: response.message || httpStatusCode_1.ResponseMessages.DATA_NOT_FOUND });
             }
         }
         catch (error) {

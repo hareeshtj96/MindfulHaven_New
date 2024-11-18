@@ -6,6 +6,7 @@ import { submitIssue } from "../../Redux/Store/Slices/userSlice";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ReactStars from "react-rating-stars-component";
+import { useSearchParams } from 'react-router-dom';
 
 const IssueManagement: React.FC = () => {
     const [showYesForm, setShowYesForm] = useState(false);
@@ -15,13 +16,15 @@ const IssueManagement: React.FC = () => {
     const [error, setError] = useState('');
     const [rating, setRating] = useState(0);
     const [isSatisfied, setIsSatisfied] = useState<boolean | null>(null); 
+    const [searchParams] = useSearchParams();
 
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
 
     const user = useSelector((state: RootState) => state.user.user);
-    const bookingStatus = useSelector((state: RootState) => state.user.appointmentData);
-    console.log("booking status.........", bookingStatus)
+    const roomId = searchParams.get('roomId');
+
+    console.log('Room ID:', roomId);
 
     const handleSatisfactionClick = (satisfied: boolean) => {
         setIsSatisfied(satisfied);
@@ -43,8 +46,7 @@ const IssueManagement: React.FC = () => {
 
         const issueData = {
             userId: user?.userId || "undefined",
-            therapistId: bookingStatus?.therapistId || bookingStatus.data?.therapistId,
-            bookingId: bookingStatus?._id || bookingStatus.data?._id,
+            bookingId: roomId,
             description: issueDescription,
             category: category,
             status: 'pending',

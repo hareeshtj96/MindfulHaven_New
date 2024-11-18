@@ -14,6 +14,7 @@ exports.default = (dependencies) => {
     const { userRepository } = dependencies.repository;
     const executeFunction = (_a) => __awaiter(void 0, [_a], void 0, function* ({ therapistId, userId, slot, notes, paymentId }) {
         try {
+            console.log("payment id in usecasse:", paymentId);
             const response = yield userRepository.saveAppointment({ therapistId, userId, slot, notes, paymentId });
             if (response.status) {
                 return { status: true, data: response.data };

@@ -341,17 +341,16 @@ export default {
             const issuesWithUserDetails = await Promise.all(issues.map(async (issue) => {
                 const issueObj = issue.toObject();
                 const user = await databaseSchema.User.findById(issueObj.userId);
-                console.log("user in issues;",user)
 
                 if (user) {
                     // Add user details to the issue object
                     (issueObj as any).userName = user.name;
                     (issueObj as any).userEmail = user.email;
-                } 
+                }
                 return issueObj;
             }));
 
-       
+
             return {
                 status: true,
                 data: {
@@ -441,7 +440,7 @@ export default {
         }
     },
 
-  
+
     saveAppointment: async ({
         therapistId,
         userId,
@@ -456,7 +455,6 @@ export default {
         paymentId?: string;
     }) => {
         try {
-            console.log("payment id in save appointment repo:", paymentId);
             const slotDate =
                 typeof slot === "string" ? new Date(slot) : (slot as Date);
 
@@ -467,7 +465,6 @@ export default {
                 status: { $ne: "cancelled" },
             });
 
-            console.log("exisitng appoitnment:......", existingAppointment);
 
             if (existingAppointment && typeof paymentId === "undefined") {
                 return {
@@ -480,7 +477,6 @@ export default {
             if (paymentId) {
                 // Fetch payment details if paymentId is provided
                 paymentDetails = await databaseSchema.Payment.findById(paymentId);
-                console.log("payment details:", paymentDetails);
 
                 if (!paymentDetails) {
                     return {
@@ -500,7 +496,6 @@ export default {
 
             // Add payment details only if available
             if (paymentDetails) {
-                console.log("Payment details found:", paymentDetails);
                 appointmentData.payment = {
                     userId: paymentDetails.userId,
                     therapistId: paymentDetails.therapistId,
@@ -575,7 +570,6 @@ export default {
                 status: { $ne: "cancelled" },
             });
 
-            console.log("Existing appointment:", existingAppointment);
 
             if (existingAppointment) {
                 return {
@@ -591,7 +585,6 @@ export default {
                 return { status: false, message: "user wallet not found" };
             }
 
-            console.log("user wallet......:", userWallet);
 
             // check if wallet balance if sufficient
             let amount = totalAmount - 80;
@@ -959,7 +952,7 @@ export default {
         }
     },
 
-    getSortedTherapists: async ({sortCriteria, page, limit}: { sortCriteria: any, page: number, limit: number}) => {
+    getSortedTherapists: async ({ sortCriteria, page, limit }: { sortCriteria: any, page: number, limit: number }) => {
         try {
             const skip = (page - 1) * limit;
 
@@ -975,11 +968,11 @@ export default {
 
             return {
                 status: true,
-                data:{
+                data: {
                     sortedTherapists,
                     total: totalTherapist,
                     currentPage: page,
-                    totalPages: Math.ceil(totalTherapist/limit)
+                    totalPages: Math.ceil(totalTherapist / limit)
                 }
             }
         } catch (error) {
@@ -987,7 +980,7 @@ export default {
         }
     },
 
-    getSortedFamilyTherapists: async ({sortCriteria, page, limit}: { sortCriteria: any, page: number, limit: number}) => {
+    getSortedFamilyTherapists: async ({ sortCriteria, page, limit }: { sortCriteria: any, page: number, limit: number }) => {
         try {
             const skip = (page - 1) * limit;
 
@@ -1003,11 +996,11 @@ export default {
 
             return {
                 status: true,
-                data:{
+                data: {
                     sortedFamilyTherapists,
                     total: totalTherapist,
                     currentPageFamily: page,
-                    totalPagesFamily: Math.ceil(totalTherapist/limit)
+                    totalPagesFamily: Math.ceil(totalTherapist / limit)
                 }
             }
         } catch (error) {
@@ -1018,7 +1011,7 @@ export default {
         }
     },
 
-    getSortedIndividualTherapists: async ({sortCriteria, page, limit}: { sortCriteria: any, page: number, limit: number}) => {
+    getSortedIndividualTherapists: async ({ sortCriteria, page, limit }: { sortCriteria: any, page: number, limit: number }) => {
         try {
             const skip = (page - 1) * limit;
 
@@ -1034,11 +1027,11 @@ export default {
 
             return {
                 status: true,
-                data:{
+                data: {
                     sortedIndividualTherapists,
                     total: totalTherapist,
                     currentPagesIndividual: page,
-                    totalPagesIndividual: Math.ceil(totalTherapist/limit)
+                    totalPagesIndividual: Math.ceil(totalTherapist / limit)
                 }
             }
         } catch (error) {
@@ -1049,7 +1042,7 @@ export default {
         }
     },
 
-    getSortedCoupleTherapists: async ({sortCriteria, page, limit}: { sortCriteria: any, page: number, limit: number}) => {
+    getSortedCoupleTherapists: async ({ sortCriteria, page, limit }: { sortCriteria: any, page: number, limit: number }) => {
         try {
             const skip = (page - 1) * limit;
 
@@ -1065,11 +1058,11 @@ export default {
 
             return {
                 status: true,
-                data:{
+                data: {
                     sortedCoupleTherapists,
                     total: totalTherapist,
                     currentPagesCouple: page,
-                    totalPagesCouple: Math.ceil(totalTherapist/limit)
+                    totalPagesCouple: Math.ceil(totalTherapist / limit)
                 }
             }
         } catch (error) {
@@ -1093,7 +1086,6 @@ export default {
     walletDetails: async ({ userId }: { userId: string }) => {
         try {
             const result = await databaseSchema.Wallet.findOne({ userId });
-            console.log("result from wallet details:", result);
 
             if (!result) {
                 return { status: false, message: "Wallet not found" };
@@ -1106,7 +1098,6 @@ export default {
 
     getSubmitIssue: async ({
         userId,
-        therapistId,
         bookingId,
         description,
         category,
@@ -1125,14 +1116,19 @@ export default {
             const booking = await databaseSchema.Appointment.findById(bookingId);
 
             if (!booking) {
-                console.log("No booking found with given bookingId");
                 return { status: false, message: "Booking not found" };
             }
 
+            // Update the booking status to 'completed'
+            booking.status = "completed";
+            await booking.save();
+
+            const { therapistId } = booking;
+
             const newIssue = new databaseSchema.Issue({
                 userId,
-                therapistId,
                 bookingId,
+                therapistId,
                 description,
                 category,
                 rating,

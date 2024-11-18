@@ -93,4 +93,6 @@ var ResponseMessages;
     ResponseMessages["ERROR_SEARCHING_INDIVIDUAL_THERAPIST"] = "Error in searching individual therapist";
     ResponseMessages["COUPLE_THERAPIST_NOT_FOUND"] = "Couple therapist not found";
     ResponseMessages["ERROR_IN_COUPLE_THERAPIST_USECASE"] = "Error in couple therapist usecase";
+    ResponseMessages["ERROR_SEARCHING_COUPLE_THERAPIST"] = "Error in searching couple therapist";
+    ResponseMessages["ERROR_WALLET_PAYMENT"] = "Error in wallet payment";
 })(ResponseMessages || (exports.ResponseMessages = ResponseMessages = {}));

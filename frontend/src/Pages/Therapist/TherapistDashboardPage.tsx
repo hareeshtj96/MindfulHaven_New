@@ -10,7 +10,7 @@ function TherapistDashboardPage() {
         <div className="flex flex-col min-h-screen">
             <TherapistHeader2 />
             <TherapistSidebar />
-            <TherapistDashboard therapistId={""} />
+            <TherapistDashboard />
             
         </div>
         </>

@@ -14,9 +14,14 @@ exports.default = (dependencies) => {
     const { sortCoupleTherapistUsecase } = dependencies.useCase;
     const coupleTherapistSorting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            console.log("entered controller");
-            const { sortBy } = req.query;
-            const response = yield sortCoupleTherapistUsecase(dependencies).executeFunction(sortBy);
+            const { sortBy, page, limit } = req.query;
+            const pageNumber = parseInt(page, 10) || 1;
+            const limitNumber = parseInt(limit, 10) || 10;
+            const response = yield sortCoupleTherapistUsecase(dependencies).executeFunction({
+                sortBy,
+                page: pageNumber,
+                limit: limitNumber
+            });
             if (response && response.status) {
                 res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, data: response.data });
             }

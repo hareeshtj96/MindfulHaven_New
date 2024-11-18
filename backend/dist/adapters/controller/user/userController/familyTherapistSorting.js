@@ -14,8 +14,14 @@ exports.default = (dependencies) => {
     const { sortFamilyTherapistUsecase } = dependencies.useCase;
     const familyTherapistSorting = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const { sortBy } = req.query;
-            const response = yield sortFamilyTherapistUsecase(dependencies).executeFunction(sortBy);
+            const { sortBy, page, limit } = req.query;
+            const pageNumber = parseInt(page, 10) || 1;
+            const limitNumber = parseInt(limit, 10) || 10;
+            const response = yield sortFamilyTherapistUsecase(dependencies).executeFunction({
+                sortBy,
+                page: pageNumber,
+                limit: limitNumber
+            });
             if (response && response.status) {
                 res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, data: response.data });
             }

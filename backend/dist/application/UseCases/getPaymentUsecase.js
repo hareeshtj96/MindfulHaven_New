@@ -26,6 +26,14 @@ exports.default = (dependencies) => {
             if (!therapistId || !userId || !totalAmount) {
                 throw new Error("Missing required payment details.");
             }
+            // Reserve the slot to booked in the database
+            const reserveAppointment = yield userRepository.saveAppointment({ therapistId, userId, slot });
+            if (!reserveAppointment) {
+                return {
+                    status: false,
+                    message: 'The slot is already booked.',
+                };
+            }
             // Create an order with Razorpay
             const razorpayOrder = yield razorpay.orders.create({
                 amount: totalAmount * 100,
@@ -40,6 +48,7 @@ exports.default = (dependencies) => {
                     amount: razorpayOrder.amount,
                     currency: razorpayOrder.currency,
                 },
+                reserveAppointment,
             };
         }
         catch (error) {

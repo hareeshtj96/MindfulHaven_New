@@ -14,8 +14,9 @@ function TherapistHeader2() {
 
     const therapist = useSelector((state: RootState) => state.therapist.currentTherapist);
 
-    console.log(therapist,"tyyt");
-    
+    const handleLogoClick = () => {
+        navigate('/therapist/therapist_dashboard');
+    }
 
     useEffect(() => {
         if(!therapist) {
@@ -39,7 +40,7 @@ function TherapistHeader2() {
             <div className="container mx-auto flex justify-between items-center py-2 px-4 md:px-6">
                 <div className="flex items-center space-x-2 flex-shrink-0">
                     <img src={logoImage} alt="MindfulHaven Logo" className="h-12 w-auto md:h-20" />
-                    <div className="text-lg md:text-2xl font-bold text-btncolor whitespace-nowrap">MindfulHaven</div>
+                    <div onClick={handleLogoClick} className="text-lg md:text-2xl font-bold text-btncolor whitespace-nowrap">MindfulHaven</div>
                 </div>
                 <div className="flex items-center space-x-4">
                     <div className="relative">
