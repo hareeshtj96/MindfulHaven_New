@@ -238,21 +238,9 @@ export const toggleUserBlockStatus = createAsyncThunk<User, { userId: string; is
     "admin/getBlockUnblock",
     async ({ userId, isBlocked }, thunkAPI) => {
       try {
-        const token = localStorage.getItem("newToken");
        
-        if (!token) {
-          return thunkAPI.rejectWithValue("No token found");
-        }
-  
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        };
-  
         // Send isBlocked status along with the request
-        const response = await axios.patch(`${GOTBLOCKUNBLOCK}/${userId}`, { isBlocked }, config);
+        const response = await axios.patch(`${GOTBLOCKUNBLOCK}/${userId}`, { isBlocked });
 
         return response.data.data.user;
       } catch (error) {

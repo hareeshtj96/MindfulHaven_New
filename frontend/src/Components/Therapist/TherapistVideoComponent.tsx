@@ -60,7 +60,7 @@ const TherapistVideoCall: React.FC = () => {
         setupVideoCall()
     }, [roomId, therapistName, therapistId, navigate]);
 
-    return <div className="w-full h-full" ref={containerRef} />
+    return <div className="w-screen h-screen bg-gray-900 flex items-center justify-center" ref={containerRef} />
 }
 
 export default TherapistVideoCall;
