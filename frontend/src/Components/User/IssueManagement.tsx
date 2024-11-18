@@ -5,61 +5,78 @@ import { useNavigate } from "react-router-dom";
 import { submitIssue } from "../../Redux/Store/Slices/userSlice";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ReactStars from "react-rating-stars-component";
 
 const IssueManagement: React.FC = () => {
-    const [showForm, setShowForm] = useState(false);
+    const [showYesForm, setShowYesForm] = useState(false);
+    const [showNoForm, setShowNoForm] = useState(false);
     const [issueDescription, setIssueDescription] = useState('');
     const [category, setCategory] = useState('');
     const [error, setError] = useState('');
+    const [rating, setRating] = useState(0);
+    const [isSatisfied, setIsSatisfied] = useState<boolean | null>(null); 
 
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
 
     const user = useSelector((state: RootState) => state.user.user);
-    console.log("user...", user);
     const bookingStatus = useSelector((state: RootState) => state.user.appointmentData);
-    console.log("appontment data....", bookingStatus);
+    console.log("booking status.........", bookingStatus)
 
     const handleSatisfactionClick = (satisfied: boolean) => {
+        setIsSatisfied(satisfied);
+
         if (satisfied) {
-            navigate('/sessions')
+            setShowYesForm(true); 
+            setShowNoForm(false);
         } else {
-            setShowForm(true);
+            setShowNoForm(true); 
+            setShowYesForm(false);
         }
     }
 
-    const handleSubmitIssue =  async () => {
-        if (!issueDescription || !category) {
+    const handleSubmitIssue = async () => {
+        if (!issueDescription || (isSatisfied === false && !category) || rating === 0) {
             setError('Please provide a category and description.');
             return;
         }
 
         const issueData = {
             userId: user?.userId || "undefined",
-            therapistId: bookingStatus?.therapistId,
-            bookingId: bookingStatus?._id,
+            therapistId: bookingStatus?.therapistId || bookingStatus.data?.therapistId,
+            bookingId: bookingStatus?._id || bookingStatus.data?._id,
             description: issueDescription,
             category: category,
             status: 'pending',
+            rating: rating
         };
 
-       try {
-          const resultAction = await dispatch(submitIssue(issueData));
+        if (isSatisfied === false && category) {
+            issueData.category = category;
+        } else if (isSatisfied === true) {
+            issueData.category = 'general'
+        }
 
-          if (submitIssue.fulfilled.match(resultAction)) {
-            toast.success('Your issue has been submitted successfully', {
-                onClose: () => navigate('/sessions')
-            });
-          } else {
-            toast.error(`Failed to submit issue`)
-          }
-       } catch (error) {
-            toast.error('An error occured while submitting the issue. Please try again.')
-       } finally {
-            setShowForm(false);
+        try {
+            const resultAction = await dispatch(submitIssue(issueData));
+
+            if (submitIssue.fulfilled.match(resultAction)) {
+                toast.success('Your issue has been submitted successfully', {
+                    onClose: () => navigate('/sessions')
+                });
+            } else {
+                toast.error('Failed to submit issue');
+            }
+        } catch (error) {
+            toast.error('An error occurred while submitting the issue. Please try again.');
+        } finally {
+            // Reset form and navigate to the sessions page
+            setShowYesForm(false);
+            setShowNoForm(false);
             setIssueDescription('');
             setCategory('');
-       }
+            setRating(0);
+        }
     };
 
     return (
@@ -71,25 +88,61 @@ const IssueManagement: React.FC = () => {
 
                     <div className="flex justify-center space-x-4">
                         <button
-                        className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded"
-                        onClick={() => handleSatisfactionClick(true)}
-                        >yes</button>
+                            className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded"
+                            onClick={() => handleSatisfactionClick(true)}
+                        >Yes</button>
 
                         <button
-                        className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded"
-                        onClick={() => handleSatisfactionClick(false)}
+                            className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded"
+                            onClick={() => handleSatisfactionClick(false)}
                         >No</button>
                     </div>
                 </div>
 
-                {showForm && (
+                {/* Form for "Yes" - Rating and Feedback */}
+                {showYesForm && (
+                    <div className="mt-6">
+                        <h3 className="text-xl font-semibold mb-4 text-gray-900">Rate the session</h3>
+
+                        {/* Rating Component */}
+                        <div className="mb-4">
+                            <ReactStars
+                                count={5}
+                                value={rating}
+                                onChange={(newRating: any) => setRating(newRating)}
+                                size={24}
+                                activeColor="#ffd700"
+                            />
+                        </div>
+
+                        {/* Feedback */}
+                        <textarea
+                            value={issueDescription}
+                            onChange={(e) => setIssueDescription(e.target.value)}
+                            placeholder="Please leave your feedback"
+                            className="w-full p-2 border rounded mb-4"
+                            rows={4}
+                        ></textarea>
+
+                        {error && <p className="text-red-500 mb-4">{error}</p>}
+
+                        <button
+                            onClick={handleSubmitIssue}
+                            className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded w-full"
+                        >Submit Feedback</button>
+                    </div>
+                )}
+
+                {/* Form for "No" - Category, Feedback, and Rating */}
+                {showNoForm && (
                     <div className="mt-6">
                         <h3 className="text-xl font-semibold mb-4 text-gray-900">Please describe the issue</h3>
 
+                        {/* Category */}
                         <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className="w-full mb-4 p-2 border-rounded"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="w-full mb-4 p-2 border-rounded"
                         >
                             <option value="">Select Category</option>
                             <option value="therapist">Therapist</option>
@@ -98,25 +151,27 @@ const IssueManagement: React.FC = () => {
                             <option value="other">Other</option>
                         </select>
 
+                        {/* Feedback */}
                         <textarea
-                        value={issueDescription}
-                        onChange={(e) => setIssueDescription(e.target.value)}
-                        placeholder="Describe the issue"
-                        className="w-full p-2 border rounded mb-4"
-                        rows={4}
+                            value={issueDescription}
+                            onChange={(e) => setIssueDescription(e.target.value)}
+                            placeholder="Describe the issue"
+                            className="w-full p-2 border rounded mb-4"
+                            rows={4}
                         ></textarea>
+
 
                         {error && <p className="text-red-500 mb-4">{error}</p>}
 
                         <button
-                        onClick={handleSubmitIssue}
-                        className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded w-full"
+                            onClick={handleSubmitIssue}
+                            className="bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded w-full"
                         >Submit Issue</button>
                     </div>
                 )}
 
             </div>
-            <ToastContainer 
+            <ToastContainer
                 position="top-right"
                 autoClose={3000}
                 hideProgressBar={false}
@@ -126,7 +181,7 @@ const IssueManagement: React.FC = () => {
                 pauseOnFocusLoss
             />
         </div>
-    )
+    );
 }
 
 export default IssueManagement;

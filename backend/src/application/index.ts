@@ -32,7 +32,8 @@ import { userRegistration,
     getCoupleTherapistUsecase,
     sortCoupleTherapistUsecase,
     checkSlotBeforePaymentUsecase,
-    searchCoupleTherapistUsecase
+    searchCoupleTherapistUsecase,
+    walletPaymentUsecase
  } from "./UseCases";
 
 export {
@@ -70,7 +71,8 @@ export {
     getCoupleTherapistUsecase,
     sortCoupleTherapistUsecase,
     checkSlotBeforePaymentUsecase,
-    searchCoupleTherapistUsecase
+    searchCoupleTherapistUsecase,
+    walletPaymentUsecase
 }
 
 

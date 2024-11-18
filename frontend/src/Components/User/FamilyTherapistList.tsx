@@ -13,13 +13,10 @@ import DefaultSkeleton from "../../Components/MaterialUI/Shimmer";
 const FamilyTherapistList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { familyTherapists, familyTherapistsSearch, totalPages, currentPage, sortedFamilyTherapists, status, error, } = useSelector(
+    const { familyTherapists, familyTherapistsSearch, totalPagesFamily, currentPagesFamily, sortedFamilyTherapists, status, error, } = useSelector(
         (state: RootState) => state.user
     );
 
-    
-
-    const state = useSelector((state: RootState) => state.user);
 
     const [sortOption, setSortOption] = useState<string>("experience");
     const [genderFilter, setGenderFilter] = useState<string>("all");
@@ -27,21 +24,19 @@ const FamilyTherapistList: React.FC = () => {
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
     const [hasSearched, setHasSearched] = useState<boolean>(false);
 
-    const [therapistsPerPage] = useState<number>(5);
+    const [therapistsPerPage] = useState<number>(2);
 
     // Fetch all therapists on mount
     useEffect(() => {
-        dispatch(fetchFamilyTherapist({ page: currentPage, limit: therapistsPerPage }));
-    }, [dispatch, currentPage, therapistsPerPage]);
+        dispatch(fetchFamilyTherapist({ page: currentPagesFamily, limit: therapistsPerPage }));
+    }, [dispatch, currentPagesFamily, therapistsPerPage]);
 
-     
-    const getTotalPages = () => totalPages || 1;
 
 
     // Fetch sorted therapists based on sort option
     useEffect(() => {
-        dispatch(fetchSortedFamilyTherapists(sortOption));
-    }, [dispatch, sortOption]);
+        dispatch(fetchSortedFamilyTherapists({ sortOption, page: currentPagesFamily, limit: therapistsPerPage }));
+    }, [dispatch, sortOption, currentPagesFamily, totalPagesFamily]);
 
     // Debounce search input
     useEffect(() => {
@@ -62,12 +57,19 @@ const FamilyTherapistList: React.FC = () => {
         }
     }, [debouncedSearchTerm, dispatch]);
 
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= totalPagesFamily) {
+            dispatch(fetchFamilyTherapist({ page: newPage, limit: therapistsPerPage }))
+        }
+    }
+
     // Filter therapists based on selected gender
     const filteredTherapists = genderFilter === "all"
         ? sortedFamilyTherapists
         : sortedFamilyTherapists.filter((therapist) => therapist.gender === genderFilter);
 
-    console.log("filtered therapists:", filteredTherapists);
+  
 
     const handleBookAppointment = (therapistId: string) => {
         navigate(`/slot_management/${therapistId}`);
@@ -104,13 +106,13 @@ const FamilyTherapistList: React.FC = () => {
                 </button>
 
                 <button onClick={() => {
-                setSearchTerm("");
-                setHasSearched(false);
-                dispatch(clearFamilyTherapistSearchResults());
+                    setSearchTerm("");
+                    setHasSearched(false);
+                    dispatch(clearFamilyTherapistSearchResults());
                 }}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full sm:w-auto"
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full sm:w-auto"
                 >
-                Clear
+                    Clear
                 </button>
             </div>
 
@@ -198,12 +200,12 @@ const FamilyTherapistList: React.FC = () => {
 
             {/* Therapist List */}
             <div className="space-y-4">
-                {!hasSearched && (!familyTherapists|| familyTherapists.length === 0) ? (
+                {!hasSearched && (!familyTherapists || familyTherapists.length === 0) ? (
                     <div className="text-center text-gray-700">
                         <p>No therapists found based on your criteria. Please try a different term.</p>
                     </div>
                 ) : (
-                    (filteredTherapists || [] ).map((therapist) => (
+                    filteredTherapists.map((therapist) => (
                         <div key={therapist._id} className="flex bg-white rounded-lg shadow-md p-4">
                             <div className="flex flex-col items-center justify-center p-4">
                                 {therapist.photo ? (
@@ -255,7 +257,32 @@ const FamilyTherapistList: React.FC = () => {
                 )}
             </div>
 
-                
+
+
+           
+            {/* Pagination */}
+            <div className="flex justify-center items-center mt-6 space-x-4">
+                <button
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPagesFamily === 1 ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPagesFamily - 1)}
+                    disabled={currentPagesFamily === 1}
+                >
+                    Previous
+                </button>
+                <span>
+                    Page {currentPagesFamily} of {totalPagesFamily}
+                </span>
+                <button
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPagesFamily === totalPagesFamily ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPagesFamily + 1)}
+                    disabled={currentPagesFamily === totalPagesFamily}
+                >
+                    Next
+                </button>
+            </div>
+
+
+
         </div>
     );
 };

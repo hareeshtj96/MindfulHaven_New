@@ -14,7 +14,7 @@ export default (dependencies: any) => {
             if( response && response.status) {
                 res.status(HttpStatusCode.OK).json({ status: true, data: response.data });
             } else {
-                res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || ResponseMessages.DATA_NOT_FOUND })
+                res.status(HttpStatusCode.OK).json({ status: false, message: response.message || ResponseMessages.DATA_NOT_FOUND })
             }
         } catch (error) {
             return res.status(HttpStatusCode.UNAUTHORIZED).json({status: false, message: ResponseMessages.TOKEN_EXPIRED });

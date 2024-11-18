@@ -17,9 +17,6 @@ const ChildTherapistList: React.FC = () => {
         (state: RootState) => state.user
     );
 
-    
-
-    const state = useSelector((state: RootState) => state.user);
 
     const [sortOption, setSortOption] = useState<string>("experience");
     const [genderFilter, setGenderFilter] = useState<string>("all");
@@ -27,21 +24,19 @@ const ChildTherapistList: React.FC = () => {
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>("");
     const [hasSearched, setHasSearched] = useState<boolean>(false);
 
-    const [therapistsPerPage] = useState<number>(5);
+    const [therapistsPerPage] = useState<number>(2);
 
     // Fetch all therapists on mount
     useEffect(() => {
         dispatch(fetchChildTherapist({ page: currentPage, limit: therapistsPerPage }));
     }, [dispatch, currentPage, therapistsPerPage]);
 
-     
-    const getTotalPages = () => totalPages || 1;
 
 
     // Fetch sorted therapists based on sort option
     useEffect(() => {
-        dispatch(fetchSortedChildTherapists(sortOption));
-    }, [dispatch, sortOption]);
+        dispatch(fetchSortedChildTherapists({ sortOption, page: currentPage, limit: therapistsPerPage }));
+    }, [dispatch, sortOption, currentPage, therapistsPerPage]);
 
     // Debounce search input
     useEffect(() => {
@@ -61,6 +56,13 @@ const ChildTherapistList: React.FC = () => {
             setHasSearched(false);
         }
     }, [debouncedSearchTerm, dispatch]);
+
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            dispatch(fetchChildTherapist({ page: newPage, limit: therapistsPerPage }))
+        }
+    }
 
     // Filter therapists based on selected gender
     const filteredTherapists = genderFilter === "all"
@@ -102,16 +104,16 @@ const ChildTherapistList: React.FC = () => {
                 </button>
 
                 <button onClick={() => {
-                setSearchTerm("");
-                setHasSearched(false);
-                dispatch(clearChildTherapistSearchResults());
+                    setSearchTerm("");
+                    setHasSearched(false);
+                    dispatch(clearChildTherapistSearchResults());
                 }}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full sm:w-auto"
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 w-full sm:w-auto"
                 >
-                Clear
+                    Clear
                 </button>
 
-                
+
             </div>
 
             {/* Display search results */}
@@ -255,7 +257,29 @@ const ChildTherapistList: React.FC = () => {
                 )}
             </div>
 
-                
+
+            {/* Pagination */}
+            <div className="flex justify-center items-center mt-6 space-x-4">
+                <button
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPage === 1 ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    Previous
+                </button>
+                <span>
+                    Page {currentPage} of {totalPages}
+                </span>
+                <button
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPage === totalPages ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                >
+                    Next
+                </button>
+            </div>
+
+
         </div>
     );
 };

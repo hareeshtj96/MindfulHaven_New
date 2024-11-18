@@ -58,7 +58,7 @@ const VideoCall: React.FC = () => {
     }, [roomId, userName, userID, navigate]);
 
     return (
-        <div className="w-full h-full" ref={containerRef} />
+        <div className="w-screen h-screen bg-gray-900 flex items-center justify-center" ref={containerRef} />
     )
 }
 

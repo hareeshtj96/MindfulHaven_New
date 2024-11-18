@@ -48,7 +48,7 @@ const Session = () => {
     const name =user?.name;
     
     const [activeTab, setActiveTab] = useState<'upcoming' | 'completed' | 'cancelled'>('upcoming');
-    const limit = 10;
+    const limit = 6;
 
 
     useEffect(() => {
@@ -71,7 +71,7 @@ const Session = () => {
             default:
                 break;
         }
-    }, [dispatch, limit, activeTab, currentPage, completedCurrentPage, cancelledCurrentPage]);
+    }, [dispatch, limit, activeTab, currentPage,]);
 
     // Show the shimmer loading effect when data is being fetched
     if (status === 'loading') {
@@ -144,41 +144,28 @@ const Session = () => {
         
     };
 
-   
-
-    const getCurrentBookings = () => {
-        let bookings:any = [];
-        switch (activeTab) {
-            case 'upcoming':
-                bookings = getFilteredUpcomingBookings()
-                break;
-            case 'completed':
-                bookings = completedBookings;
-                break;
-            case 'cancelled':
-                bookings = cancelledBookings;
-                break;
-            default:
-                bookings = [];
-                break;
-        }
-        const startIndex = (currentPage - 1) * limit;
-        const endIndex = startIndex + limit;
-        return bookings.slice(startIndex, endIndex)
-    };
-
-    const currentBookings = getCurrentBookings();
-
-  
 
     const getTotalPages = () => {
-        const totalBookings = activeTab === 'upcoming' ? getFilteredUpcomingBookings().length :
-                              activeTab === 'completed' ? completedBookings.length :
-                              cancelledBookings.length;
-       
-        return Math.max(Math.ceil(totalBookings / limit), 1);
+        let totalBookings = 0;
+    
+        switch (activeTab) {
+            case 'upcoming':
+                totalBookings = getFilteredUpcomingBookings().length;  
+                break;
+            case 'completed':
+                totalBookings = completedBookings.length;
+                break;
+            case 'cancelled':
+                totalBookings = cancelledBookings.length;
+                break;
+            default:
+                totalBookings = 0;
+                break;
+        }
+    
+        return Math.max(Math.ceil(totalBookings / limit), 1);  
     };
-
+    
 
     const setCurrentPage = (newPage: number) => {
         const totalPages = getTotalPages();
@@ -201,8 +188,47 @@ const Session = () => {
 
     
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage)
-    }
+        const totalPages = getTotalPages();
+        const validatedPage = Math.min(Math.max(newPage, 1), totalPages);
+    
+        setCurrentPage(validatedPage);
+        switch (activeTab) {
+            case 'upcoming':
+                dispatch(fetchScheduledBookingDetails({ page: validatedPage, limit }));
+                break;
+            case 'completed':
+                dispatch(fetchCompletedBookingDetails({ page: validatedPage, limit }));
+                break;
+            case 'cancelled':
+                dispatch(fetchCancelledBookingDetails({ page: validatedPage, limit }));
+                break;
+            default:
+                break;
+        }
+    };
+
+    const getCurrentBookings = () => {
+        let bookings:Booking[] = [];
+        switch (activeTab) {
+            case 'upcoming':
+                bookings = getFilteredUpcomingBookings()
+                break;
+            case 'completed':
+                bookings = completedBookings;
+                break;
+            case 'cancelled':
+                bookings = cancelledBookings;
+                break;
+            default:
+                bookings = [];
+                break;
+        }
+        const startIndex = (currentPage - 1) * limit;
+        const endIndex = startIndex + limit;
+        return bookings.slice(startIndex, endIndex)
+    };
+
+    const currentBookings = getCurrentBookings();
 
     // SOCKET CREATION
 
@@ -438,6 +464,11 @@ const Session = () => {
 
             
         </div>
+
+
+        
+
+        
     );
 };
 

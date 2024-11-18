@@ -9,6 +9,8 @@ const UserWallet: React.FC = () => {
   const location = useLocation();
   const { user, loading, error, walletData } = useSelector((state: RootState) => state.user);
 
+  console.log("wallet data.........", walletData)
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
   const [totalPages, setTotalPages] = useState(1);
@@ -42,7 +44,7 @@ const UserWallet: React.FC = () => {
 
   
   const paginatedTransactions = walletData?.transactionHistory
-   ? walletData.transactionHistory.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) : []
+   ? walletData.transactionHistory.slice().reverse().slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) : []
 
   if (loading) {
     return <div>Loading...</div>;

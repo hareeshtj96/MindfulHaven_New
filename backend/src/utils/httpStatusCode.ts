@@ -90,7 +90,8 @@ export enum ResponseMessages {
     ERROR_SEARCHING_INDIVIDUAL_THERAPIST = "Error in searching individual therapist",
     COUPLE_THERAPIST_NOT_FOUND = "Couple therapist not found",
     ERROR_IN_COUPLE_THERAPIST_USECASE = "Error in couple therapist usecase",
-    ERROR_SEARCHING_COUPLE_THERAPIST = "Error in searching couple therapist"
+    ERROR_SEARCHING_COUPLE_THERAPIST = "Error in searching couple therapist",
+    ERROR_WALLET_PAYMENT = "Error in wallet payment"
     
 
 }

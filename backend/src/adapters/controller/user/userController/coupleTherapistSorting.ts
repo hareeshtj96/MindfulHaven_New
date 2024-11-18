@@ -7,12 +7,17 @@ export default (dependencies: any) => {
     const { sortCoupleTherapistUsecase } = dependencies.useCase;
 
     const coupleTherapistSorting = async ( req: Request, res: Response) => {
-        try {
-            console.log("entered controller");
-            
-            const { sortBy } = req.query;
+        try {         
+            const { sortBy, page, limit } = req.query;
+
+            const pageNumber = parseInt(page as string, 10) || 1;
+            const limitNumber = parseInt(limit as string, 10) || 10;
            
-            const response = await sortCoupleTherapistUsecase(dependencies).executeFunction(sortBy);
+            const response = await sortCoupleTherapistUsecase(dependencies).executeFunction({
+                sortBy,
+                page: pageNumber,
+                limit: limitNumber
+            });
          
             if (response && response.status) {
                 res.status(HttpStatusCode.OK).json({ status: true, data: response.data})

@@ -14,14 +14,11 @@ import DefaultSkeleton from "../../Components/MaterialUI/Shimmer";
 const CoupleTherapistList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { coupleTherapists, coupleTherapistsSearch, totalPages, currentPage, sortedCoupleTherapists, status, error, } = useSelector(
+    const { coupleTherapists, coupleTherapistsSearch, totalPagesCouple, currentPagesCouple, sortedCoupleTherapists, status, error, } = useSelector(
         (state: RootState) => state.user
     );
 
-    
-
-    const state = useSelector((state: RootState) => state.user);
-    console.log("state is..........", state )
+    console.log("sorted couple therapists:", sortedCoupleTherapists)
 
     const [sortOption, setSortOption] = useState<string>("experience");
     const [genderFilter, setGenderFilter] = useState<string>("all");
@@ -33,17 +30,15 @@ const CoupleTherapistList: React.FC = () => {
 
     // Fetch all therapists on mount
     useEffect(() => {
-        dispatch(fetchCoupleTherapist({ page: currentPage, limit: therapistsPerPage }));
-    }, [dispatch, currentPage, therapistsPerPage]);
+        dispatch(fetchCoupleTherapist({ page: currentPagesCouple, limit: therapistsPerPage }));
+    }, [dispatch, currentPagesCouple, therapistsPerPage]);
 
      
-    const getTotalPages = () => totalPages || 1;
-
 
     // Fetch sorted therapists based on sort option
     useEffect(() => {
-        dispatch(fetchSortedCoupleTherapists(sortOption));
-    }, [dispatch, sortOption]);
+        dispatch(fetchSortedCoupleTherapists({sortOption, page: currentPagesCouple, limit: therapistsPerPage}));
+    }, [dispatch, sortOption, currentPagesCouple, therapistsPerPage]);
 
     // Debounce search input
     useEffect(() => {
@@ -64,10 +59,20 @@ const CoupleTherapistList: React.FC = () => {
         }
     }, [debouncedSearchTerm, dispatch]);
 
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= totalPagesCouple) {
+            dispatch(fetchCoupleTherapist({ page: newPage, limit: therapistsPerPage }))
+        }
+    }
+
     // Filter therapists based on selected gender
-    const filteredTherapists = genderFilter === "all"
+    const filteredTherapists = Array.isArray(sortedCoupleTherapists)
+    ? genderFilter === "all"
         ? sortedCoupleTherapists
-        : sortedCoupleTherapists.filter((therapist) => therapist.gender === genderFilter);
+        : sortedCoupleTherapists.filter((therapist) => therapist.gender === genderFilter)
+    : [];
+
+   console.log("filtered therapists:", filteredTherapists)
 
     const handleBookAppointment = (therapistId: string) => {
         navigate(`/slot_management/${therapistId}`);
@@ -203,7 +208,7 @@ const CoupleTherapistList: React.FC = () => {
                         <p>No therapists found based on your criteria. Please try a different term.</p>
                     </div>
                 ) : (
-                    filteredTherapists.map((therapist) => (
+                    (filteredTherapists || [] ).map((therapist) => (
                         <div key={therapist._id} className="flex bg-white rounded-lg shadow-md p-4">
                             <div className="flex flex-col items-center justify-center p-4">
                                 {therapist.photo ? (
@@ -253,6 +258,28 @@ const CoupleTherapistList: React.FC = () => {
                         </div>
                     ))
                 )}
+            </div>
+
+
+            {/* Pagination */}
+            <div className="flex justify-center items-center mt-6 space-x-4">
+                <button
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPagesCouple === 1 ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPagesCouple - 1)}
+                    disabled={currentPagesCouple === 1}
+                >
+                    Previous
+                </button>
+                <span>
+                    Page {currentPagesCouple} of {totalPagesCouple}
+                </span>
+                <button
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPagesCouple === totalPagesCouple ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPagesCouple + 1)}
+                    disabled={currentPagesCouple === totalPagesCouple}
+                >
+                    Next
+                </button>
             </div>
 
                 

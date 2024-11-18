@@ -8,9 +8,16 @@ export default (dependencies: any) => {
 
     const childTherapistSorting = async ( req: Request, res: Response) => {
         try {
-            const { sortBy } = req.query;
-           
-            const response = await sortChildTherapistUsecase(dependencies).executeFunction(sortBy);
+            const { sortBy, page, limit } = req.query;
+
+            const pageNumber = parseInt(page as string, 10) || 1;
+            const limitNumber = parseInt(limit as string, 10) || 10;
+       
+            const response = await sortChildTherapistUsecase(dependencies).executeFunction({
+                sortBy,
+                page: pageNumber,
+                limit: limitNumber
+            });
          
             if (response && response.status) {
                 res.status(HttpStatusCode.OK).json({ status: true, data: response.data})

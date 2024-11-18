@@ -7,6 +7,7 @@ export default (dependencies:any) => {
     const submitIssueController = async (req: Request, res: Response) => { 
         try {
             const  details  = req.body;
+            console.log("details recieved in controller:", details)
          
             const response = await submitIssueUsecase(dependencies).executeFunction(details);
             

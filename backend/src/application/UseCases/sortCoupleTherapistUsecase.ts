@@ -4,7 +4,7 @@ import { ResponseMessages } from "../../utils/httpStatusCode";
 export default (dependencies: any) => {
     const { userRepository } = dependencies.repository;
 
-    const executeFunction = async (sortBy: string) => {
+    const executeFunction = async ({ sortBy, page, limit }: { sortBy: string; page: number; limit: number }) => {
         try {
             let sortCriteria = {};
 
@@ -12,11 +12,8 @@ export default (dependencies: any) => {
                 sortCriteria = {  professionalExperience: -1 }
             }
             
-            const sortedTherapists = await userRepository.getSortedCoupleTherapists(sortCriteria);
-            console.log("sorted therapists:", sortedTherapists);
-            
-            
-
+            const sortedTherapists = await userRepository.getSortedCoupleTherapists({sortCriteria, page, limit});
+           
             return { status: true, data: sortedTherapists };
             
         } catch (error) {

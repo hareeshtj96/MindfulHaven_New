@@ -13,14 +13,10 @@ import DefaultSkeleton from "../../Components/MaterialUI/Shimmer";
 const IndividualTherapistList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { individualTherapists, individualTherapistsSearch, totalPages, sortedIndividualTherapists, currentPage, status, error, } = useSelector(
+    const { individualTherapists, individualTherapistsSearch, totalPagesIndividual, sortedIndividualTherapists, currentPagesIndividual, status, error, } = useSelector(
         (state: RootState) => state.user
     );
 
-    
-
-    const state = useSelector((state: RootState) => state.user);
-    console.log("state is..........", state )
 
     const [sortOption, setSortOption] = useState<string>("experience");
     const [genderFilter, setGenderFilter] = useState<string>("all");
@@ -32,17 +28,15 @@ const IndividualTherapistList: React.FC = () => {
 
     // Fetch all therapists on mount
     useEffect(() => {
-        dispatch(fetchIndividualTherapist({ page: currentPage, limit: therapistsPerPage }));
-    }, [dispatch, currentPage, therapistsPerPage]);
+        dispatch(fetchIndividualTherapist({ page: currentPagesIndividual, limit: therapistsPerPage }));
+    }, [dispatch, currentPagesIndividual, therapistsPerPage]);
 
      
-    const getTotalPages = () => totalPages || 1;
-
 
     // Fetch sorted therapists based on sort option
     useEffect(() => {
-        dispatch(fetchSortedIndividualTherapists(sortOption));
-    }, [dispatch, sortOption]);
+        dispatch(fetchSortedIndividualTherapists({sortOption, page: currentPagesIndividual, limit: therapistsPerPage}));
+    }, [dispatch, sortOption, currentPagesIndividual, therapistsPerPage]);
 
     // Debounce search input
     useEffect(() => {
@@ -62,6 +56,13 @@ const IndividualTherapistList: React.FC = () => {
             setHasSearched(false);
         }
     }, [debouncedSearchTerm, dispatch]);
+
+
+    const handlePageChange = (newPage: number) => {
+        if (newPage >= 1 && newPage <= totalPagesIndividual) {
+            dispatch(fetchIndividualTherapist({ page: newPage, limit: therapistsPerPage }))
+        }
+    }
 
     // Filter therapists based on selected gender
     const filteredTherapists = genderFilter === "all"
@@ -252,6 +253,28 @@ const IndividualTherapistList: React.FC = () => {
                         </div>
                     ))
                 )}
+            </div>
+
+
+            {/* Pagination */}
+            <div className="flex justify-center items-center mt-6 space-x-4">
+                <button
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPagesIndividual === 1 ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPagesIndividual - 1)}
+                    disabled={currentPagesIndividual === 1}
+                >
+                    Previous
+                </button>
+                <span>
+                    Page {currentPagesIndividual} of {totalPagesIndividual}
+                </span>
+                <button
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPagesIndividual === totalPagesIndividual ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPagesIndividual + 1)}
+                    disabled={currentPagesIndividual === totalPagesIndividual}
+                >
+                    Next
+                </button>
             </div>
 
                 

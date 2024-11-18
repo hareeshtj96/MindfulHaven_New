@@ -18,6 +18,7 @@ interface Issue {
     status: string;
     isActive: boolean;
     bookingId: string;
+    rating: number;
 }
 
 const AdminIssuesManagement: React.FC = () => {
@@ -34,7 +35,7 @@ const AdminIssuesManagement: React.FC = () => {
   const itemsPerPage = 3;
 
 
-  const totalPages = Math.ceil(issues.length / itemsPerPage);
+
  
   // Fetch issues on component mount
   useEffect(() => {
@@ -46,7 +47,11 @@ const AdminIssuesManagement: React.FC = () => {
   // Define columns for the table
   const columns = ["User", "Therapist", "Category", "Description",  "Action"];
 
-  const currentData = issues.slice(
+  const filteredIssues = issues.filter((issue) => !issue.rating)
+
+  const totalPages = Math.ceil(filteredIssues.length / itemsPerPage);
+
+  const currentData = filteredIssues.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );

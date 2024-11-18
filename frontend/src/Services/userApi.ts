@@ -39,3 +39,4 @@ export const GETCOUPLETHERAPIST = `${BASE_URL}/coupleTherapy`;
 export const SORTCOUPLETHERAPIST = `${BASE_URL}/sort_coupleTherapist`;
 export const CHECKSLOTBEFOREPAYMENT = `${BASE_URL}/checkSlotBeforePayment`;
 export const SEARCHCOUPLETHERAPIST = `${BASE_URL}/search_coupleTherapist`;
+export const WALLETPAYMENT = `${BASE_URL}/wallet_payment`
