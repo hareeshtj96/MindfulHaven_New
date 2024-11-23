@@ -24,7 +24,6 @@ const TherapistDetails = () => {
     const [professionalExperience, setProfessionalExperience] = useState<string>('');
     const [establishment, setEstablishment] = useState<string>('');
     const [location, setLocation] = useState<string>('');
-    const [timings, setTimings] = useState<Array<{ dayOfWeek: number[], startTime: string, endTime: string }>>([]);
     const [fees, setFees] = useState<number | ''>('');
     const [photoBase64, setPhotoBase64] = useState<File | null>(null);
 
@@ -47,15 +46,15 @@ const TherapistDetails = () => {
         }
     };
 
-    const handleAddTiming = () => {
-        setTimings([...timings, { dayOfWeek: [], startTime: '', endTime: ''}])
-    };
+    // const handleAddTiming = () => {
+    //     setTimings([...timings, { dayOfWeek: [], startTime: '', endTime: ''}])
+    // };
 
-    const handleTimingChange = (index: number, field: string, value: any) => {
-        const updatedTimings = [...timings];
-        updatedTimings[index][field as keyof typeof updatedTimings[0]] = value;
-        setTimings(updatedTimings);
-    }
+    // const handleTimingChange = (index: number, field: string, value: any) => {
+    //     const updatedTimings = [...timings];
+    //     updatedTimings[index][field as keyof typeof updatedTimings[0]] = value;
+    //     setTimings(updatedTimings);
+    // }
 
 
     const validateForm = () => {
@@ -72,7 +71,6 @@ const TherapistDetails = () => {
         if(!professionalExperience) newErrors.professionalExperience = "Professional experience is required";
         if(!establishment) newErrors.establishment = "Establishment is required";
         if(!location) newErrors.location = "Location is required";
-        if(timings.length === 0) newErrors.timings = "At least one timing block is required";
         if(fees === ""){
             newErrors.fees = "Fees is required";
         } else if (fees <= 0) {
@@ -107,7 +105,6 @@ const TherapistDetails = () => {
             professionalExperience,
             establishment,
             location,
-            timings,
             fees,
         };
 
@@ -264,7 +261,7 @@ const TherapistDetails = () => {
                     {errors.location && <p className="text-red-500">{errors.location}</p>}
                 </div>
 
-                <div className="col-span-2">
+                {/* <div className="col-span-2">
                     <label className="block">Availability (Timings)</label>
                     {timings.map((timing, index) => (
                         <div key={index} className="mb-4">
@@ -287,7 +284,7 @@ const TherapistDetails = () => {
                     ))}
                     <button type="button" onClick={handleAddTiming} className="bg-customGreen text-white py-2 px-4 rounded hover:bg-green-600">Add Timing Block</button>
                     {errors.timings && <p className="text-red-500">{errors.timings}</p>}
-                </div>
+                </div> */}
 
                 <div>
                     <input

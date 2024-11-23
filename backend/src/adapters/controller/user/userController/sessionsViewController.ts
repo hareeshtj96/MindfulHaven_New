@@ -37,7 +37,7 @@ export default (dependencies: any) => {
             const userId = decodedToken.userId;
            
             if (!userId) {
-                return res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: ResponseMessages.USER_ID_NOT_IN_TOKEN });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: false, message: ResponseMessages.USER_ID_NOT_IN_TOKEN });
             }
 
             const response = await getAllBookings(dependencies).executeFunction({ userId, page, limit });

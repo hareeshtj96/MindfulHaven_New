@@ -98,7 +98,7 @@ interface LoginResponse {
 
 interface AvailableDetails {
     booked: any[];
-    availableSlots: string[];
+    updatedTimings: any[];
     timings: any[]
 }
 
@@ -298,14 +298,13 @@ export const fetchAvailableDetails = createAsyncThunk<AvailableDetails, string, 
     "therapist/fetchAvailableDetails",
     async(therapistId, thunkAPI) => {
         try {
-            
             const response = await axios.get(GETAVAILABILITY, {
                 params: { therapistId }
             });
 
-            const { booked, availableSlots, timings } = response.data.data;
+            const { booked, updatedTimings, timings } = response.data.data;
 
-            return { booked, availableSlots, timings }
+            return { booked, updatedTimings, timings }
             
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch details";
@@ -411,9 +410,12 @@ export const cancelAppointmentByTherapist = createAsyncThunk(
 
 export const cancelAvailableSlot = createAsyncThunk(
     "therapist/cancelAvailableSlot",
-    async ({slot, therapistId}: {slot: string, therapistId: string}, {rejectWithValue}) => {
+    async ({slotId, therapistId}: {slotId: string, therapistId: string}, {rejectWithValue}) => {
         try {
-            const response = await axios.put(CANCELAVAILABLESLOT, {slot, therapistId});
+            console.log("slot in cancel slot:", slotId);
+            console.log("therapist id in cancel slot:", therapistId);
+
+            const response = await axios.put(CANCELAVAILABLESLOT, {slotId, therapistId});
             return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Failed to cancel available slots")

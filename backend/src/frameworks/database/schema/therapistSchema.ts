@@ -69,15 +69,15 @@ const therapistSchema = new Schema({
     timings: [{
         dayOfWeek: {
             type: [Number],
-            required: true,
+         
         },
         startTime: {
             type: String,
-            required: true,
+    
         },
         endTime: {
             type: String,
-            required: true,
+    
         },
     }],
     availableSlots: [Date],
@@ -126,14 +126,19 @@ const therapistSchema = new Schema({
             type: Date,
             required: true,
         },
-        startTime: {
-            type: String,
-            required: true,
-        },
-        endTime: {
-            type: String,
-            required: true,
-        },
+        slots: [
+            {
+                startTime: {
+                    type: String,
+                    required: true,
+                },
+                endTime: {
+                    type: String,
+                    required: true,
+                },
+            }
+        ]
+        
     }],
 });
 

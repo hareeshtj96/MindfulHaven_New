@@ -69,7 +69,6 @@ export default {
                         professionalExperience: therapistData.professionalExperience,
                         establishment: therapistData.establishment,
                         location: therapistData.location,
-                        timings: therapistData.timings,
                         fees: therapistData.fees,
                         photo: therapistData.photo,
                         availableSlots: therapistData.availableSlots,
@@ -131,19 +130,24 @@ export default {
         try {
             const therapistDetails = await databaseSchema.Therapist.findById(therapistId);
 
-            const availableSlots = therapistDetails?.availableSlots
-            const booked = therapistDetails?.booked
+            const updatedTimings = therapistDetails?.updatedTimings
             const timings = therapistDetails?.timings
+
+            const appointments = await databaseSchema.Appointment.find({
+                therapistId,
+                'payment.paymentStatus': 'success'
+            }).select('slot');
+
+            const bookedSlots = appointments.map((appointment) => appointment.slot);
 
             return {
                 status: true,
                 data: {
-                    availableSlots,
-                    booked,
+                    updatedTimings,
+                    booked: bookedSlots,
                     timings
                 }
             }
-
         } catch (error) {
             return {
                 status: false,
@@ -157,10 +161,10 @@ export default {
 
         try {
 
-            const totalBookingsCount = await databaseSchema.Appointment.countDocuments({ therapistId })
+            const totalBookingsCount = await databaseSchema.Appointment.countDocuments({ therapistId, 'payment.paymentStatus': 'success' })
             const totalPages = Math.ceil(totalBookingsCount / limit);
 
-            const bookings = await databaseSchema.Appointment.find({ therapistId }).skip((page - 1) * limit).limit(limit);
+            const bookings = await databaseSchema.Appointment.find({ therapistId, 'payment.paymentStatus': 'success' }).skip((page - 1) * limit).limit(limit);
 
             if (!bookings) {
                 return {
@@ -191,12 +195,70 @@ export default {
 
     },
 
+    // updateTimings: async (email: string, startTime: string, endTime: string, date: string) => {
+    //     try {
+    //         const therapist = await databaseSchema.Therapist.findOne({ email });
+
+    //         if (!therapist) {
+    //             return { status: false, message: "Therapist not found" }
+    //         }
+
+    //         const reformattedDate = date.split("/").reverse().join("-");
+    //         const [startHour, startMinute] = startTime.split(":").map(Number);
+    //         const [endHour, endMinute] = endTime.split(":").map(Number);
+
+    //         const startDateTime = new Date(reformattedDate);
+    //         startDateTime.setHours(startHour, startMinute, 0);
+
+
+    //         const endDateTime = new Date(reformattedDate);
+    //         endDateTime.setHours(endHour, endMinute, 0);
+
+    //         const currentDateTime = new Date();
+
+    //         if (startDateTime >= endDateTime) {
+    //             return { status: false, message: "Start time must be before end time" };
+    //         }
+
+    //         if (startDateTime <= currentDateTime) {
+    //             return { status: false, message: "Start time must be in the future" };
+    //         }
+
+
+    //         // Check if this timing already exists in updatedTimings
+    //         const existingTiming = therapist.updatedTimings.some(timing =>
+    //             timing.date.toISOString().split("T")[0] === reformattedDate &&
+    //             timing.startTime === startTime &&
+    //             timing.endTime === endTime
+    //         );
+
+    //         if (existingTiming) {
+    //             return { status: false, message: "This timing already exists" };
+    //         }
+
+    //         const newTiming = {
+    //             date: reformattedDate,
+    //             startTime: startTime,
+    //             endTime: endTime
+    //         }
+
+    //         therapist.updatedTimings.push(newTiming);
+
+    //         await therapist.save();
+
+    //         return { status: true, message: "Timings updated successfully" }
+
+    //     } catch (error) {
+    //         return { status: false, message: "Error occured during updatiing therapist timings" }
+    //     }
+    // },
+
     updateTimings: async (email: string, startTime: string, endTime: string, date: string) => {
         try {
             const therapist = await databaseSchema.Therapist.findOne({ email });
 
             if (!therapist) {
-                return { status: false, message: "Therapist not found" }
+                return { status: false, message: "Therapist not found" };
             }
 
             const reformattedDate = date.split("/").reverse().join("-");
@@ -205,7 +267,6 @@ export default {
 
             const startDateTime = new Date(reformattedDate);
             startDateTime.setHours(startHour, startMinute, 0);
-
 
             const endDateTime = new Date(reformattedDate);
             endDateTime.setHours(endHour, endMinute, 0);
@@ -220,33 +281,49 @@ export default {
                 return { status: false, message: "Start time must be in the future" };
             }
 
-            // Check if this timing already exists in updatedTimings
-            const existingTiming = therapist.updatedTimings.some(timing =>
-                timing.date.toISOString().split("T")[0] === reformattedDate &&
-                timing.startTime === startTime &&
-                timing.endTime === endTime
+            // Find an existing entry for the same date
+            const existingDateEntry = therapist.updatedTimings.find(
+                timing => timing.date.toISOString().split("T")[0] === reformattedDate
             );
 
-            if (existingTiming) {
-                return { status: false, message: "This timing already exists" };
-            }
+            if (existingDateEntry) {
+                // Check for overlapping slots
+                const isOverlapping = existingDateEntry.slots.some(slot => {
+                    const existingStart = new Date(`${reformattedDate}T${slot.startTime}`);
+                    const existingEnd = new Date(`${reformattedDate}T${slot.endTime}`);
 
-            const newTiming = {
-                date: reformattedDate,
-                startTime: startTime,
-                endTime: endTime
-            }
+                    return (
+                        (startDateTime >= existingStart && startDateTime < existingEnd) ||
+                        (endDateTime > existingStart && endDateTime <= existingEnd) ||
+                        (startDateTime <= existingStart && endDateTime >= existingEnd)
+                    );
+                });
 
-            therapist.updatedTimings.push(newTiming);
+                if (isOverlapping) {
+                    return { status: false, message: "This timing overlaps with an existing slot" };
+                }
+
+                // Add the new slot to the existing date
+                existingDateEntry.slots.push({ startTime, endTime });
+            } else {
+                // Create a new entry for this date
+                therapist.updatedTimings.push({
+                    date: new Date(reformattedDate),
+                    slots: [{ startTime, endTime }]
+                });
+            }
 
             await therapist.save();
 
-            return { status: true, message: "Timings updated successfully" }
-
+            return { status: true, message: "Timings updated successfully" };
         } catch (error) {
-            return { status: false, message: "Error occured during updatiing therapist timings" }
+            console.error("Error updating timings:", error);
+            return { status: false, message: "Error occurred during updating therapist timings" };
         }
     },
+
+
+
 
     cancelAppointmentTherapist: async ({ bookingId }: { bookingId: string }) => {
         try {
@@ -265,7 +342,7 @@ export default {
         }
     },
 
-    getCancelSlot: async ({ slot, therapistId }: { slot: string, therapistId: string }) => {
+    getCancelSlot: async ({ slotId, therapistId }: { slotId: string, therapistId: string }) => {
         try {
             const therapist = await databaseSchema.Therapist.findById(therapistId);
 
@@ -273,7 +350,23 @@ export default {
                 return { status: false, message: "Therapist not found" }
             }
 
-            therapist.availableSlots.pull(slot);
+            const { updatedTimings } = therapist;
+
+            const timingIndex = updatedTimings.findIndex((timing) =>
+            timing.slots.some((slot) => slot._id?.toString() === slotId))
+
+            if (timingIndex === -1) {
+                return { status: false, message: "Slot not found in updatedTimings"}
+            }
+
+            // Remove slot from slots array
+            const slotIndex = updatedTimings[timingIndex].slots.findIndex(
+                (slot) => slot._id?.toString() === slotId
+            );
+
+            if (slotIndex !== -1) {
+                updatedTimings[timingIndex].slots.splice(slotIndex, 1);
+            }
 
             await therapist.save();
 
@@ -328,7 +421,7 @@ export default {
 
             return {
                 status: true,
-                
+
                 totalProfit,
                 mostBookedHour,
                 userName,

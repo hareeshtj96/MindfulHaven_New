@@ -8,7 +8,7 @@ function TherapistSidebar() {
     const [isOpen, setIsOpen] = useState(false);
     const therapist = useSelector((state: RootState) => state.therapist.currentTherapist);
     const therapistId = therapist?.therapistId
-    console.log("therpist id:", therapistId);
+  
     
     const navigate = useNavigate()
 

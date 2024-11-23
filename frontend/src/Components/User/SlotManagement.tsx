@@ -66,6 +66,7 @@ const SlotManagement = () => {
   const timings = useSelector((state: RootState) => state.user.timings || []);
   const booked = useSelector((state: RootState) => state.user.booked);
   const issues = useSelector((state: RootState) => state.user.issues || [])
+  const updatedTimings = useSelector((state: RootState) => state.user.updatedTimings || []);
   console.log("issues;", issues);
 
 
@@ -132,6 +133,8 @@ const SlotManagement = () => {
   };
 
 
+  // combine timings and updatedTimings
+  const combinedTimings = Array.from(new Set([...timings, ...updatedTimings]));
 
   const filterBookedSlotsByDate = (
     date: string,
@@ -165,8 +168,6 @@ const SlotManagement = () => {
   };
 
   const filteredSlots = getFilteredSlots(availableSlots, bookedSlots);
-
-
 
   const getBookedTimesForDate = (date: string): string[] => {
 

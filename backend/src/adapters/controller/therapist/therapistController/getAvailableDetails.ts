@@ -7,7 +7,9 @@ export default (dependencies: any) => {
 
     const getAvailableDetailsController = async (req: Request, res: Response ) => {
         try {
+            console.log("entered controller.............");
             const { therapistId } = req.query;
+
 
             const response = await getTherapistDetailsUsecase(dependencies).executeFunction(therapistId);
          

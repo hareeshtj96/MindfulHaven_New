@@ -175,6 +175,7 @@ interface UserState {
     timings: any[] 
     booked: any[]
     issues:any[]
+    updatedTimings: any[]
     sortedTherapists: Therapist[]
     sortedFamilyTherapists: Therapist[]
     sortedIndividualTherapists: Therapist[]
@@ -234,6 +235,7 @@ const initialState: UserState = {
     timings: [],
     booked: [],
     issues: [],
+    updatedTimings: [],
     sortedTherapists: [],
     sortedFamilyTherapists: [],
     sortedIndividualTherapists:[],
@@ -543,6 +545,7 @@ export const fetchIndividualTherapist = createAsyncThunk<{individualTherapists:T
     async({page, limit}, thunkAPI) => {
         try {
             const response = await axios.get(GETINDIVIDUALTHERAPIST, { params: {page, limit}});
+            console.log("response from individual therapist:", response);
 
             const {individualTherapists, currentPagesIndividual, totalPagesIndividual} =  response.data.data;
             return { individualTherapists, currentPagesIndividual, totalPagesIndividual };
@@ -571,18 +574,20 @@ export const fetchCoupleTherapist = createAsyncThunk<{coupleTherapists: Therapis
 
 
 export const fetchAvailableSlots = createAsyncThunk<{
-    booked: any[]; availableSlots: string[], timings: any[], issues: any[]
+    booked: any[]; availableSlots: string[], timings: any[], issues: any[], updatedTimings: any[]
 }, string, { rejectValue: string}>(
     'user/fetchAvailableSlots',
     async(therapistId, thunkAPI) => {
         try {
             const response = await axios.get(`${GETSLOTS}/${therapistId}`);
+            console.log("response from fetch available slots:", response);
           
             return {
                 availableSlots: response.data.data.availableSlots,
                 timings: response.data.data.timings,
                 booked: response.data.data.booked,
                 issues: response.data.data.issues,
+                updatedTimings: response.data.data.updatedTimings
             }
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch available slots";
@@ -774,6 +779,7 @@ export const fetchScheduledBookingDetails = createAsyncThunk<{
         try {
             
             const authInfoString = localStorage.getItem("authInfo");
+            console.log("auth info strig slice:", authInfoString);
 
             if (!authInfoString) {
                 return thunkAPI.rejectWithValue("Token is missing or invalid");
@@ -1384,6 +1390,7 @@ const userSlice = createSlice({
                 state.timings = action.payload.timings;
                 state.booked = action.payload.booked;
                 state.issues = action.payload.issues;
+                state.updatedTimings = action.payload.updatedTimings;
                
             })
             .addCase(fetchAvailableSlots.rejected, (state, action) => {

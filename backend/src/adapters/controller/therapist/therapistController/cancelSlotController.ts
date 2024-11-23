@@ -7,9 +7,9 @@ export default (dependencies: any) => {
 
     const cancelSlotController = async (req: Request, res: Response ) => {
         try {
-            const { slot, therapistId } = req.body;
+            const { slotId, therapistId } = req.body;
 
-            const response = await cancelSlotUsecase(dependencies).executeFunction({slot, therapistId});
+            const response = await cancelSlotUsecase(dependencies).executeFunction({slotId, therapistId});
             
             if( response && response.status) {
                 res.status(HttpStatusCode.OK).json({ status: true, data: response.data });

@@ -15,10 +15,10 @@ const BookingStatus = () => {
 
   const therapist = useSelector((state: RootState) => {
     const therapistList = [
-      ...(state.user.therapists?.therapists || []),
-      ...(state.user.familyTherapists?.therapists || []),
-      ...(state.user.coupleTherapists?.therapists || []),
-      ...(state.user.individualTherapists?.therapists || []),
+      ...(state.user.therapists || []),
+      ...(state.user.familyTherapists || []),
+      ...(state.user.coupleTherapists || []),
+      ...(state.user.individualTherapists || []),
     ];
 
     return therapistList.find(

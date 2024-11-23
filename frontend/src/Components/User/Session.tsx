@@ -10,8 +10,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-
-
 const formatDateTime = (slot: string) => {
     const date = new Date(slot);
 
@@ -186,6 +184,8 @@ const Session = () => {
         }
     };
 
+   
+
     
     const handlePageChange = (newPage: number) => {
         const totalPages = getTotalPages();
@@ -309,25 +309,7 @@ const Session = () => {
         }
     }
 
-    const handleEndSession = async () => {
-        try {
-            // Stop publishing local stream
-            if (zegoEngineRef.current) {
-                const localVideoRef = document.getElementById('localVideo') as HTMLVideoElement;
-                const streamID = `stream_${userId}`;
-                
-                zegoEngineRef.current.stopPublishingStream(streamID);
-                localVideoRef.srcObject = null; // Clear the local video element
-
-                // Logout from the room
-                await zegoEngineRef.current.logoutRoom();
-                console.log("Successfully left the room");
-            }
-        } catch (error) {
-            console.error('Failed to end session:', error);
-        }
-    };
-
+   
     const ConfirmCancelToast = ({ onConfirm, closeToast}: { onConfirm: () => void; closeToast: () => void }) => (
         <div>
             <p>Do you really want to cancel this appointment?</p>

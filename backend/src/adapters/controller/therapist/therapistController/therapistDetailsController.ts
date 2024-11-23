@@ -71,15 +71,11 @@ export default function therapistDetailsController(dependencies: any) {
                 professionalExperience,
                 establishment,
                 location,
-                timings,
                 fees,
                 therapistId,
             } = therapistData;
 
-            //Generate slots using RRule
-            const slotRules = createTherapistSlotRules(timings);
-            const slots = slotRules.all();
-            
+           
             let photoUrl = "";
 
             let identityProofUrl = "";
@@ -109,11 +105,9 @@ export default function therapistDetailsController(dependencies: any) {
                 professionalExperience,
                 establishment,
                 location,
-                timings,
                 fees,
                 therapistId,
                 photo: photoUrl,
-                availableSlots: slots
             }
 
             const saveResult = await therapistRepository.saveTherapist(newTherapist);
@@ -124,6 +118,7 @@ export default function therapistDetailsController(dependencies: any) {
 
             res.status(HttpStatusCode.OK).json({ status: true, message: ResponseMessages.THERAPIST_SAVED,  data: saveResult.data});
         } catch (error) {
+            console.log("error in save therapist:", error);
             res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error"});
         }
     };

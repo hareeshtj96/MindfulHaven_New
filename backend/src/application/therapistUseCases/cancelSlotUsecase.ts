@@ -4,9 +4,9 @@ import { ResponseMessages } from "../../utils/httpStatusCode";
 export default (dependencies: any) => {
     const { therapistRepository } = dependencies.repository;
 
-    const executeFunction = async (slot: any, therapistId: any) => {
+    const executeFunction = async (slotId: any, therapistId: any) => {
         try {
-            const response = await therapistRepository.getCancelSlot(slot, therapistId);
+            const response = await therapistRepository.getCancelSlot(slotId, therapistId);
         
             if(response.status) {
                 return { status: true, data: response.data};

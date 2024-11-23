@@ -13,6 +13,8 @@ if (!REFRESH_SECRET_KEY) {
 }
 
 export const refreshTokenController = (dependencies: any) => {
+
+    console.log("entered refresh token controller........")
     
     return (req: Request, res: Response) => {
         const refreshToken = req.cookies['refreshToken'];

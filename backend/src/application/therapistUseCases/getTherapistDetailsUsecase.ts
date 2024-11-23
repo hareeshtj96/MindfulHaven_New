@@ -7,7 +7,7 @@ export default (dependencies: any) => {
     const executeFunction = async (therapistId: any) => {
         try {
             const response = await therapistRepository.getDetails(therapistId);
-            
+              
             if(response.status) {
                 return { status: true, data: response.data};
             } else  {

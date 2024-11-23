@@ -159,7 +159,7 @@ const TherapistProfileView = () => {
                     <p className="mb-2">
                         <strong>Location:</strong> {therapist.location}
                     </p>
-                    <p className="mb-2">
+                    {/* <p className="mb-2">
                         <strong>Timings:</strong> 
                         {therapist.timings && therapist.timings.length > 0 ? (
                             <ul>
@@ -172,7 +172,7 @@ const TherapistProfileView = () => {
                         ) : (
                             "No timings available"
                         )}
-                    </p>
+                    </p> */}
                     <p className="mb-2">
                         <strong>Fees:</strong> ₹{therapist.fees}
                     </p>

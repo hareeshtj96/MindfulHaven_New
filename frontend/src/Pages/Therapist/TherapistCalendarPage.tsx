@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TherapistCalendar from "../../Components/Therapist/TherapistCalendar";
+import TherapistCalender2 from "../../Components/Therapist/TherapistCalender2";
 import TherapistHeader2 from "../../Layout/TherapistLayout/TherapistHeader2";
 
 
@@ -10,7 +11,7 @@ function TherapistCalendarPage() {
         <>
          <div className="flex flex-col min-h-screen">
          <TherapistHeader2 />
-         <TherapistCalendar />
+         <TherapistCalender2 />
          </div>
         
         </>

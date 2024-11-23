@@ -235,14 +235,14 @@ export default {
     getIndividualTherapist: async (page: number, limit: number) => {
         try {
             const skip = (page - 1) * limit;
-
+        
             const individualTherapists = await databaseSchema.Therapist.find({
                 specialization: "Individual Therapy",
                 isVerified: true,
             })
                 .skip(skip)
                 .limit(limit);
-
+            
             const totalTherapists = await databaseSchema.Therapist.countDocuments({
                 specialization: "Individual Therapy",
                 isVerified: true,
@@ -329,7 +329,7 @@ export default {
             }
 
             // Destructure the required properties
-            const { timings, availableSlots, booked } = therapist;
+            const { timings, availableSlots, booked, updatedTimings } = therapist;
 
             // Fetch issues related to this therapist, where the rating exists
             const issues = await databaseSchema.Issue.find({
@@ -356,6 +356,7 @@ export default {
                 data: {
                     timings,
                     availableSlots,
+                    updatedTimings,
                     booked,
                     issues: issuesWithUserDetails
                 },
@@ -826,6 +827,7 @@ export default {
             const bookings = await databaseSchema.Appointment.find({
                 userId: userId,
                 status: "cancelled",
+                "payment.paymentStatus": "success",
             })
                 .skip(skip)
                 .limit(limit);
@@ -846,6 +848,7 @@ export default {
             const totalBookings = await databaseSchema.Appointment.countDocuments({
                 userId: userId,
                 status: "cancelled",
+                "payment.paymentStatus": "success",
             });
 
             return {
