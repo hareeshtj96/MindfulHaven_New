@@ -33,7 +33,8 @@ import { userRegistration,
     sortCoupleTherapistUsecase,
     checkSlotBeforePaymentUsecase,
     searchCoupleTherapistUsecase,
-    walletPaymentUsecase
+    walletPaymentUsecase,
+    userNotificationsUsecase
  } from "./UseCases";
 
 export {
@@ -72,12 +73,13 @@ export {
     sortCoupleTherapistUsecase,
     checkSlotBeforePaymentUsecase,
     searchCoupleTherapistUsecase,
-    walletPaymentUsecase
+    walletPaymentUsecase,
+    userNotificationsUsecase,
 }
 
 
 
-import { adminLogin, getAllUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase} from "./adminUseCases";
+import { adminLogin, getAllUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase, adminNotificationsUsecase} from "./adminUseCases";
 
 export {
     adminLogin,
@@ -86,11 +88,12 @@ export {
     therapistDetailstUsecase,
     adminDashboardDetailsUsecase,
     getIssuesUsecase,
-    getIssuesresolvedUsecase
+    getIssuesresolvedUsecase,
+    adminNotificationsUsecase
 }
 
 
-import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase, cancelSlotUsecase, fetchTherapistUsecase } from "./therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase, cancelSlotUsecase, fetchTherapistUsecase, therapistNotificationsUsecase } from "./therapistUseCases";
 
 export {
     therapistRegistration,
@@ -101,5 +104,6 @@ export {
     getTherapistDetailsUsecase,
     therapistPhotoUsecase,
     cancelSlotUsecase,
-    fetchTherapistUsecase
+    fetchTherapistUsecase,
+    therapistNotificationsUsecase
 }

@@ -63,7 +63,8 @@ export default (dependencies: any) =>{
        coupleTherapistSorting,
        checkSlotsBeforePaymentController,
        searchCoupleTherapistController,
-       walletPaymentController
+       walletPaymentController,
+       userNotificationsController
     } = userController(dependencies);
 
 
@@ -106,7 +107,8 @@ export default (dependencies: any) =>{
     router.get('/sort_coupleTherapist', coupleTherapistSorting);
     router.get('/checkSlotBeforePayment/:id', checkSlotsBeforePaymentController);
     router.get('/search_coupleTherapist', searchCoupleTherapistController);
-    router.post('/wallet_payment', walletPaymentController)
+    router.post('/wallet_payment', walletPaymentController);
+    router.get('/user_notifications', userNotificationsController);
 
 
     return router;

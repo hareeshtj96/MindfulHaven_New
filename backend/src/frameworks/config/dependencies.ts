@@ -36,12 +36,13 @@ import {
     sortCoupleTherapistUsecase,
     checkSlotBeforePaymentUsecase,
     searchCoupleTherapistUsecase,
-    walletPaymentUsecase
+    walletPaymentUsecase,
+    userNotificationsUsecase
  } from "../../application/UseCases";
 
-import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase } from "../../application/adminUseCases";
+import { adminLogin, getAllUsecase, getUsersUsecase, getVerifiedUsecase, getuserBlockUsecase, therapistDetailstUsecase, adminDashboardDetailsUsecase, getIssuesUsecase, getIssuesresolvedUsecase, adminNotificationsUsecase } from "../../application/adminUseCases";
 
-import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase, cancelSlotUsecase, fetchTherapistUsecase } from "../../application/therapistUseCases";
+import { therapistRegistration, getTherapistProfileUsecase, bookingUsecase, updateTherapistTimingsUsecase, therapistSessionUsecase, cancelAppointmentTherapistUsecase, getTherapistDetailsUsecase, therapistPhotoUsecase, cancelSlotUsecase, fetchTherapistUsecase, therapistNotificationsUsecase } from "../../application/therapistUseCases";
 
 const useCase: any={
     userRegistration: userRegistration,
@@ -81,6 +82,7 @@ const useCase: any={
     checkSlotBeforePaymentUsecase: checkSlotBeforePaymentUsecase,
     searchCoupleTherapistUsecase: searchCoupleTherapistUsecase,
     walletPaymentUsecase: walletPaymentUsecase,
+    userNotificationsUsecase: userNotificationsUsecase,
 
 
 
@@ -95,6 +97,7 @@ const useCase: any={
     adminDashboardDetailsUsecase: adminDashboardDetailsUsecase,
     getIssuesUsecase: getIssuesUsecase,
     getIssuesresolvedUsecase: getIssuesresolvedUsecase,
+    adminNotificationsUsecase: adminNotificationsUsecase,
     
 
 
@@ -110,6 +113,7 @@ const useCase: any={
     therapistPhotoUsecase: therapistPhotoUsecase,
     cancelSlotUsecase: cancelSlotUsecase,
     fetchTherapistUsecase: fetchTherapistUsecase,
+    therapistNotificationsUsecase: therapistNotificationsUsecase,
 }
 
 const repository:any={

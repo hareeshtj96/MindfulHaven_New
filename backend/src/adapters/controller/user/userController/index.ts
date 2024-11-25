@@ -38,6 +38,7 @@ import coupleTherapistSorting from "./coupleTherapistSorting";
 import checkSlotsBeforePaymentController from "./checkSlotsBeforePaymentController";
 import searchCoupleTherapistController from "./searchCoupleTherapistController";
 import walletPaymentController from "./walletPaymentController";
+import userNotificationsController from "./userNotificationsController";
 
 
 
@@ -83,6 +84,6 @@ export default (dependencies:any) => {
         checkSlotsBeforePaymentController: checkSlotsBeforePaymentController(dependencies),
         searchCoupleTherapistController: searchCoupleTherapistController(dependencies),
         walletPaymentController: walletPaymentController(dependencies),
-        
+        userNotificationsController: userNotificationsController(dependencies),
     }
 }

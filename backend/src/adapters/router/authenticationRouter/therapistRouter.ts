@@ -70,7 +70,8 @@ export default (dependencies: any) => {
         getAvailableDetails,
         cancelSlotController,
         updatePhotoController,
-        fetchProfitTherapist
+        fetchProfitTherapist,
+        therapistNotificationController
     } = therapistController(dependencies);
 
 
@@ -87,6 +88,7 @@ export default (dependencies: any) => {
     router.put('/therapist_cancelSlot', cancelSlotController);
     router.put('/updatePhoto',upload, therapistTokenAuthenticate, updatePhotoController)
     router.get('/fetchProfit', fetchProfitTherapist);
+    router.get('/notifications', therapistNotificationController);
    
 
     router.use('/*', roleMiddleware(['therapist']));

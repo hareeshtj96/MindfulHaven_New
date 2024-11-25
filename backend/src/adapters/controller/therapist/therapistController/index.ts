@@ -12,6 +12,7 @@ import getAvailableDetails from "./getAvailableDetails"
 import cancelSlotController from "./cancelSlotController"
 import updatePhotoController from "./updatePhotoController"
 import fetchProfitTherapist from "./fetchProfitTherapist"
+import therapistNotificationController from "./therapistNotificationController"
 
 
 export default (dependencies: any) => {
@@ -29,5 +30,6 @@ export default (dependencies: any) => {
         cancelSlotController: cancelSlotController(dependencies),
         updatePhotoController: updatePhotoController(dependencies),
         fetchProfitTherapist: fetchProfitTherapist(dependencies),
+        therapistNotificationController: therapistNotificationController(dependencies),
     }
 }

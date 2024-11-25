@@ -13,7 +13,7 @@ import DefaultSkeleton from "../../Components/MaterialUI/Shimmer";
 const ChildTherapistList: React.FC = () => {
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
-    const { therapists, childTherapistsSearch, totalPages, currentPage, sortedTherapists, status, error, } = useSelector(
+    const { therapists, childTherapistsSearch, totalPagesChild, currentPageChild, sortedTherapists, status, error, } = useSelector(
         (state: RootState) => state.user
     );
 
@@ -28,15 +28,15 @@ const ChildTherapistList: React.FC = () => {
 
     // Fetch all therapists on mount
     useEffect(() => {
-        dispatch(fetchChildTherapist({ page: currentPage, limit: therapistsPerPage }));
-    }, [dispatch, currentPage, therapistsPerPage]);
+        dispatch(fetchChildTherapist({ page: currentPageChild, limit: therapistsPerPage }));
+    }, [dispatch, currentPageChild, therapistsPerPage]);
 
 
 
     // Fetch sorted therapists based on sort option
     useEffect(() => {
-        dispatch(fetchSortedChildTherapists({ sortOption, page: currentPage, limit: therapistsPerPage }));
-    }, [dispatch, sortOption, currentPage, therapistsPerPage]);
+        dispatch(fetchSortedChildTherapists({ sortOption, page: currentPageChild, limit: therapistsPerPage }));
+    }, [dispatch, sortOption, currentPageChild, therapistsPerPage]);
 
     // Debounce search input
     useEffect(() => {
@@ -59,7 +59,7 @@ const ChildTherapistList: React.FC = () => {
 
 
     const handlePageChange = (newPage: number) => {
-        if (newPage >= 1 && newPage <= totalPages) {
+        if (newPage >= 1 && newPage <= totalPagesChild) {
             dispatch(fetchChildTherapist({ page: newPage, limit: therapistsPerPage }))
         }
     }
@@ -261,19 +261,19 @@ const ChildTherapistList: React.FC = () => {
             {/* Pagination */}
             <div className="flex justify-center items-center mt-6 space-x-4">
                 <button
-                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPage === 1 ? "cursor-not-allowed" : ""}`}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPageChild === 1 ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPageChild - 1)}
+                    disabled={currentPageChild === 1}
                 >
                     Previous
                 </button>
                 <span>
-                    Page {currentPage} of {totalPages}
+                    Page {currentPageChild} of {totalPagesChild}
                 </span>
                 <button
-                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPage === totalPages ? "cursor-not-allowed" : ""}`}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                    className={`px-4 py-2 bg-blue-200 rounded-lg ${currentPageChild === totalPagesChild ? "cursor-not-allowed" : ""}`}
+                    onClick={() => handlePageChange(currentPageChild + 1)}
+                    disabled={currentPageChild === totalPagesChild}
                 >
                     Next
                 </button>

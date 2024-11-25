@@ -1,6 +1,8 @@
 import { StringExpressionOperatorReturningString } from "mongoose";
 import { databaseSchema } from "../database";
 import bcrypt from "bcryptjs";
+import { Appointment } from "../database/schema/appointmentSchema";
+import moment from 'moment';
 
 export default {
     createUser: async (data: any) => {
@@ -173,9 +175,7 @@ export default {
             const therapists = await databaseSchema.Therapist.find({
                 specialization: "Child Therapy",
                 isVerified: true,
-            })
-                .skip(skip)
-                .limit(limit);
+            }).skip(skip).limit(limit);
 
             const totalTherapists = await databaseSchema.Therapist.countDocuments({
                 specialization: "Child Therapy",
@@ -187,8 +187,8 @@ export default {
                 data: {
                     therapists,
                     total: totalTherapists,
-                    currentPage: page,
-                    totalPages: Math.ceil(totalTherapists / limit),
+                    currentPageChild: page,
+                    totalPagesChild: Math.ceil(totalTherapists / limit),
                 },
             };
         } catch (error) {
@@ -235,14 +235,14 @@ export default {
     getIndividualTherapist: async (page: number, limit: number) => {
         try {
             const skip = (page - 1) * limit;
-        
+
             const individualTherapists = await databaseSchema.Therapist.find({
                 specialization: "Individual Therapy",
                 isVerified: true,
             })
                 .skip(skip)
                 .limit(limit);
-            
+
             const totalTherapists = await databaseSchema.Therapist.countDocuments({
                 specialization: "Individual Therapy",
                 isVerified: true,
@@ -1096,6 +1096,45 @@ export default {
             return { status: true, data: result };
         } catch (error) {
             return { status: false, message: "Failed to retrieve wallet details" };
+        }
+    },
+
+    userNotifications: async ({ userId }: { userId: string }) => {
+        try {
+            const appointments = await databaseSchema.Appointment.find({
+                userId,
+                status: 'scheduled',
+                'payment.paymentStatus': 'success'
+            });
+
+            // Get today's date
+            const today = moment().startOf('day');
+
+            // Filter appointments matching today's date
+            const todayAppointments = appointments.filter(appointment =>
+                moment(appointment.slot).isSame(today, 'day')
+            );
+
+            // For each appointment, fetch the therapist's name
+            const appointmentsWithTherapist = await Promise.all(todayAppointments.map(async (appointment) => {
+                const therapist = await databaseSchema.Therapist.findById(appointment.therapistId);
+
+                return {
+                    ...appointment.toObject(), 
+                    therapistName: therapist ? therapist.name : 'Unknown' 
+                };
+            }));
+
+            return {
+                status: true,
+                data: appointmentsWithTherapist
+            };
+        } catch (error) {
+            console.error("Error fetching user notifications:", error);
+            return {
+                status: false,
+                message: "Error fetching user notifications"
+            }
         }
     },
 

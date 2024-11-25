@@ -13,8 +13,10 @@ import { REGISTERTHERAPIST,
     GETAVAILABILITY,
     CANCELAVAILABLESLOT,
     UPDATEPHOTO,
-    FETCHPROFIT
+    FETCHPROFIT,
+    THERAPISTNOTIFICATIONS
   } from "../../../Services/therapistApi";
+import { markAllNotificationsAsRead } from "./userSlice";
 
 
 
@@ -120,6 +122,9 @@ interface TherapistState {
     totalProfit: number | null;
     mostBookedHour: string | null;
     userName : string | null;
+    therapistNotifications: any[],
+    hasFetchedTherapistNotifications: boolean,
+    notificationsRead: boolean,
 }
 
 //initial state
@@ -140,7 +145,10 @@ const initialState: TherapistState = {
     details: null,
     totalProfit: null,
     mostBookedHour: null,
-    userName: null
+    userName: null,
+    therapistNotifications: [],
+    hasFetchedTherapistNotifications: false,
+    notificationsRead: false
 }
 
 // Thunk for therapist login
@@ -439,6 +447,24 @@ export const fetchTherapistProfit = createAsyncThunk(
     }
 );
 
+export const fetchTherapistNotifications = createAsyncThunk(
+    "therapist/notificaitions",
+    async (therapistId: string, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(THERAPISTNOTIFICATIONS, {
+                params: { therapistId },
+            });
+
+            console.log("response from therapist notification slice:", response.data.data);
+
+            return response.data.data
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Failed to fetch therapist notifications");
+
+        }
+    }
+)
+
 
 
 
@@ -456,6 +482,12 @@ const therapistSlice = createSlice({
         clearError: (state) => {
             state.error = null;
             state.otpError = null;
+        },
+        setTherapistNotificationsFetched: (state, action) => {
+            state.hasFetchedTherapistNotifications = action.payload
+        },
+        markAllTherapistNotificationsAsRead: (state) => {
+            state.notificationsRead = true;
         }
     },
     extraReducers: (builder) => {
@@ -567,11 +599,16 @@ const therapistSlice = createSlice({
             .addCase(fetchTherapistProfit.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
-            });
+            })
+            .addCase(fetchTherapistNotifications.fulfilled, (state, action) => {
+                state.loading = false;
+                state.therapistNotifications = action.payload;
+                state.hasFetchedTherapistNotifications = true;
+            })
     },
 }); 
 
-export const { logout, clearError  } = therapistSlice.actions;
+export const { logout, clearError, setTherapistNotificationsFetched, markAllTherapistNotificationsAsRead  } = therapistSlice.actions;
 
 
 

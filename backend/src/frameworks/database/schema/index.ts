@@ -5,6 +5,7 @@ import { Appointment } from "./appointmentSchema";
 import { Payment } from "./paymentSchema";
 import { Wallet } from "./walletSchema";
 import { Issue } from "./issueSchema";
+import { Notification } from './notificationSchema';
 
 
 interface DatabaseSchemaType {
@@ -15,6 +16,7 @@ interface DatabaseSchemaType {
     Payment: typeof Payment;
     Wallet: typeof Wallet;
     Issue: typeof Issue;
+    Notification: typeof Notification;
 }
 
 const databaseSchema: DatabaseSchemaType = {
@@ -24,7 +26,8 @@ const databaseSchema: DatabaseSchemaType = {
     Appointment,
     Payment,
     Wallet,
-    Issue
+    Issue,
+    Notification
 }
 
 export default databaseSchema;

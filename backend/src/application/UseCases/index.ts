@@ -36,6 +36,7 @@ import sortCoupleTherapistUsecase from "./sortCoupleTherapistUsecase";
 import checkSlotBeforePaymentUsecase from "./checkSlotBeforePaymentUsecase";
 import searchCoupleTherapistUsecase from "./searchCoupleTherapistUsecase";
 import walletPaymentUsecase from "./walletPaymentUsecase";
+import userNotificationsUsecase from "./userNotificationsUsecase";
 
 export {
     userRegistration,
@@ -75,5 +76,6 @@ export {
     sortCoupleTherapistUsecase,
     checkSlotBeforePaymentUsecase,
     searchCoupleTherapistUsecase,
-    walletPaymentUsecase
+    walletPaymentUsecase,
+    userNotificationsUsecase
 }

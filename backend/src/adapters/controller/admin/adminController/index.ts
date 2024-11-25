@@ -8,6 +8,7 @@ import getTherapistDetails from "./getTherapistDetails";
 import adminDashboardDetails from "./adminDashboardDetails";
 import adminFetchIssues from "./adminFetchIssues";
 import adminIssueResolve from "./adminIssueResolve";
+import adminNotificationsController from "./adminNotificationsController";
 
 export default (dependencies: any) => {
     return {
@@ -20,5 +21,6 @@ export default (dependencies: any) => {
         adminDashboardDetails: adminDashboardDetails(dependencies),
         adminFetchIssues: adminFetchIssues(dependencies),
         adminIssueResolve: adminIssueResolve(dependencies),
+        adminNotificationsController: adminNotificationsController(dependencies),
     }
 }

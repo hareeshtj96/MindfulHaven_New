@@ -15,7 +15,8 @@ export default (dependencies:any) => {
         getTherapistDetails,
         adminDashboardDetails,
         adminFetchIssues,
-        adminIssueResolve
+        adminIssueResolve,
+        adminNotificationsController
     } = adminController(dependencies);
 
     router.post('/admin_login', adminLoginController);
@@ -27,6 +28,7 @@ export default (dependencies:any) => {
     router.get('/admin_dashboard', adminDashboardDetails);
     router.get('/admin_issues', adminFetchIssues);
     router.post('/admin_resolveIssues', adminIssueResolve);
+    router.get('/notifications', adminNotificationsController);
 
 
     

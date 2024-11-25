@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 import bcrypt from "bcryptjs";
 import dotenv from 'dotenv';
 dotenv.config();
+import moment from 'moment';
 
 export default {
     createtherapist: async (data: any) => {
@@ -432,7 +433,46 @@ export default {
             console.error("Error in get therapist profit:", error);
             return { status: false, message: "Failed to fetch profit" }
         }
-    }
+    },
+
+    therapistNotifications: async ({ therapistId }: { therapistId: string }) => {
+        try {
+            const appointments = await databaseSchema.Appointment.find({
+                therapistId,
+                status: 'scheduled',
+                'payment.paymentStatus': 'success'
+            });
+
+            // Get today's date
+            const today = moment().startOf('day');
+
+            // Filter appointments matching today's date
+            const todayAppointments = appointments.filter(appointment =>
+                moment(appointment.slot).isSame(today, 'day')
+            );
+
+            // For each appointment, fetch the therapist's name
+            const appointmentsWithUser = await Promise.all(todayAppointments.map(async (appointment) => {
+                const user = await databaseSchema.User.findById(appointment.userId);
+
+                return {
+                    ...appointment.toObject(), 
+                    userName: user ? user.name : 'Unknown' 
+                };
+            }));
+
+            return {
+                status: true,
+                data: appointmentsWithUser
+            };
+        } catch (error) {
+            console.error("Error fetching therapist notifications:", error);
+            return {
+                status: false,
+                message: "Error fetching therapist notifications"
+            }
+        }
+    },
 
 }
 

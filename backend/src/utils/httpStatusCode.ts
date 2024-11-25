@@ -91,7 +91,10 @@ export enum ResponseMessages {
     COUPLE_THERAPIST_NOT_FOUND = "Couple therapist not found",
     ERROR_IN_COUPLE_THERAPIST_USECASE = "Error in couple therapist usecase",
     ERROR_SEARCHING_COUPLE_THERAPIST = "Error in searching couple therapist",
-    ERROR_WALLET_PAYMENT = "Error in wallet payment"
+    ERROR_WALLET_PAYMENT = "Error in wallet payment",
+    ERROR_USERNOTIFICATIONS_USECASE = "Error in user notifications usecase",
+    ERROR_THERAPISTNOTIFICATIONS_USECASE = "Error in therapist notifications usecase",
+    ERROR_ADMINNOTIFICATIONS_USECASE = "Error in admin notifications usecase"
     
 
 }

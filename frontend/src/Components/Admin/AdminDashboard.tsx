@@ -12,11 +12,11 @@ const AdminDashboard: React.FC = () => {
 
 
   const revenueData = [
-    {name: 'January', revenue: 100 },
-    { name: 'February', revenue: 200 },
-    { name: 'March', revenue: 500 },
-    { name: 'April', revenue: totalRevenue },
-    { name: 'May', revenue: 100 }
+    { id: 1, name: 'January', revenue: 100 },
+    { id: 2, name: 'February', revenue: 200 },
+    { id: 3, name: 'March', revenue: 500 },
+    { id: 4, name: 'April', revenue: totalRevenue || 0 },
+    { id: 5, name: 'May', revenue: 100 }
   ]
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const AdminDashboard: React.FC = () => {
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="revenue" fill="#82ca9d" />
+            <Bar dataKey="revenue" fill="#82ca9d" key="revenue-bar" />
             </BarChart>
         </ResponsiveContainer>
     </div>

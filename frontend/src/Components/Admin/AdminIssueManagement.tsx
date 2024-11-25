@@ -27,16 +27,11 @@ const AdminIssuesManagement: React.FC = () => {
   const { issues, loading, error } = useSelector(
     (state: RootState) => state.admin as { issues: Issue[]; loading: boolean; error: string | null }
   );
-
-  console.log("issues:", issues);
   
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
-
-
- 
   // Fetch issues on component mount
   useEffect(() => {
     dispatch(fetchIssues())

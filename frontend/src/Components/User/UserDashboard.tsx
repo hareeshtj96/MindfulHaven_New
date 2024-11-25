@@ -24,7 +24,7 @@ function Dashboard() {
   );
 
   const stateIss = useSelector((state: RootState) => state.user);
-  console.log("state is....dashboard", stateIss);
+
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchTermGemini, setSearchTermGemini] = useState("");

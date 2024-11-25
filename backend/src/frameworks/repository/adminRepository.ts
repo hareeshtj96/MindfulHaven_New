@@ -274,6 +274,38 @@ export default {
         }
     },
 
+
+
+
+    adminNotifications: async () => {
+        try {
+            const therapists = await databaseSchema.Therapist.find({
+                isVerified: false
+            });
+
+            const issues = await databaseSchema.Issue.find({
+                status: 'pending',
+                rating : { $exists: false }
+            });
+
+            return {
+                status: true, 
+                data: {
+                    pendingTherapistVerification: therapists.map((therapist) => ({
+                        id: therapist._id,
+                        name: therapist.name,
+                        email: therapist.email,
+                    })),
+                    pendingIssuesCount: issues.length,
+                },
+            };
+
+        } catch (error) {
+            console.error("Error fetching admin notifications:", error);
+            return { status: false, message: "Error fetching admin notifications"}
+        }
+    }
+
    
     
 }

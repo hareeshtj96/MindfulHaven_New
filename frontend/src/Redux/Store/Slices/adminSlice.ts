@@ -8,7 +8,8 @@ import { ADMINLOGIN,
     GETTHERAPISTDETAILS,
     GETDASHBOARDDETAILS,
     FETCHISSUES,
-    RESOLVEISSUE
+    RESOLVEISSUE,
+    ADMINNOTIFICATIONS
  } from "../../../Services/adminApi";
 import { act } from "react";
 
@@ -69,7 +70,13 @@ interface AdminState {
     totalAppointments: number,
     totalRevenue: number,
     issues: []
-    blockStatus: User | null
+    blockStatus: User | null,
+    adminNotifications: {
+        pendingIssuesCount: number,
+        pendingTherapistVerification : string[],
+    },
+    hasFetchedAdminNotifications: boolean,
+    notificationsRead : boolean,
     }
 
 const initialState: AdminState = {
@@ -88,7 +95,13 @@ const initialState: AdminState = {
     totalAppointments: 0,
     totalRevenue: 0,
     issues: [],
-    blockStatus: null
+    blockStatus: null,
+    adminNotifications: {
+        pendingIssuesCount: 0,
+        pendingTherapistVerification: [],
+    },
+    hasFetchedAdminNotifications: false,
+    notificationsRead: false,
 }
 
 export const loginAdmin = createAsyncThunk<LoginResponse, {email: string, password: string }, { rejectValue: string }>(
@@ -251,6 +264,22 @@ export const toggleUserBlockStatus = createAsyncThunk<User, { userId: string; is
   );
 
 
+  export const fetchAdminNotifications = createAsyncThunk(
+    "admin/notifications",
+    async (_, { rejectWithValue}) => {
+        try {
+            const response = await axios.get(ADMINNOTIFICATIONS);
+
+            console.log("response from admin notification slice:", response.data.data);
+
+            return response.data.data
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || "Failed to fetch the notifications")
+        }
+    }
+  )
+
+
   
 
 const adminSlice = createSlice({
@@ -266,7 +295,13 @@ const adminSlice = createSlice({
         resetLoading: (state) => {
             state.loading = false;
             state.error = null;
-          },
+        },
+        setAdminNotificationsFetched: (state, action) => {
+            state.hasFetchedAdminNotifications = action.payload
+        },
+        markAllAdminNotificationsAsRead: (state) => {
+            state.notificationsRead = true;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -369,11 +404,19 @@ const adminSlice = createSlice({
             .addCase(toggleUserBlockStatus.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload || "Failed to toggle block status";
-            });
+            })
+            .addCase(fetchAdminNotifications.fulfilled, (state, action) => {
+                state.loading = false;
+                state.adminNotifications = {
+                    pendingIssuesCount: action.payload.pendingIssuesCount || 0,
+                    pendingTherapistVerification: action.payload.pendingTherapistVerification || [],
+                }
+                state.hasFetchedAdminNotifications = true;
+            })
             
     },
 });
 
-export const { logout, resetLoading } = adminSlice.actions;
+export const { logout, resetLoading, markAllAdminNotificationsAsRead, setAdminNotificationsFetched } = adminSlice.actions;
 
 export default adminSlice.reducer;
