@@ -58,7 +58,7 @@ function uploadFileToS3(file_1, bucketName_1) {
 }
 exports.default = (dependencies) => {
     const router = (0, express_1.default)();
-    const { therapistRegisterController, verifyOTP, therapistLogin, therapistDetailsController, getTherapistProfile, getBookingsController, therapistUpdateTimingsController, therapistVideoController, cancelAppointmentTherapist, getAvailableDetails, cancelSlotController, updatePhotoController, fetchProfitTherapist } = (0, controller_1.therapistController)(dependencies);
+    const { therapistRegisterController, verifyOTP, therapistLogin, therapistDetailsController, getTherapistProfile, getBookingsController, therapistUpdateTimingsController, therapistVideoController, cancelAppointmentTherapist, getAvailableDetails, cancelSlotController, updatePhotoController, fetchProfitTherapist, therapistNotificationController } = (0, controller_1.therapistController)(dependencies);
     router.post('/therapist_register', therapistRegisterController);
     router.post('/therapist_OTP', verifyOTP);
     router.post('/therapist_login', therapistLogin);
@@ -72,6 +72,7 @@ exports.default = (dependencies) => {
     router.put('/therapist_cancelSlot', cancelSlotController);
     router.put('/updatePhoto', upload, therapistTokenAuthentication_1.therapistTokenAuthenticate, updatePhotoController);
     router.get('/fetchProfit', fetchProfitTherapist);
+    router.get('/notifications', therapistNotificationController);
     router.use('/*', (0, roleMiddleware_1.default)(['therapist']));
     return router;
 };

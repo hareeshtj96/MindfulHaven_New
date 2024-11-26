@@ -21,7 +21,7 @@ const upload = (0, multer_1.default)({ storage: storage }).fields([
 ]);
 exports.default = (dependencies) => {
     const router = (0, express_1.default)();
-    const { registrationController, verifyOtpController, resendOTPController, loginController, googleAuthController, forgotPasswordController, resetPassword, resetPasswordOtpcontroller, refreshTokenController, userProfileController, childTherapistController, slotManagementController, appointmentController, bookingStatusController, sessionsViewController, completedBookingController, cancelledBookingController, appointmentBookedController, searchTherapistsController, childTherapistSorting, paymentManagementController, verifyPaymentController, joinVideoController, searchChildTherapistController, cancelAppointment, geminiAPIController, changePasswordController, walletDetailsController, submitIssueController, familyTherapistController, searchFamilyTherapistController, familyTherapistSorting, individualTherapistController, individualTherapistSorting, searchIndividualTherapistController, coupleTherapistController, coupleTherapistSorting, checkSlotsBeforePaymentController, searchCoupleTherapistController, walletPaymentController } = (0, controller_1.userController)(dependencies);
+    const { registrationController, verifyOtpController, resendOTPController, loginController, googleAuthController, forgotPasswordController, resetPassword, resetPasswordOtpcontroller, refreshTokenController, userProfileController, childTherapistController, slotManagementController, appointmentController, bookingStatusController, sessionsViewController, completedBookingController, cancelledBookingController, appointmentBookedController, searchTherapistsController, childTherapistSorting, paymentManagementController, verifyPaymentController, joinVideoController, searchChildTherapistController, cancelAppointment, geminiAPIController, changePasswordController, walletDetailsController, submitIssueController, familyTherapistController, searchFamilyTherapistController, familyTherapistSorting, individualTherapistController, individualTherapistSorting, searchIndividualTherapistController, coupleTherapistController, coupleTherapistSorting, checkSlotsBeforePaymentController, searchCoupleTherapistController, walletPaymentController, userNotificationsController } = (0, controller_1.userController)(dependencies);
     router.post('/register', registrationController);
     router.post('/register_google_auth', googleAuthController);
     router.post('/verify_otp', verifyOtpController);
@@ -62,5 +62,6 @@ exports.default = (dependencies) => {
     router.get('/checkSlotBeforePayment/:id', checkSlotsBeforePaymentController);
     router.get('/search_coupleTherapist', searchCoupleTherapistController);
     router.post('/wallet_payment', walletPaymentController);
+    router.get('/user_notifications', userNotificationsController);
     return router;
 };

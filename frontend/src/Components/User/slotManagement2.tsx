@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { RootState, AppDispatch } from "../../Redux/Store/store";
 import {
     fetchAvailableSlots,
-    saveAppointment,
     fetchBookedSlots,
     checkSlotBeforePayment
 } from "../../Redux/Store/Slices/userSlice";
@@ -21,13 +20,17 @@ interface CheckSlotResponse {
 
 const SlotManagement = () => {
     const { therapistId } = useParams<{ therapistId: string }>();
-    console.log("therapist id slot:", therapistId);
-
+    
     const dispatch: AppDispatch = useDispatch();
     const navigate = useNavigate();
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
     const [notes, setNotes] = useState<string>("");
+    const [showModal, setShowModal] = useState(false);
+
+    // Toggle Modal Visibility
+    const handleModalToggle = () => setShowModal(!showModal);
+
 
 
 
@@ -52,11 +55,12 @@ const SlotManagement = () => {
     const bookedSlots = useSelector(
         (state: RootState) => state.user.bookedSlots || []
     );
-   
+
     const issues = useSelector((state: RootState) => state.user.issues || [])
     const updatedTimings = useSelector((state: RootState) => state.user.updatedTimings || []);
-    console.log("updatedTiminfs ;", updatedTimings);
 
+    // Determine remaining reviews count
+    const remainingReviews = issues.length > 2 ? issues.length - 2 : 0;
 
     const loading = useSelector((state: RootState) => state.user.loading);
     const error = useSelector((state: RootState) => state.user.error);
@@ -144,21 +148,21 @@ const SlotManagement = () => {
         const slots: { date: string; time: string }[] = [];
 
         updatedTimings.forEach((timing) => {
-            const date = timing.date.split("T")[0]; 
+            const date = timing.date.split("T")[0];
             timing.slots.forEach((slot: any) => {
-            const start = new Date(`1970-01-01T${slot.startTime}:00Z`);
-            const end = new Date(`1970-01-01T${slot.endTime}:00Z`);
-            let current = new Date(start);
+                const start = new Date(`1970-01-01T${slot.startTime}:00Z`);
+                const end = new Date(`1970-01-01T${slot.endTime}:00Z`);
+                let current = new Date(start);
 
-            while (current < end) {
-                slots.push({
-                    date,
-                    time: current.toISOString().substring(11, 16),
-                });
-                current.setHours(current.getHours() + 1);
-            }
+                while (current < end) {
+                    slots.push({
+                        date,
+                        time: current.toISOString().substring(11, 16),
+                    });
+                    current.setHours(current.getHours() + 1);
+                }
             })
-            
+
         });
 
         return slots;
@@ -169,7 +173,7 @@ const SlotManagement = () => {
         ...availableSlots.map((slot) => ({ date: slot.split("T")[0], time: slot.split("T")[1]?.substring(0, 5) || "" })),
         ...generateUpdatedSlots(updatedTimings),
     ]
-    console.log("merged slots:", mergedSlots)
+    
 
     // Get filtered slots using combinedTimings
     const filteredSlots = getFilteredSlots(mergedSlots, bookedSlots);
@@ -188,43 +192,45 @@ const SlotManagement = () => {
     }
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-2xl">
+        <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-blue-50 via-white to-blue-100">
+            <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-5xl">
                 {/* Therapist Details */}
-                <div className="flex flex-col items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{therapist?.name || "Therapist Name"}</h2>
-                    <p className="text-gray-600 text-sm mb-4">{therapist?.email || "Therapist Email"}</p>
-                    <p className="text-gray-600 text-sm mb-4">
-                        {therapist?.professionalExperience || "0"} years of experience
-                    </p>
+                <div className="flex flex-col items-center bg-gray-100 shadow-md rounded-lg p-6 w-full lg:w-1/2 mx-auto mb-8">
+                    {/* Profile Picture */}
+                    <div className="mb-6">
+                        <img
+                            src={therapist?.photo || "https://via.placeholder.com/150"}
+                            alt="Therapist photo"
+                            className="w-32 h-32 object-cover rounded-full border-4 border-gray-300 shadow-lg"
+                        />
+                    </div>
+
+                    {/* Therapist Information */}
+                    <h2 className="text-3xl font-bold text-gray-900 mb-2">{therapist?.name || "Therapist Name"}</h2>
+                    <p className="text-gray-600 text-base mb-1">{therapist?.email || "Therapist Email"}</p>
+                    <p className="text-gray-600 text-base mb-1">{therapist?.phone || "Therapist Mobile"}</p>
+
+                    <div className="text-center text-gray-700 mb-4">
+                        <p className="font-medium text-lg">
+                            {therapist?.professionalExperience || "0"} years of experience
+                        </p>
+                        <p className="italic">{therapist?.specialization || "Specialization not available"}</p>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 w-full shadow-inner mb-4">
+                        <p className="text-gray-600">
+                            <strong>Education:</strong> {therapist?.educationalQualifications || "Not specified"}
+                        </p>
+                        <p className="text-gray-600">
+                            <strong>Location:</strong> {therapist?.location || "Not specified"}
+                        </p>
+                        <p className="text-gray-600">
+                            <strong>Establishment:</strong> {therapist?.establishment || "Not specified"}
+                        </p>
+                    </div>
                 </div>
 
-                {/* Display User Details */}
-                <div className="mb-6 w-full">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Ratings & Reviews</h3>
-                    {issues.length > 0 ? (
-                        issues.map((issue) => (
-                            <div key={issue._id} className="mb-6">
-                                {/* Rating Section */}
-                                <div className="mb-4">
-                                    <div className="flex items-center justify-between">
-                                        <ReactStars
-                                            count={5}
-                                            value={issue.rating}
-                                            size={24}
-                                            activeColor="#ffd700"
-                                            edit={false}
-                                        />
-                                        <p className="text-gray-600 text-sm ml-4">{issue.userEmail}</p>
-                                    </div>
-                                    <p className="mt-2">{issue.description}</p>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        <div className="text-gray-600">No Ratings available</div>
-                    )}
-                </div>
+
 
                 {/* Available Dates */}
                 <div className="mb-6 w-full">
@@ -232,25 +238,25 @@ const SlotManagement = () => {
                         Available Dates
                     </h3>
                     {filteredSlots.length > 0 ? (
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             {Array.from(new Set(filteredSlots.map((slot) => slot.date)))
-                            .sort((a,b) => new Date(a).getTime() - new Date(b).getTime())
-                            .map(
-                                (uniqueDate, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleDateSelection(uniqueDate)}
-                                        className={`${selectedDate === uniqueDate ? "bg-green-500" : "bg-green-200"
-                                            } text-white font-semibold py-2 px-4 rounded-lg`}
-                                    >
-                                        {new Date(uniqueDate).toLocaleDateString("en-GB", {
-                                            day: "2-digit",
-                                            month: "short",
-                                            year: "numeric",
-                                        })}
-                                    </button>
-                                )
-                            )}
+                                .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                                .map(
+                                    (uniqueDate, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleDateSelection(uniqueDate)}
+                                            className={`${selectedDate === uniqueDate ? "bg-green-500" : "bg-green-200"
+                                                } text-white font-semibold py-2 px-4 rounded-lg`}
+                                        >
+                                            {new Date(uniqueDate).toLocaleDateString("en-GB", {
+                                                day: "2-digit",
+                                                month: "short",
+                                                year: "numeric",
+                                            })}
+                                        </button>
+                                    )
+                                )}
                         </div>
                     ) : (
                         <div className="text-gray-600">No available dates</div>
@@ -270,14 +276,14 @@ const SlotManagement = () => {
                                     const timeA = new Date(`1970-01-01T${a.time}`).getTime();
                                     const timeB = new Date(`1970-01-01T${b.time}`).getTime();
                                     return timeA - timeB;
-                                  })
+                                })
                                 .map((slot, index) => (
                                     <button
                                         key={index}
                                         onClick={() => handleTimeSelection(slot.time)}
                                         className={`${selectedTime === slot.time
-                                                ? "bg-blue-500 text-white"
-                                                : "bg-blue-200"
+                                            ? "bg-blue-500 text-white"
+                                            : "bg-blue-200"
                                             } text-gray-800 font-semibold py-1 px-4 rounded-lg m-1`}
                                     >
                                         {slot.time}
@@ -291,7 +297,7 @@ const SlotManagement = () => {
                 <div className="mb-6 w-full">
                     <label
                         htmlFor="notes"
-                        className="block text-sm font-medium text-gray-700"
+                        className="block text-sm font-medium text-gray-700 mb-2"
                     >
                         Notes (optional)
                     </label>
@@ -299,21 +305,86 @@ const SlotManagement = () => {
                         id="notes"
                         value={notes}
                         onChange={handleNotesChange}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-green-300"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300"
                         rows={4}
                         placeholder="Add any notes for the appointment"
                     ></textarea>
                 </div>
 
                 {/* Submit Button */}
-                <div className="mt-4">
+                <div className="mt-4 text-center">
                     <button
                         onClick={handleSubmit}
-                        className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-all duration-300"
+                        className="bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-green-700 transition-all"
                     >
                         Proceed to Payment
                     </button>
                 </div>
+
+                {/* Display User Details */}
+                <div className="mt-8">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-4">Ratings & Reviews</h3>
+
+                    {/* Show only the first two reviews */}
+                    {issues.slice(0, 2).map((issue) => (
+                        <div key={issue._id} className="mb-6 p-4 bg-gray-50 shadow-md rounded-lg">
+                            <div className="mb-2 flex items-center justify-between">
+                                <ReactStars count={5} value={issue.rating} size={24} activeColor="#ffd700" edit={false} />
+                                <p className="text-gray-600 text-sm ml-4">{issue.userEmail}</p>
+                            </div>
+                            <p className="text-gray-700">{issue.description}</p>
+                        </div>
+                    ))}
+
+                    {/* See Other Reviews Link */}
+                    {remainingReviews > 0 && (
+                        <button
+                            onClick={handleModalToggle}
+                            className="text-blue-500 hover:underline"
+                        >
+                            See Other {remainingReviews} Reviews
+                        </button>
+                    )}
+
+                    {/* Modal */}
+                    {showModal && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                            <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-2xl">
+                                <h3 className="text-xl font-bold mb-4">All Reviews</h3>
+
+                                <div className="space-y-4">
+                                    {issues.map((issue) => (
+                                        <div key={issue._id}>
+                                            <div className="flex items-center justify-between">
+                                                <ReactStars
+                                                    count={5}
+                                                    value={issue.rating}
+                                                    size={24}
+                                                    activeColor="#ffd700"
+                                                    edit={false}
+                                                />
+                                                <p className="text-gray-600 text-sm ml-4">
+                                                    {issue.userEmail}
+                                                </p>
+                                            </div>
+                                            <p className="mt-2">{issue.description}</p>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Close Button */}
+                                <button
+                                    onClick={handleModalToggle}
+                                    className="mt-4 text-white bg-red-400 px-4 py-2 rounded hover:bg-red-500"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+
             </div>
         </div>
 

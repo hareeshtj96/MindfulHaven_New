@@ -22,7 +22,6 @@ const TherapistProfileView = () => {
     const navigate = useNavigate();
 
     const therapistData22 = useSelector((state: RootState) => state.therapist);
-    console.log("therapist 22:", therapistData22);
 
     // Select the array of therapist data
     const currentTherapist = useSelector((state: RootState) => state.therapist.currentTherapist);
@@ -44,7 +43,6 @@ const TherapistProfileView = () => {
 
 
     const therapist = currentTherapist
-    console.log("therapist data :", therapist);
 
     if (loading) {
         return <div>Loading...</div>;

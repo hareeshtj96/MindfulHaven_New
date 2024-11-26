@@ -14,8 +14,8 @@ exports.default = (dependencies) => {
     const { cancelSlotUsecase } = dependencies.useCase;
     const cancelSlotController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const { slot, therapistId } = req.body;
-            const response = yield cancelSlotUsecase(dependencies).executeFunction({ slot, therapistId });
+            const { slotId, therapistId } = req.body;
+            const response = yield cancelSlotUsecase(dependencies).executeFunction({ slotId, therapistId });
             if (response && response.status) {
                 res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, data: response.data });
             }

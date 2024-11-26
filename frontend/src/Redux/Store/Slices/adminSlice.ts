@@ -270,8 +270,6 @@ export const toggleUserBlockStatus = createAsyncThunk<User, { userId: string; is
         try {
             const response = await axios.get(ADMINNOTIFICATIONS);
 
-            console.log("response from admin notification slice:", response.data.data);
-
             return response.data.data
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Failed to fetch the notifications")
@@ -326,8 +324,6 @@ const adminSlice = createSlice({
             })
             .addCase(fetchTherapists.fulfilled, (state, action: PayloadAction<{ therapists: Therapist[], totalPages: number, currentPage: number }>) => {
                 state.loading = false;
-                console.log("Action payload:", action.payload);
-            
                 // Set the therapists data and pagination information
                 state.therapists = action.payload.therapists; 
                 state.totalPages = action.payload.totalPages;  
@@ -343,7 +339,6 @@ const adminSlice = createSlice({
             })
             .addCase(fetchUsers.fulfilled, (state, action: PayloadAction<User[]>) => {
                 state.loading = false;
-                console.log("action payload user:", action.payload);
                 state.users = action.payload;
             })
             .addCase(fetchUsers.rejected, (state, action:PayloadAction<string | undefined>) => {

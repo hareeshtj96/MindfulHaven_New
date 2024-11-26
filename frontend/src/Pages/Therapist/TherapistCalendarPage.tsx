@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import TherapistCalendar from "../../Components/Therapist/TherapistCalendar";
 import TherapistCalender2 from "../../Components/Therapist/TherapistCalender2";
 import TherapistHeader2 from "../../Layout/TherapistLayout/TherapistHeader2";
 

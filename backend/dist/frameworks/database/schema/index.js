@@ -7,6 +7,7 @@ const appointmentSchema_1 = require("./appointmentSchema");
 const paymentSchema_1 = require("./paymentSchema");
 const walletSchema_1 = require("./walletSchema");
 const issueSchema_1 = require("./issueSchema");
+const notificationSchema_1 = require("./notificationSchema");
 const databaseSchema = {
     User: userSchema_1.User,
     Admin: adminSchema_1.Admin,
@@ -14,6 +15,7 @@ const databaseSchema = {
     Appointment: appointmentSchema_1.Appointment,
     Payment: paymentSchema_1.Payment,
     Wallet: walletSchema_1.Wallet,
-    Issue: issueSchema_1.Issue
+    Issue: issueSchema_1.Issue,
+    Notification: notificationSchema_1.Notification
 };
 exports.default = databaseSchema;

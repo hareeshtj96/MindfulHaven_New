@@ -15,7 +15,6 @@ const VideoCall: React.FC = () => {
     const userName = userData?.name;
 
     const handleLeaveRoom = async () => {
-        console.log('user left the room');
         navigate(`/issue_management?roomId=${roomId}`);
     };
 

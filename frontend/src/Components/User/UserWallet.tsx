@@ -9,8 +9,6 @@ const UserWallet: React.FC = () => {
   const location = useLocation();
   const { user, loading, error, walletData } = useSelector((state: RootState) => state.user);
 
-  console.log("wallet data.........", walletData)
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
   const [totalPages, setTotalPages] = useState(1);

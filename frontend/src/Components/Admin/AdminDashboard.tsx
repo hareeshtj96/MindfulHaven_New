@@ -20,7 +20,6 @@ const AdminDashboard: React.FC = () => {
   ]
 
   useEffect(() => {
-    console.log('Admin Dashboard Rendered');
     dispatch(fetchDashboardDetails())
   }, [dispatch]);
 

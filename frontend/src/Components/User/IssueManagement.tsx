@@ -24,8 +24,6 @@ const IssueManagement: React.FC = () => {
     const user = useSelector((state: RootState) => state.user.user);
     const roomId = searchParams.get('roomId');
 
-    console.log('Room ID:', roomId);
-
     const handleSatisfactionClick = (satisfied: boolean) => {
         setIsSatisfied(satisfied);
 

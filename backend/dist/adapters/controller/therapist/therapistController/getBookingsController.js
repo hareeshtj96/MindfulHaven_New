@@ -17,9 +17,14 @@ exports.default = (dependencies) => {
             const { id } = req.params;
             const page = parseInt(req.query.page, 10) || 1;
             const limit = parseInt(req.query.limit, 10) || 2;
-            const response = yield bookingUsecase(dependencies).executeFunction({ therapistId: id, page, limit });
+            const status = req.query.status || '';
+            const response = yield bookingUsecase(dependencies).executeFunction({ therapistId: id, page, limit, status });
             if (response && response.status) {
-                res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, data: response.data, totalPages: response.totalPages });
+                res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true,
+                    data: response.data,
+                    totalPagesBooking: response.totalPagesBooking,
+                    currentPagesBooking: response.currentPagesBooking
+                });
             }
             else {
                 res.status(httpStatusCode_1.HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || httpStatusCode_1.ResponseMessages.DATA_NOT_FOUND });

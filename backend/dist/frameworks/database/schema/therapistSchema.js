@@ -68,15 +68,12 @@ const therapistSchema = new mongoose_1.Schema({
     timings: [{
             dayOfWeek: {
                 type: [Number],
-                required: true,
             },
             startTime: {
                 type: String,
-                required: true,
             },
             endTime: {
                 type: String,
-                required: true,
             },
         }],
     availableSlots: [Date],
@@ -122,14 +119,18 @@ const therapistSchema = new mongoose_1.Schema({
                 type: Date,
                 required: true,
             },
-            startTime: {
-                type: String,
-                required: true,
-            },
-            endTime: {
-                type: String,
-                required: true,
-            },
+            slots: [
+                {
+                    startTime: {
+                        type: String,
+                        required: true,
+                    },
+                    endTime: {
+                        type: String,
+                        required: true,
+                    },
+                }
+            ]
         }],
 });
 const Therapist = (0, mongoose_1.model)('Therapist', therapistSchema);

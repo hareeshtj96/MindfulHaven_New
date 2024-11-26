@@ -12,6 +12,7 @@ const getTherapistDetails_1 = __importDefault(require("./getTherapistDetails"));
 const adminDashboardDetails_1 = __importDefault(require("./adminDashboardDetails"));
 const adminFetchIssues_1 = __importDefault(require("./adminFetchIssues"));
 const adminIssueResolve_1 = __importDefault(require("./adminIssueResolve"));
+const adminNotificationsController_1 = __importDefault(require("./adminNotificationsController"));
 exports.default = (dependencies) => {
     return {
         adminLoginController: (0, adminLoginController_1.default)(dependencies),
@@ -23,5 +24,6 @@ exports.default = (dependencies) => {
         adminDashboardDetails: (0, adminDashboardDetails_1.default)(dependencies),
         adminFetchIssues: (0, adminFetchIssues_1.default)(dependencies),
         adminIssueResolve: (0, adminIssueResolve_1.default)(dependencies),
+        adminNotificationsController: (0, adminNotificationsController_1.default)(dependencies),
     };
 };

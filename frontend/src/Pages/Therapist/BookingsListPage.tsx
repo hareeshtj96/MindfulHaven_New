@@ -1,7 +1,7 @@
 import React from "react";
-import BookingsList from "../../Components/Therapist/BookingsList";
 import TherapistHeader2 from "../../Layout/TherapistLayout/TherapistHeader2";
 import TherapistSidebar from "../../Layout/TherapistLayout/TherapistSidebar";
+import BookingsList2 from "../../Components/Therapist/BookingList2";
 
 
 function BookingsListPage() {
@@ -10,7 +10,7 @@ function BookingsListPage() {
         <div className="flex flex-col min-h-screen">
             <TherapistHeader2 />
             <TherapistSidebar />
-            <BookingsList />
+            <BookingsList2 />
             
         </div>
         </>

@@ -14,6 +14,7 @@ if (!REFRESH_SECRET_KEY) {
     throw new Error('REFRESH_SECRET_KEY is not defined in the environment');
 }
 const refreshTokenController = (dependencies) => {
+    console.log("entered refresh token controller........");
     return (req, res) => {
         const refreshToken = req.cookies['refreshToken'];
         if (!refreshToken) {

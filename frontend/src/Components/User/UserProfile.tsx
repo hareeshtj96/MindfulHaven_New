@@ -8,10 +8,8 @@ const UserProfile = () => {
     const dispatch: AppDispatch = useDispatch();
     const location = useLocation();
 
-    console.log("//////user profile s callig.........")
     const user = useSelector((state: RootState) => state.user.user);
-  
-    console.log("user.......", user);
+
     const loading = useSelector((state: RootState) => state.user.loading);
     const error = useSelector((state: RootState) => state.user.error);
 

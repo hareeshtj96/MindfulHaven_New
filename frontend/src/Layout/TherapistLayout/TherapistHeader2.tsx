@@ -17,7 +17,7 @@ function TherapistHeader2() {
     const navigate = useNavigate();
     const dispatch: AppDispatch = useDispatch();
 
-    
+
 
     const therapist = useSelector((state: RootState) => state.therapist.currentTherapist);
     const therapistId = therapist?.therapistId;
@@ -31,7 +31,7 @@ function TherapistHeader2() {
         return new Date(notification.slot).toISOString().split('T')[0] === today;
     });
 
-   
+
     useEffect(() => {
         if (!therapist) {
             navigate('/therapist/therapist_login')
@@ -51,7 +51,6 @@ function TherapistHeader2() {
     const toggleNotifications = () => setIsNoticationOpen(!isNotificationOpen);
 
     const handleLogout = () => {
-        console.log("inside handle logout")
         localStorage.removeItem('therapistToken');
         dispatch(logout())
         navigate("/therapist/therapist_login");
@@ -73,7 +72,12 @@ function TherapistHeader2() {
             <div className="container mx-auto flex justify-between items-center py-2 px-4 md:px-6">
                 <div className="flex items-center space-x-2 flex-shrink-0">
                     <img src={logoImage} alt="MindfulHaven Logo" className="h-12 w-auto md:h-20" />
-                    <div onClick={() => navigate('/therapist/therapist_dashboard')} className="text-lg md:text-2xl font-bold text-btncolor whitespace-nowrap">MindfulHaven</div>
+                    <div
+                        onClick={() => navigate('/therapist/therapist_dashboard')}
+                        className="text-lg md:text-2xl font-bold text-btncolor whitespace-nowrap cursor-pointer"
+                    >
+                        MindfulHaven
+                    </div>
                 </div>
                 <div className="flex items-center space-x-4">
                     {/* Notifications Bell */}

@@ -14,6 +14,7 @@ exports.default = (dependencies) => {
     const { getTherapistDetailsUsecase } = dependencies.useCase;
     const getAvailableDetailsController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
+            console.log("entered controller.............");
             const { therapistId } = req.query;
             const response = yield getTherapistDetailsUsecase(dependencies).executeFunction(therapistId);
             if (response && response.status) {

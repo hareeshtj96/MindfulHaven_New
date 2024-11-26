@@ -42,7 +42,6 @@ const Session = () => {
 
     const user = useSelector((state: RootState) => state.user.user)
     const [refreshToggle, setRefreshToggle] = useState(false);
-    console.log("states....", user);
 
     const userId = user?.userId;
     const name = user?.name;

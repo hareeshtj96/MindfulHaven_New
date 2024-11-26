@@ -231,4 +231,30 @@ exports.default = {
             return { status: false, message: "Failed to resolve the issue" };
         }
     }),
+    adminNotifications: () => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const therapists = yield database_1.databaseSchema.Therapist.find({
+                isVerified: false
+            });
+            const issues = yield database_1.databaseSchema.Issue.find({
+                status: 'pending',
+                rating: { $exists: false }
+            });
+            return {
+                status: true,
+                data: {
+                    pendingTherapistVerification: therapists.map((therapist) => ({
+                        id: therapist._id,
+                        name: therapist.name,
+                        email: therapist.email,
+                    })),
+                    pendingIssuesCount: issues.length,
+                },
+            };
+        }
+        catch (error) {
+            console.error("Error fetching admin notifications:", error);
+            return { status: false, message: "Error fetching admin notifications" };
+        }
+    })
 };

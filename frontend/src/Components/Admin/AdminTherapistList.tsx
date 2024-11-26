@@ -47,7 +47,6 @@ const AdminTherapistList: React.FC = () => {
     }, [dispatch, currentPage]);
 
     const handleShowDetails = (therapist: Therapist) => {
-        console.log("therapist from show details:", therapist._id);
         navigate(`/admin/admin_getTherapistDetails/${therapist._id}`)
     }
 
@@ -63,8 +62,6 @@ const AdminTherapistList: React.FC = () => {
         }
     }
 
-    
-    console.log("Therapist Data for frontend:", therapistData);
 
     // Handling loading and error states
     if (loading) return <p>Loading...</p>;

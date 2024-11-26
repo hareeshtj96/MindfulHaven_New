@@ -83,6 +83,9 @@ interface Therapist {
     phone: string;
     specialization: string;
     professionalExperience: number;
+    educationalQualifications: string;
+    location: string;
+    establishment: string;
     photo: string;
     availableSlots: string[];
     bookedSlots: string[]
@@ -557,8 +560,7 @@ export const fetchIndividualTherapist = createAsyncThunk<{ individualTherapists:
     async ({ page, limit }, thunkAPI) => {
         try {
             const response = await axios.get(GETINDIVIDUALTHERAPIST, { params: { page, limit } });
-            console.log("response from individual therapist:", response);
-
+            
             const { individualTherapists, currentPagesIndividual, totalPagesIndividual } = response.data.data;
             return { individualTherapists, currentPagesIndividual, totalPagesIndividual };
         } catch (error: any) {
@@ -592,8 +594,7 @@ export const fetchAvailableSlots = createAsyncThunk<{
     async (therapistId, thunkAPI) => {
         try {
             const response = await axios.get(`${GETSLOTS}/${therapistId}`);
-            console.log("response from fetch available slots:", response);
-
+            
             return {
                 availableSlots: response.data.data.availableSlots,
                 timings: response.data.data.timings,
@@ -787,12 +788,10 @@ export const fetchScheduledBookingDetails = createAsyncThunk<{
     { rejectValue: string }>(
         "user/fetchScheduledBookingDetails",
         async ({ page, limit, }, thunkAPI) => {
-            console.log("fetching page:", page, "with limit:", limit);
             try {
 
                 const authInfoString = localStorage.getItem("authInfo");
-                console.log("auth info strig slice:", authInfoString);
-
+                
                 if (!authInfoString) {
                     return thunkAPI.rejectWithValue("Token is missing or invalid");
                 }
@@ -834,7 +833,6 @@ export const fetchCompletedBookingDetails = createAsyncThunk<{
     { rejectValue: string }>(
         "user/fetchCompletedBookingDetails",
         async ({ page, limit }, thunkAPI) => {
-            console.log("fetching page:", page, "with limit:", limit);
             try {
                 const authInfoString = localStorage.getItem("authInfo");
 
@@ -1186,8 +1184,6 @@ export const fetchUserNotifications = createAsyncThunk(
                 params: { userId },
             });
 
-            console.log("response from user notification slice:", response.data.data);
-
             return response.data.data
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || "Failed to fetch user notifications");
@@ -1441,8 +1437,6 @@ const userSlice = createSlice({
             })
             .addCase(fetchBookedSlots.fulfilled, (state, action) => {
                 state.loading = false;
-                console.log("action paylod from fetch booked:", action.payload);
-
                 state.bookedSlots = action.payload.bookedSlots
             })
             .addCase(saveAppointment.pending, (state) => {
@@ -1569,7 +1563,6 @@ const userSlice = createSlice({
             })
             .addCase(fetchSortedFamilyTherapists.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                console.log("action paylod in sort famiy:", action.payload)
                 state.sortedFamilyTherapists = action.payload.sortedFamilyTherapists;
                 state.totalPagesFamily = action.payload.totalPagesFamily;
                 state.currentPagesFamily = action.payload.currentPageFamily;
@@ -1659,8 +1652,6 @@ const userSlice = createSlice({
             })
             .addCase(fetchWalletDetails.fulfilled, (state, action) => {
                 state.loading = false;
-                console.log("action payload:", action.payload);
-
                 state.walletData = action.payload;
             })
             .addCase(fetchUserNotifications.fulfilled, (state, action) => {

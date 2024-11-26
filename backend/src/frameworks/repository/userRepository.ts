@@ -373,6 +373,7 @@ export default {
         try {
             const bookedSlots = await databaseSchema.Appointment.find({
                 therapistId,
+                status: { $ne: "cancelled" },
             });
 
             if (!bookedSlots) {
@@ -557,9 +558,6 @@ export default {
         totalAmount: number;
     }) => {
         try {
-            console.log("Initiating wallet payment save...");
-            console.log("total amount...", totalAmount);
-
             // Convert `slot` to a `Date` object if it's a string
             const slotDate =
                 typeof slot === "string" ? new Date(slot) : (slot as Date);
@@ -606,10 +604,9 @@ export default {
 
             // Save payment details in the Payment collection
             const walletPayment = new databaseSchema.Payment(walletPaymentDetails);
-            console.log(" wallet payment:", walletPayment);
+
             const savedWalletPayment = await walletPayment.save();
 
-            console.log("Saved wallet payment:", savedWalletPayment);
 
             // Create the appointment object
             const appointmentData: any = {
@@ -647,6 +644,15 @@ export default {
 
             // updating user's wallet
             userWallet.balance -= totalAmount;
+
+            // Add transaction to transaction history
+            const transactionEntry = {
+                type: "debit",
+                amount: totalAmount,
+                date: new Date(),
+                status: "completed",
+            };
+            userWallet.transactionHistory.push(transactionEntry);
             await userWallet.save();
 
             return {
@@ -1120,8 +1126,8 @@ export default {
                 const therapist = await databaseSchema.Therapist.findById(appointment.therapistId);
 
                 return {
-                    ...appointment.toObject(), 
-                    therapistName: therapist ? therapist.name : 'Unknown' 
+                    ...appointment.toObject(),
+                    therapistName: therapist ? therapist.name : 'Unknown'
                 };
             }));
 

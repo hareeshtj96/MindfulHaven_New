@@ -17,6 +17,7 @@ const mongoose = require('mongoose');
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+const moment_1 = __importDefault(require("moment"));
 exports.default = {
     createtherapist: (data) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -74,7 +75,6 @@ exports.default = {
                     professionalExperience: therapistData.professionalExperience,
                     establishment: therapistData.establishment,
                     location: therapistData.location,
-                    timings: therapistData.timings,
                     fees: therapistData.fees,
                     photo: therapistData.photo,
                     availableSlots: therapistData.availableSlots,
@@ -120,14 +120,18 @@ exports.default = {
     getDetails: (therapistId) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             const therapistDetails = yield database_1.databaseSchema.Therapist.findById(therapistId);
-            const availableSlots = therapistDetails === null || therapistDetails === void 0 ? void 0 : therapistDetails.availableSlots;
-            const booked = therapistDetails === null || therapistDetails === void 0 ? void 0 : therapistDetails.booked;
+            const updatedTimings = therapistDetails === null || therapistDetails === void 0 ? void 0 : therapistDetails.updatedTimings;
             const timings = therapistDetails === null || therapistDetails === void 0 ? void 0 : therapistDetails.timings;
+            const appointments = yield database_1.databaseSchema.Appointment.find({
+                therapistId,
+                'payment.paymentStatus': 'success'
+            }).select('slot');
+            const bookedSlots = appointments.map((appointment) => appointment.slot);
             return {
                 status: true,
                 data: {
-                    availableSlots,
-                    booked,
+                    updatedTimings,
+                    booked: bookedSlots,
                     timings
                 }
             };
@@ -139,11 +143,23 @@ exports.default = {
             };
         }
     }),
-    getBookings: (therapistId, page, limit) => __awaiter(void 0, void 0, void 0, function* () {
+    getBookings: (therapistId, page, limit, status) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            const totalBookingsCount = yield database_1.databaseSchema.Appointment.countDocuments({ therapistId });
+            const filter = {
+                therapistId,
+                'payment.paymentStatus': 'success',
+            };
+            if (status) {
+                if (status === 'upcoming') {
+                    filter.status = 'scheduled';
+                }
+                else {
+                    filter.status = status;
+                }
+            }
+            const totalBookingsCount = yield database_1.databaseSchema.Appointment.countDocuments(filter).skip((page - 1) * limit).limit(limit);
             const totalPages = Math.ceil(totalBookingsCount / limit);
-            const bookings = yield database_1.databaseSchema.Appointment.find({ therapistId }).skip((page - 1) * limit).limit(limit);
+            const bookings = yield database_1.databaseSchema.Appointment.find(filter).skip((page - 1) * limit).limit(limit);
             if (!bookings) {
                 return {
                     status: false, message: "Bookings not found"
@@ -155,7 +171,11 @@ exports.default = {
                 return Object.assign(Object.assign({}, booking.toObject()), { user: user ? { name: user.name, email: user.email, mobile: user.mobile } : 'Unknown user' });
             })));
             return {
-                status: true, message: "Bookings retrieved successfully", data: bookingsWithUserDetails, totalPages
+                status: true,
+                message: "Bookings retrieved successfully",
+                data: bookingsWithUserDetails,
+                currentPagesBooking: page,
+                totalPagesBooking: totalPages
             };
         }
         catch (error) {
@@ -184,24 +204,36 @@ exports.default = {
             if (startDateTime <= currentDateTime) {
                 return { status: false, message: "Start time must be in the future" };
             }
-            // Check if this timing already exists in updatedTimings
-            const existingTiming = therapist.updatedTimings.some(timing => timing.date.toISOString().split("T")[0] === reformattedDate &&
-                timing.startTime === startTime &&
-                timing.endTime === endTime);
-            if (existingTiming) {
-                return { status: false, message: "This timing already exists" };
+            // Find an existing entry for the same date
+            const existingDateEntry = therapist.updatedTimings.find(timing => timing.date.toISOString().split("T")[0] === reformattedDate);
+            if (existingDateEntry) {
+                // Check for overlapping slots
+                const isOverlapping = existingDateEntry.slots.some(slot => {
+                    const existingStart = new Date(`${reformattedDate}T${slot.startTime}`);
+                    const existingEnd = new Date(`${reformattedDate}T${slot.endTime}`);
+                    return ((startDateTime >= existingStart && startDateTime < existingEnd) ||
+                        (endDateTime > existingStart && endDateTime <= existingEnd) ||
+                        (startDateTime <= existingStart && endDateTime >= existingEnd));
+                });
+                if (isOverlapping) {
+                    return { status: false, message: "This timing overlaps with an existing slot" };
+                }
+                // Add the new slot to the existing date
+                existingDateEntry.slots.push({ startTime, endTime });
             }
-            const newTiming = {
-                date: reformattedDate,
-                startTime: startTime,
-                endTime: endTime
-            };
-            therapist.updatedTimings.push(newTiming);
+            else {
+                // Create a new entry for this date
+                therapist.updatedTimings.push({
+                    date: new Date(reformattedDate),
+                    slots: [{ startTime, endTime }]
+                });
+            }
             yield therapist.save();
             return { status: true, message: "Timings updated successfully" };
         }
         catch (error) {
-            return { status: false, message: "Error occured during updatiing therapist timings" };
+            console.error("Error updating timings:", error);
+            return { status: false, message: "Error occurred during updating therapist timings" };
         }
     }),
     cancelAppointmentTherapist: (_a) => __awaiter(void 0, [_a], void 0, function* ({ bookingId }) {
@@ -218,13 +250,22 @@ exports.default = {
             return { status: false, message: "Failed to cancel appointment" };
         }
     }),
-    getCancelSlot: (_a) => __awaiter(void 0, [_a], void 0, function* ({ slot, therapistId }) {
+    getCancelSlot: (_a) => __awaiter(void 0, [_a], void 0, function* ({ slotId, therapistId }) {
         try {
             const therapist = yield database_1.databaseSchema.Therapist.findById(therapistId);
             if (!therapist) {
                 return { status: false, message: "Therapist not found" };
             }
-            therapist.availableSlots.pull(slot);
+            const { updatedTimings } = therapist;
+            const timingIndex = updatedTimings.findIndex((timing) => timing.slots.some((slot) => { var _a; return ((_a = slot._id) === null || _a === void 0 ? void 0 : _a.toString()) === slotId; }));
+            if (timingIndex === -1) {
+                return { status: false, message: "Slot not found in updatedTimings" };
+            }
+            // Remove slot from slots array
+            const slotIndex = updatedTimings[timingIndex].slots.findIndex((slot) => { var _a; return ((_a = slot._id) === null || _a === void 0 ? void 0 : _a.toString()) === slotId; });
+            if (slotIndex !== -1) {
+                updatedTimings[timingIndex].slots.splice(slotIndex, 1);
+            }
             yield therapist.save();
             return { status: true, message: "Slot removed successfully" };
         }
@@ -271,5 +312,34 @@ exports.default = {
             console.error("Error in get therapist profit:", error);
             return { status: false, message: "Failed to fetch profit" };
         }
-    })
+    }),
+    therapistNotifications: (_a) => __awaiter(void 0, [_a], void 0, function* ({ therapistId }) {
+        try {
+            const appointments = yield database_1.databaseSchema.Appointment.find({
+                therapistId,
+                status: 'scheduled',
+                'payment.paymentStatus': 'success'
+            });
+            // Get today's date
+            const today = (0, moment_1.default)().startOf('day');
+            // Filter appointments matching today's date
+            const todayAppointments = appointments.filter(appointment => (0, moment_1.default)(appointment.slot).isSame(today, 'day'));
+            // For each appointment, fetch the therapist's name
+            const appointmentsWithUser = yield Promise.all(todayAppointments.map((appointment) => __awaiter(void 0, void 0, void 0, function* () {
+                const user = yield database_1.databaseSchema.User.findById(appointment.userId);
+                return Object.assign(Object.assign({}, appointment.toObject()), { userName: user ? user.name : 'Unknown' });
+            })));
+            return {
+                status: true,
+                data: appointmentsWithUser
+            };
+        }
+        catch (error) {
+            console.error("Error fetching therapist notifications:", error);
+            return {
+                status: false,
+                message: "Error fetching therapist notifications"
+            };
+        }
+    }),
 };

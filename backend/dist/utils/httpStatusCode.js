@@ -95,4 +95,7 @@ var ResponseMessages;
     ResponseMessages["ERROR_IN_COUPLE_THERAPIST_USECASE"] = "Error in couple therapist usecase";
     ResponseMessages["ERROR_SEARCHING_COUPLE_THERAPIST"] = "Error in searching couple therapist";
     ResponseMessages["ERROR_WALLET_PAYMENT"] = "Error in wallet payment";
+    ResponseMessages["ERROR_USERNOTIFICATIONS_USECASE"] = "Error in user notifications usecase";
+    ResponseMessages["ERROR_THERAPISTNOTIFICATIONS_USECASE"] = "Error in therapist notifications usecase";
+    ResponseMessages["ERROR_ADMINNOTIFICATIONS_USECASE"] = "Error in admin notifications usecase";
 })(ResponseMessages || (exports.ResponseMessages = ResponseMessages = {}));

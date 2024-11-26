@@ -229,6 +229,7 @@ const TherapistCalendar: React.FC = () => {
                 <h2 className="text-xl font-semibold mb-4">Your Updated Timings</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {paginatedTimings
+                    .filter((timing) => new Date(timing.date).getTime() >= new Date().getTime())
                         .slice()
                         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
                         .map((timing) => (

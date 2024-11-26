@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../database");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const moment_1 = __importDefault(require("moment"));
 exports.default = {
     createUser: (data) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -143,9 +144,7 @@ exports.default = {
             const therapists = yield database_1.databaseSchema.Therapist.find({
                 specialization: "Child Therapy",
                 isVerified: true,
-            })
-                .skip(skip)
-                .limit(limit);
+            }).skip(skip).limit(limit);
             const totalTherapists = yield database_1.databaseSchema.Therapist.countDocuments({
                 specialization: "Child Therapy",
                 isVerified: true,
@@ -155,8 +154,8 @@ exports.default = {
                 data: {
                     therapists,
                     total: totalTherapists,
-                    currentPage: page,
-                    totalPages: Math.ceil(totalTherapists / limit),
+                    currentPageChild: page,
+                    totalPagesChild: Math.ceil(totalTherapists / limit),
                 },
             };
         }
@@ -285,7 +284,7 @@ exports.default = {
                 };
             }
             // Destructure the required properties
-            const { timings, availableSlots, booked } = therapist;
+            const { timings, availableSlots, booked, updatedTimings } = therapist;
             // Fetch issues related to this therapist, where the rating exists
             const issues = yield database_1.databaseSchema.Issue.find({
                 therapistId: therapistId,
@@ -307,6 +306,7 @@ exports.default = {
                 data: {
                     timings,
                     availableSlots,
+                    updatedTimings,
                     booked,
                     issues: issuesWithUserDetails
                 },
@@ -323,6 +323,7 @@ exports.default = {
         try {
             const bookedSlots = yield database_1.databaseSchema.Appointment.find({
                 therapistId,
+                status: { $ne: "cancelled" },
             });
             if (!bookedSlots) {
                 return {
@@ -462,8 +463,6 @@ exports.default = {
     }),
     WalletPaymentSave: (_a) => __awaiter(void 0, [_a], void 0, function* ({ therapistId, userId, slot, notes, totalAmount, }) {
         try {
-            console.log("Initiating wallet payment save...");
-            console.log("total amount...", totalAmount);
             // Convert `slot` to a `Date` object if it's a string
             const slotDate = typeof slot === "string" ? new Date(slot) : slot;
             // Check if the slot is already booked
@@ -500,9 +499,7 @@ exports.default = {
             };
             // Save payment details in the Payment collection
             const walletPayment = new database_1.databaseSchema.Payment(walletPaymentDetails);
-            console.log(" wallet payment:", walletPayment);
             const savedWalletPayment = yield walletPayment.save();
-            console.log("Saved wallet payment:", savedWalletPayment);
             // Create the appointment object
             const appointmentData = {
                 therapistId,
@@ -535,6 +532,14 @@ exports.default = {
             }
             // updating user's wallet
             userWallet.balance -= totalAmount;
+            // Add transaction to transaction history
+            const transactionEntry = {
+                type: "debit",
+                amount: totalAmount,
+                date: new Date(),
+                status: "completed",
+            };
+            userWallet.transactionHistory.push(transactionEntry);
             yield userWallet.save();
             return {
                 status: true,
@@ -674,6 +679,7 @@ exports.default = {
             const bookings = yield database_1.databaseSchema.Appointment.find({
                 userId: userId,
                 status: "cancelled",
+                "payment.paymentStatus": "success",
             })
                 .skip(skip)
                 .limit(limit);
@@ -685,6 +691,7 @@ exports.default = {
             const totalBookings = yield database_1.databaseSchema.Appointment.countDocuments({
                 userId: userId,
                 status: "cancelled",
+                "payment.paymentStatus": "success",
             });
             return {
                 status: true,
@@ -915,6 +922,35 @@ exports.default = {
         }
         catch (error) {
             return { status: false, message: "Failed to retrieve wallet details" };
+        }
+    }),
+    userNotifications: (_a) => __awaiter(void 0, [_a], void 0, function* ({ userId }) {
+        try {
+            const appointments = yield database_1.databaseSchema.Appointment.find({
+                userId,
+                status: 'scheduled',
+                'payment.paymentStatus': 'success'
+            });
+            // Get today's date
+            const today = (0, moment_1.default)().startOf('day');
+            // Filter appointments matching today's date
+            const todayAppointments = appointments.filter(appointment => (0, moment_1.default)(appointment.slot).isSame(today, 'day'));
+            // For each appointment, fetch the therapist's name
+            const appointmentsWithTherapist = yield Promise.all(todayAppointments.map((appointment) => __awaiter(void 0, void 0, void 0, function* () {
+                const therapist = yield database_1.databaseSchema.Therapist.findById(appointment.therapistId);
+                return Object.assign(Object.assign({}, appointment.toObject()), { therapistName: therapist ? therapist.name : 'Unknown' });
+            })));
+            return {
+                status: true,
+                data: appointmentsWithTherapist
+            };
+        }
+        catch (error) {
+            console.error("Error fetching user notifications:", error);
+            return {
+                status: false,
+                message: "Error fetching user notifications"
+            };
         }
     }),
     getSubmitIssue: (_a) => __awaiter(void 0, [_a], void 0, function* ({ userId, bookingId, description, category, status, rating, }) {

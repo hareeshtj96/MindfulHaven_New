@@ -35,7 +35,7 @@ exports.default = (dependencies) => {
             const decodedToken = jsonwebtoken_1.default.verify(token, SECRET_KEY);
             const userId = decodedToken.userId;
             if (!userId) {
-                return res.status(httpStatusCode_1.HttpStatusCode.BAD_REQUEST).json({ status: false, message: httpStatusCode_1.ResponseMessages.USER_ID_NOT_IN_TOKEN });
+                return res.status(httpStatusCode_1.HttpStatusCode.UNAUTHORIZED).json({ status: false, message: httpStatusCode_1.ResponseMessages.USER_ID_NOT_IN_TOKEN });
             }
             const response = yield getAllBookings(dependencies).executeFunction({ userId, page, limit });
             if (response && response.status) {

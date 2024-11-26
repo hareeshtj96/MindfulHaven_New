@@ -12,11 +12,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const httpStatusCode_1 = require("../../utils/httpStatusCode");
 exports.default = (dependencies) => {
     const { therapistRepository } = dependencies.repository;
-    const executeFunction = (_a) => __awaiter(void 0, [_a], void 0, function* ({ therapistId, page, limit }) {
+    const executeFunction = (_a) => __awaiter(void 0, [_a], void 0, function* ({ therapistId, page, limit, status }) {
         try {
-            const response = yield therapistRepository.getBookings(therapistId, page, limit);
+            const response = yield therapistRepository.getBookings(therapistId, page, limit, status);
             if (response.status) {
-                return { status: true, data: response.data, totalPages: response.totalPages };
+                return { status: true,
+                    data: response.data,
+                    totalPagesBooking: response.totalPagesBooking,
+                    currentPagesBooking: response.currentPagesBooking };
             }
             else {
                 return { status: false, message: response.message };

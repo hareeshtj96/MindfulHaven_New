@@ -42,6 +42,7 @@ const useCase = {
     checkSlotBeforePaymentUsecase: UseCases_1.checkSlotBeforePaymentUsecase,
     searchCoupleTherapistUsecase: UseCases_1.searchCoupleTherapistUsecase,
     walletPaymentUsecase: UseCases_1.walletPaymentUsecase,
+    userNotificationsUsecase: UseCases_1.userNotificationsUsecase,
     adminLogin: adminUseCases_1.adminLogin,
     getAllUsecase: adminUseCases_1.getAllUsecase,
     getUsersUsecase: adminUseCases_1.getUsersUsecase,
@@ -51,6 +52,7 @@ const useCase = {
     adminDashboardDetailsUsecase: adminUseCases_1.adminDashboardDetailsUsecase,
     getIssuesUsecase: adminUseCases_1.getIssuesUsecase,
     getIssuesresolvedUsecase: adminUseCases_1.getIssuesresolvedUsecase,
+    adminNotificationsUsecase: adminUseCases_1.adminNotificationsUsecase,
     therapistRegistration: therapistUseCases_1.therapistRegistration,
     getTherapistProfileUsecase: therapistUseCases_1.getTherapistProfileUsecase,
     bookingUsecase: therapistUseCases_1.bookingUsecase,
@@ -61,6 +63,7 @@ const useCase = {
     therapistPhotoUsecase: therapistUseCases_1.therapistPhotoUsecase,
     cancelSlotUsecase: therapistUseCases_1.cancelSlotUsecase,
     fetchTherapistUsecase: therapistUseCases_1.fetchTherapistUsecase,
+    therapistNotificationsUsecase: therapistUseCases_1.therapistNotificationsUsecase,
 };
 const repository = {
     userRepository: repository_1.userRepository,

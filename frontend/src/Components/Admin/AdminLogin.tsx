@@ -25,7 +25,6 @@ function AdminLogin() {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         const resultAction = await dispatch(loginAdmin({ email, password }));
-        console.log("result action....", resultAction);
 
         if (loginAdmin.fulfilled.match(resultAction)) {
             const { token, status, message } = resultAction.payload; 

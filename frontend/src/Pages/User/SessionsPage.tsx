@@ -1,5 +1,4 @@
 import React from "react";
-import Session from "../../Components/User/Session";
 import Session2 from "../../Components/User/session2";
 import DashboardHeader from "../../Layout/UserLayout/DashboardHeader"
 import Footer from "../../Layout/Footer";

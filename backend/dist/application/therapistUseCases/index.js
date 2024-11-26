@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchTherapistUsecase = exports.cancelSlotUsecase = exports.therapistPhotoUsecase = exports.getTherapistDetailsUsecase = exports.cancelAppointmentTherapistUsecase = exports.therapistSessionUsecase = exports.updateTherapistTimingsUsecase = exports.bookingUsecase = exports.getTherapistProfileUsecase = exports.therapistRegistration = void 0;
+exports.therapistNotificationsUsecase = exports.fetchTherapistUsecase = exports.cancelSlotUsecase = exports.therapistPhotoUsecase = exports.getTherapistDetailsUsecase = exports.cancelAppointmentTherapistUsecase = exports.therapistSessionUsecase = exports.updateTherapistTimingsUsecase = exports.bookingUsecase = exports.getTherapistProfileUsecase = exports.therapistRegistration = void 0;
 const therapistRegisterUseCase_1 = __importDefault(require("./therapistRegisterUseCase"));
 exports.therapistRegistration = therapistRegisterUseCase_1.default;
 const getTherapistProfileUsecase_1 = __importDefault(require("./getTherapistProfileUsecase"));
@@ -24,3 +24,5 @@ const cancelSlotUsecase_1 = __importDefault(require("./cancelSlotUsecase"));
 exports.cancelSlotUsecase = cancelSlotUsecase_1.default;
 const fetchTherapistUsecase_1 = __importDefault(require("./fetchTherapistUsecase"));
 exports.fetchTherapistUsecase = fetchTherapistUsecase_1.default;
+const therapistNotificationsUsecase_1 = __importDefault(require("./therapistNotificationsUsecase"));
+exports.therapistNotificationsUsecase = therapistNotificationsUsecase_1.default;

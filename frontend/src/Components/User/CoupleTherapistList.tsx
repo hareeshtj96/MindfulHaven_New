@@ -18,8 +18,6 @@ const CoupleTherapistList: React.FC = () => {
         (state: RootState) => state.user
     );
 
-    console.log("sorted couple therapists:", sortedCoupleTherapists)
-
     const [sortOption, setSortOption] = useState<string>("experience");
     const [genderFilter, setGenderFilter] = useState<string>("all");
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -72,7 +70,6 @@ const CoupleTherapistList: React.FC = () => {
         : sortedCoupleTherapists.filter((therapist) => therapist.gender === genderFilter)
     : [];
 
-   console.log("filtered therapists:", filteredTherapists)
 
     const handleBookAppointment = (therapistId: string) => {
         navigate(`/slot_management/${therapistId}`);

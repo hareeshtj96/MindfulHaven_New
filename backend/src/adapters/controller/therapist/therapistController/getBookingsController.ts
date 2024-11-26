@@ -10,12 +10,17 @@ export default (dependencies: any) => {
             const { id } = req.params;
         
             const page = parseInt(req.query.page as string, 10) || 1;
-            const limit = parseInt(req.query.limit as string, 10) || 2
+            const limit = parseInt(req.query.limit as string, 10) || 2;
+            const status = req.query.status as string || ''; 
            
-            const response = await bookingUsecase(dependencies).executeFunction({ therapistId: id, page, limit });
+            const response = await bookingUsecase(dependencies).executeFunction({ therapistId: id, page, limit, status });
 
             if( response && response.status) {
-                res.status(HttpStatusCode.OK).json({ status: true, data: response.data, totalPages: response.totalPages});
+                res.status(HttpStatusCode.OK).json({ status: true, 
+                    data: response.data, 
+                    totalPagesBooking: response.totalPagesBooking,
+                    currentPagesBooking: response.currentPagesBooking
+                });
             } else {
                 res.status(HttpStatusCode.BAD_REQUEST).json({ status: false, message: response.message || ResponseMessages.DATA_NOT_FOUND })
             }

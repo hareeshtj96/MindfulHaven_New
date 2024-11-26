@@ -41,7 +41,6 @@ function Login() {
     useEffect(() => {
         if(shouldNavigate) {
             const timer = setTimeout(() => {
-                console.log("navigating to dashboard");
                 navigate("/dashboard");
                 window.history.pushState(null, '', '/dashboard');
                 
@@ -56,8 +55,6 @@ function Login() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
 
-            console.log("user goggole auth:", user);
-
             //dispatch an action to save the user details in redux store
             dispatch(googleRegister({
                 name: user.displayName,
@@ -71,7 +68,6 @@ function Login() {
             })
             .catch((error) => {
                 // Handle errors, such as if registration or login failed
-                console.error("Google Sign-In Error:", error);
                 setErrors({ general: "Google Sign-In failed" });
             });
         } catch(error) {
@@ -82,19 +78,15 @@ function Login() {
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
-        console.log("dispatching loginuser with:", {email, password});
 
         dispatch(loginUser({email, password})).then((action) => {
             if(loginUser.fulfilled.match(action)) {
                 
                 if(action.payload.token) {
                     toast.success("Login successful!", { position: 'top-right' })
-                    console.log("login successful:", action.payload);
-                    
                     setShouldNavigate(true);
                 }
             } else {
-                console.log("login failed:", action.payload);
                 toast.error("Login failed. Please check your credentials.", { position:'top-right'})
             }
             

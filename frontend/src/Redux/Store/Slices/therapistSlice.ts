@@ -117,7 +117,8 @@ interface TherapistState {
     error: string | null;
     otpVerified: boolean;
     otpError: string | null;
-    totalPages: number;
+    totalPagesBooking: number;
+    currentPagesBooking: number;
     details: AvailableDetails | null;
     totalProfit: number | null;
     mostBookedHour: string | null;
@@ -141,7 +142,8 @@ const initialState: TherapistState = {
     error: null,
     otpVerified: false,
     otpError: null,
-    totalPages: 0,
+    totalPagesBooking: 0,
+    currentPagesBooking: 0,
     details: null,
     totalProfit: null,
     mostBookedHour: null,
@@ -322,22 +324,29 @@ export const fetchAvailableDetails = createAsyncThunk<AvailableDetails, string, 
 )
 
 
-export const fetchBookingAppointments = createAsyncThunk<{ bookings: Booking[], totalPages: number}, FetchAppointmentsPayload, {rejectValue: string}>(
-    "therapist/fetchBookingAppointment",
-    async({therapistId, page, limit}, thunkAPI) => {
+export const fetchBookingAppointments = createAsyncThunk<
+    { bookings: Booking[], totalPagesBooking: number, currentPagesBooking: number },
+    { therapistId: string, page: number, limit: number, status: string },  
+    { rejectValue: string }
+>(
+    'therapist/fetchBookingAppointment',
+    async ({ therapistId, page, limit, status }, thunkAPI) => {
         try {
-            const response = await axios.get(`${GETAPPOINTMENT}/${therapistId}`, {params: { page, limit}});
-            // return response.data.data as Booking[];
+            // Pass status as a query parameter to the API call
+            const response = await axios.get(`${GETAPPOINTMENT}/${therapistId}`, {
+                params: { page, limit, status }
+            });
             return {
                 bookings: response.data.data,
-                totalPages: response.data.totalPages
-            }
+                totalPagesBooking: response.data.totalPagesBooking,
+                currentPagesBooking: response.data.currentPagesBooking
+            };
         } catch (error: any) {
             const message = error.response?.data?.message || "Failed to fetch booking appointment";
             return thunkAPI.rejectWithValue(message);
         }
     }
-)
+);
 
 export const updateTherapistAvailability = createAsyncThunk<
 Therapist,
@@ -420,9 +429,6 @@ export const cancelAvailableSlot = createAsyncThunk(
     "therapist/cancelAvailableSlot",
     async ({slotId, therapistId}: {slotId: string, therapistId: string}, {rejectWithValue}) => {
         try {
-            console.log("slot in cancel slot:", slotId);
-            console.log("therapist id in cancel slot:", therapistId);
-
             const response = await axios.put(CANCELAVAILABLESLOT, {slotId, therapistId});
             return response.data;
         } catch (error: any) {
@@ -454,8 +460,6 @@ export const fetchTherapistNotifications = createAsyncThunk(
             const response = await axios.get(THERAPISTNOTIFICATIONS, {
                 params: { therapistId },
             });
-
-            console.log("response from therapist notification slice:", response.data.data);
 
             return response.data.data
         } catch (error: any) {
@@ -550,8 +554,6 @@ const therapistSlice = createSlice({
             .addCase(fetchProfile.fulfilled, (state, action: PayloadAction<Therapist[]>) => {
                 state.loading = false;
                 const therapistId = localStorage.getItem("therapistId");
-                console.log("id from slice:", therapistId);
-                console.log("actionm playload slice:", action.payload)
                 if (therapistId) {
                     state.currentTherapist = action.payload.find(t => t._id === therapistId) || null;
                 }
@@ -564,10 +566,10 @@ const therapistSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(fetchBookingAppointments.fulfilled, (state, action: PayloadAction<{ bookings: Booking[]; totalPages: number}>) => {
-                console.log("action paylod.........", action.payload);
+            .addCase(fetchBookingAppointments.fulfilled, (state, action: PayloadAction<{ bookings: Booking[]; totalPagesBooking: number; currentPagesBooking: number}>) => {
                 state.bookings = action.payload.bookings;
-                state.totalPages = action.payload.totalPages;
+                state.totalPagesBooking = action.payload.totalPagesBooking;
+                state.currentPagesBooking = action.payload.currentPagesBooking;
                 state.loading = false;
             })
             .addCase(fetchBookingAppointments.rejected, (state, action) => {

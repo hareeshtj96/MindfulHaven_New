@@ -30,11 +30,8 @@ const TherapistDetails = () => {
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log("e target:", e.target.files);
         if (e.target.files && e.target.files[0]) {
 
-            console.log('hiiiiii....');
-            
             const file = e.target.files[0];
     
             if (e.target.name === "photo") {
@@ -46,15 +43,6 @@ const TherapistDetails = () => {
         }
     };
 
-    // const handleAddTiming = () => {
-    //     setTimings([...timings, { dayOfWeek: [], startTime: '', endTime: ''}])
-    // };
-
-    // const handleTimingChange = (index: number, field: string, value: any) => {
-    //     const updatedTimings = [...timings];
-    //     updatedTimings[index][field as keyof typeof updatedTimings[0]] = value;
-    //     setTimings(updatedTimings);
-    // }
 
 
     const validateForm = () => {

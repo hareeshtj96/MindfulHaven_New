@@ -70,7 +70,6 @@ function Dashboard() {
   };
 
   const handleBookAppointment = (therapistId: string) => {
-    console.log("Booking appointment for therapist ID:", therapistId);
     navigate(`/slot_management/${therapistId}`);
   };
 

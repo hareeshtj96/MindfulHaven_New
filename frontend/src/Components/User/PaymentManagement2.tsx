@@ -62,7 +62,6 @@ const PaymentPage = () => {
                 notes
         })).unwrap() 
 
-            console.log("payment response wallet:", paymentResponse)
 
             if (paymentResponse.success) {
                 if (paymentResponse.appointmentData?.status) {
@@ -203,7 +202,7 @@ const PaymentPage = () => {
             return response;
         } catch (error) {
             toast.error("Error saving payment status.");
-            console.error("Error:", error);
+           
         }
     };
 

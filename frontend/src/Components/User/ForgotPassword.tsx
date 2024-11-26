@@ -18,7 +18,6 @@ function ForgotPassword() {
         dispatch(forgotPassword(email ))
         .unwrap()
         .then((response) => {
-            console.log("Response from forgotPassword:", response);
             if(response.status) {
                 navigate('/forgotPasswordOtp');
             }

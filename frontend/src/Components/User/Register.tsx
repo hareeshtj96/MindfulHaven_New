@@ -60,8 +60,6 @@ function Register() {
             const result = await signInWithPopup(auth, provider);
             const user = result.user;
 
-            console.log("user goggole auth:", user);
-
             //dispatch an action to save the user details in redux store
             dispatch(googleRegister({
                 name: user.displayName,
@@ -72,7 +70,6 @@ function Register() {
                 navigate("/dashboard");
             });
         } catch(error) {
-            console.error("Google Sign-In Error:", error);
             setErrors({general: "Google Sign-In failed"});
         }
     }
@@ -119,14 +116,10 @@ function Register() {
         e.preventDefault();
         const validateErrors = validate();
 
-        console.log("Before validation:", {name, email, mobile, password, confirmPassword})
-
         if(Object.keys(validateErrors).length > 0) {
             setErrors(validateErrors);
             return;
         }
-
-        console.log("After validation:", {name, email, mobile, password, confirmPassword});
 
         setErrors({});
         setLoading(true);

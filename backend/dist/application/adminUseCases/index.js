@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getIssuesresolvedUsecase = exports.getIssuesUsecase = exports.adminDashboardDetailsUsecase = exports.therapistDetailstUsecase = exports.getuserBlockUsecase = exports.getVerifiedUsecase = exports.getUsersUsecase = exports.getAllUsecase = exports.adminLogin = void 0;
+exports.adminNotificationsUsecase = exports.getIssuesresolvedUsecase = exports.getIssuesUsecase = exports.adminDashboardDetailsUsecase = exports.therapistDetailstUsecase = exports.getuserBlockUsecase = exports.getVerifiedUsecase = exports.getUsersUsecase = exports.getAllUsecase = exports.adminLogin = void 0;
 const adminLoginUseCase_1 = __importDefault(require("./adminLoginUseCase"));
 exports.adminLogin = adminLoginUseCase_1.default;
 const getAllUsecase_1 = __importDefault(require("./getAllUsecase"));
@@ -22,3 +22,5 @@ const getIssuesUsecase_1 = __importDefault(require("./getIssuesUsecase"));
 exports.getIssuesUsecase = getIssuesUsecase_1.default;
 const getIssuesresolvedUsecase_1 = __importDefault(require("./getIssuesresolvedUsecase"));
 exports.getIssuesresolvedUsecase = getIssuesresolvedUsecase_1.default;
+const adminNotificationsUsecase_1 = __importDefault(require("./adminNotificationsUsecase"));
+exports.adminNotificationsUsecase = adminNotificationsUsecase_1.default;

@@ -1,5 +1,4 @@
 import React from "react";
-import PaymentManagement from "../../Components/User/PaymentManagement";
 import PaymentManagement2 from '../../Components/User/PaymentManagement2';
 import DashboardHeader from "../../Layout/UserLayout/DashboardHeader"
 import Footer from "../../Layout/Footer";

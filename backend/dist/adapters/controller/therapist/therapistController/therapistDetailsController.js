@@ -55,10 +55,7 @@ function therapistDetailsController(dependencies) {
                 return res.status(httpStatusCode_1.HttpStatusCode.BAD_REQUEST).json({ message: httpStatusCode_1.ResponseMessages.THERAPIST_DATA_MISSING });
             }
             const therapistData = JSON.parse(req.body.therapistData);
-            const { name, phone, specialization, gender, educationalQualifications, counsellingQualification, professionalExperience, establishment, location, timings, fees, therapistId, } = therapistData;
-            //Generate slots using RRule
-            const slotRules = createTherapistSlotRules(timings);
-            const slots = slotRules.all();
+            const { name, phone, specialization, gender, educationalQualifications, counsellingQualification, professionalExperience, establishment, location, fees, therapistId, } = therapistData;
             let photoUrl = "";
             let identityProofUrl = "";
             if (req.files) {
@@ -81,11 +78,9 @@ function therapistDetailsController(dependencies) {
                 professionalExperience,
                 establishment,
                 location,
-                timings,
                 fees,
                 therapistId,
                 photo: photoUrl,
-                availableSlots: slots
             };
             const saveResult = yield therapistRepository.saveTherapist(newTherapist);
             if (!saveResult) {
@@ -94,6 +89,7 @@ function therapistDetailsController(dependencies) {
             res.status(httpStatusCode_1.HttpStatusCode.OK).json({ status: true, message: httpStatusCode_1.ResponseMessages.THERAPIST_SAVED, data: saveResult.data });
         }
         catch (error) {
+            console.log("error in save therapist:", error);
             res.status(httpStatusCode_1.HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
         }
     });

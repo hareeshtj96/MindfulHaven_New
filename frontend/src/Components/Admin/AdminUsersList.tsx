@@ -39,8 +39,6 @@ const AdminUsersList: React.FC = () => {
   const handleBlockToggle = async (userId: string, isBlocked: boolean, currentUserId: string) => {
     const action = isBlocked ? "unblock" : "block";
     const newBlockedState = !isBlocked;
-    console.log("newBlocked state:", newBlockedState);
-    console.log("currentUserId (logged-in user):", currentUserId);
     
      
     toast(
@@ -53,7 +51,6 @@ const AdminUsersList: React.FC = () => {
                 try {
                   
                   const resultAction = await dispatch(toggleUserBlockStatus({ userId, isBlocked: newBlockedState }));
-                  console.log("result action:", resultAction);
                   
                   unwrapResult(resultAction); 
 
@@ -65,8 +62,7 @@ const AdminUsersList: React.FC = () => {
                   );
 
                   if (newBlockedState && userId === currentUserId ) {
-                    console.log("dispatching logout....");
-                    
+                  
                     dispatch(logoutUser());
                   }
 
@@ -75,7 +71,6 @@ const AdminUsersList: React.FC = () => {
                   
 
                 } catch (error) {
-                  console.error(`Failed to ${action} the user:`, error);
                   toast.error(`Failed to ${action} the user.`);
                 }
                 closeToast(); 
