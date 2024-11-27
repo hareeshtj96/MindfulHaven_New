@@ -791,7 +791,7 @@ export default {
             const bookings = await databaseSchema.Appointment.find({
                 userId: userId,
                 status: "scheduled",
-                'payment.status': 'success',
+                'payment.paymentStatus': 'success',
                 slot: { $gte: currentDate },
             })
                 .skip(skip)
