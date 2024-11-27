@@ -25,7 +25,7 @@ function DashboardHeader() {
     const today = new Date().toISOString().split('T')[0];
 
     // Filter today's notifications
-    const todayNotifications = userNotifications.filter(notification => {
+    const todayNotifications = (userNotifications || []).filter(notification => {
         return new Date(notification.slot).toISOString().split('T')[0] === today;
     });
 

@@ -27,7 +27,7 @@ function TherapistHeader2() {
     const today = new Date().toISOString().split('T')[0];
 
     // Filter today's notifications
-    const todayNotifications = therapistNotifications.filter(notification => {
+    const todayNotifications = (therapistNotifications || []).filter(notification => {
         return new Date(notification.slot).toISOString().split('T')[0] === today;
     });
 

@@ -20,7 +20,7 @@ export default function userRegistrationGoogle(dependencies: any) {
                 return { status: false, data: ResponseMessages.USER_ALREADY_EXISTS };
             }
             
-            const response = await userRepository.createUser(data);
+            const response = await userRepository.createUserGoogle(data);
            
             if(response.status) {
                 const token = jwt.sign (

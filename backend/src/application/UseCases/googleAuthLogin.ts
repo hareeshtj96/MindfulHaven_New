@@ -25,7 +25,7 @@ export default function userLoginGoogle(dependencies: any) {
                 
             }
 
-            const response = await userRepository.createUser(data);
+            const response = await userRepository.createUserGoogle(data);
             
             if(response.status) {
                 const token = jwt.sign (

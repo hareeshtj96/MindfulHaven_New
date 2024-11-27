@@ -55,6 +55,50 @@ export default {
         }
     },
 
+    createUserGoogle: async (data: any) => {
+        try {
+            const { name, email, mobile, role } = data;
+    
+            // Create the user
+            const user = new databaseSchema.User({
+                name,
+                email,
+                mobile,
+                role,
+                isVerified: true, 
+            });
+    
+            const savedUser = await user.save();
+    
+            // Create wallet for the user
+            const newWallet = new databaseSchema.Wallet({
+                userId: savedUser._id,
+                balance: 0,
+                transactionHistory: [],
+                currency: "INR",
+            });
+    
+            const savedWallet = await newWallet.save();
+    
+            // Update user with wallet reference
+            savedUser.wallet = savedWallet._id;
+            await savedUser.save();
+    
+            // Fetch user with wallet details
+            const userWithWallet = await databaseSchema.User.findById(
+                savedUser._id
+            ).populate("wallet");
+    
+            return {
+                status: true,
+                data: { user: userWithWallet, wallet: savedWallet },
+            };
+        } catch (error) {
+            return { status: false, message: "Internal server error" };
+        }
+    },
+    
+
     getUserByEmail: async (data: any) => {
         try {
             const { email } = data;
@@ -747,6 +791,7 @@ export default {
             const bookings = await databaseSchema.Appointment.find({
                 userId: userId,
                 status: "scheduled",
+                'payment.status': 'success',
                 slot: { $gte: currentDate },
             })
                 .skip(skip)

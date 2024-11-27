@@ -25,12 +25,13 @@ const TherapistCalendar: React.FC = () => {
 
     const { updatedTimings, booked } = useSelector((state: RootState) => state.therapist.details || { booked: [], timings: [], updatedTimings: [] });
 
-    const totalPages = Math.ceil(updatedTimings.length / itemsPerPage);
+    const totalPages = Math.ceil((updatedTimings?.length || 0) / itemsPerPage);
 
-    const paginatedTimings = updatedTimings.slice(
+    const paginatedTimings = (updatedTimings || []).slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
+
 
     const handleNext = () => {
         if (currentPage < totalPages) setCurrentPage(currentPage + 1)
@@ -147,52 +148,52 @@ const TherapistCalendar: React.FC = () => {
 
     const CustomConfirmationToast = ({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }) => (
         <div>
-          <p className="mb-2">Do you want to delete this slot?</p>
-          <div className="flex justify-end gap-2">
-            <button
-              onClick={onConfirm}
-              className="bg-red-500 text-white px-3 py-1 rounded-md text-xs"
-            >
-              Yes
-            </button>
-            <button
-              onClick={onCancel}
-              className="bg-gray-300 px-3 py-1 rounded-md text-xs"
-            >
-              No
-            </button>
-          </div>
+            <p className="mb-2">Do you want to delete this slot?</p>
+            <div className="flex justify-end gap-2">
+                <button
+                    onClick={onConfirm}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md text-xs"
+                >
+                    Yes
+                </button>
+                <button
+                    onClick={onCancel}
+                    className="bg-gray-300 px-3 py-1 rounded-md text-xs"
+                >
+                    No
+                </button>
+            </div>
         </div>
-      );
+    );
 
 
     // Handle slot deletion
     const handleDeleteSlot = (slotId: string, therapistId: string) => {
         toast(
-          <CustomConfirmationToast
-            onConfirm={async () => {
-              try {
-                const response = await dispatch(cancelAvailableSlot({ slotId, therapistId }));
-                if (response.payload && response.payload.status) {
-                  toast.success("Slot deleted successfully!");
-                  dispatch(fetchAvailableDetails(therapistId));
-                } else {
-                  toast.error("Failed to delete slot");
-                }
-              } catch (error) {
-                toast.error("Error deleting slot");
-              } finally {
-                toast.dismiss();
-              }
-            }}
-            onCancel={() => {
-              toast.info("Slot deletion canceled.");
-              toast.dismiss(); 
-            }}
-          />,
-          { autoClose: false } 
+            <CustomConfirmationToast
+                onConfirm={async () => {
+                    try {
+                        const response = await dispatch(cancelAvailableSlot({ slotId, therapistId }));
+                        if (response.payload && response.payload.status) {
+                            toast.success("Slot deleted successfully!");
+                            dispatch(fetchAvailableDetails(therapistId));
+                        } else {
+                            toast.error("Failed to delete slot");
+                        }
+                    } catch (error) {
+                        toast.error("Error deleting slot");
+                    } finally {
+                        toast.dismiss();
+                    }
+                }}
+                onCancel={() => {
+                    toast.info("Slot deletion canceled.");
+                    toast.dismiss();
+                }}
+            />,
+            { autoClose: false }
         );
-      };
+    };
 
 
 
@@ -228,9 +229,16 @@ const TherapistCalendar: React.FC = () => {
             <div className="flex-1 w-full sm:w-1/2 p-4 bg-white shadow-md rounded-lg mb-6 sm:mb-0 sm:mr-4">
                 <h2 className="text-xl font-semibold mb-4">Your Updated Timings</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {paginatedTimings
-                    .filter((timing) => new Date(timing.date).getTime() >= new Date().getTime())
+                    {(paginatedTimings || [])
                         .slice()
+                        .filter((timing) => {
+                            const now = new Date();
+                            const startOfToday = new Date();
+                            startOfToday.setHours(0, 0, 0, 0); 
+
+                            const timingDate = new Date(timing.date);
+                            return timingDate.getTime() >= startOfToday.getTime();
+                        })
                         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
                         .map((timing) => (
                             <div
@@ -243,64 +251,80 @@ const TherapistCalendar: React.FC = () => {
                                     </span>
                                 </div>
                                 <div className="space-y-4">
-                                    {timing.slots
-                                        .slice()
-                                        .sort((a: any, b: any) => {
-                                            const timeA = new Date(`1970-01-01T${a.startTime}`).getTime();
-                                            const timeB = new Date(`1970-01-01T${b.startTime}`).getTime();
-                                            return timeA - timeB
-                                        })
-                                        .map((slot: any) => (
-                                            <div key={slot._id}>
-
-                                                <div className="flex flex-wrap gap-2">
-                                                    {generateTimeBlocks(slot.startTime, slot.endTime)
-                                                        .filter((time) => {
-                                                            const timeISO = `${timing.date.split('T')[0]}T${time}:00.000Z`;
-                                                            return !booked.includes(timeISO)
-                                                        })
-                                                        .map((time, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="bg-green-50 text-blue-600 text-center py-2 px-6 rounded-lg text-xs font-semibold"
-                                                            >
-                                                                {time}
-                                                            </div>
-                                                        ))}
-                                                    <button
-                                                        onClick={() => handleDeleteSlot(slot._id, therapistId ?? '')}
-                                                        className="ml-2 bg-red-500 text-white text-xxs px-2 py-1  rounded-md"
-                                                    >
-                                                        X
-                                                    </button>
+                                    {(timing.slots && timing.slots.length > 0) ? (
+                                        (timing.slots || [])
+                                            .slice()
+                                            .sort((a: any, b: any) => {
+                                                // Sort slots by startTime
+                                                const timeA = new Date(`1970-01-01T${a.startTime}`).getTime();
+                                                const timeB = new Date(`1970-01-01T${b.startTime}`).getTime();
+                                                return timeA - timeB;
+                                            })
+                                            .map((slot: any) => (
+                                                <div key={slot._id}>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {(generateTimeBlocks(slot.startTime, slot.endTime) || [])
+                                                            .filter((time) => {
+                                                                // Filter unbooked time blocks
+                                                                const timeISO = `${timing.date.split('T')[0]}T${time}:00.000Z`;
+                                                                return !booked.includes(timeISO);
+                                                            })
+                                                            .map((time, index) => (
+                                                                <div
+                                                                    key={index}
+                                                                    className="bg-green-50 text-blue-600 text-center py-2 px-6 rounded-lg text-xs font-semibold"
+                                                                >
+                                                                    {time}
+                                                                </div>
+                                                            ))}
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDeleteSlot(slot._id, therapistId ?? '')
+                                                            }
+                                                            className="ml-2 bg-red-500 text-white text-xxs px-2 py-1 rounded-md"
+                                                        >
+                                                            X
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))
+                                    ) : (
+                                        <div className="text-gray-500 text-sm">
+                                            No slots available for this timing.
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ))}
                 </div>
-                {/* Pagination controls*/}
+                {/* Pagination controls */}
                 <div className="flex justify-center mt-4 space-x-4">
                     <button
                         onClick={handlePrevious}
                         disabled={currentPage === 1}
-                        className={`px-4 py-2 rounded-lg text-sm font-semibold ${currentPage === 1 ? "bg-gray-200 text-gray-500" : "bg-green-500 text-white"
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold ${currentPage === 1
+                            ? "bg-gray-200 text-gray-500"
+                            : "bg-green-500 text-white"
                             }`}
                     >
                         Previous
                     </button>
-                    <span className='text-sm font-medium text-gray-600'> Page {currentPage} of {totalPages}</span>
+                    <span className="text-sm font-medium text-gray-600">
+                        Page {currentPage} of {totalPages}
+                    </span>
                     <button
                         onClick={handleNext}
                         disabled={currentPage === totalPages}
-                        className={`px-4 py-2 rounded-lg text-sm font-semibold ${currentPage === totalPages ? "bg-gray-200 text-gray-500" : "bg-green-500 text-white"
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold ${currentPage === totalPages
+                            ? "bg-gray-200 text-gray-500"
+                            : "bg-green-500 text-white"
                             }`}
                     >
                         Next
                     </button>
                 </div>
             </div>
+
 
 
             {/* Right Side: Update Availability Form */}
