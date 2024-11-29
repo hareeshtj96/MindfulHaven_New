@@ -813,6 +813,7 @@ export default {
             const totalBookings = await databaseSchema.Appointment.countDocuments({
                 userId: userId,
                 status: "scheduled",
+                'payment.paymentStatus': 'success',
                 slot: { $gte: currentDate },
             });
 
